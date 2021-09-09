@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# 获取分支名
+git_branch() {
+    git rev-parse --abbrev-ref HEAD
+}
+
+# 自动给 commit 追加--story, --bug等
+auto_append_id() {
+  branch=$(git_branch)
+  idstr=$(echo "$branch" | grep -oE "(issue)_([0-9]*)$")
+  # 分支名中存在 story 等关键词，自动替换为 --story=xxx
+  if [ -n "$idstr" ]; then
+    append_str="--${idstr//_/=#}"
+    echo -e "\n$append_str" >> "$1"
+  fi
+}
+
+# 如果未补充git type，自动在message前补充 git type
+# https://www.ruanyifeng.com/blog/2016/01/commit_message_change_log.html
+auto_prepend_type() {
+  checkScope=$(cat $1 | grep -E "^.+:\s.+(\s|\S)*")
+  if [ -n "$checkScope" ]; then
+    return
+  fi
+  prepend_str="$(gen_scope)"": "
+  content=$(cat "$1")
+  echo "$prepend_str""$content" > "$1"
+}
+
+# 根据提交的变更，自动生成 scope
+gen_scope(){
+  scope=$(get_change_paths | uniq -c | sort -r | head -1 | awk '{print $2}')
+  echo "$scope"
+}
+
+# 获取修改内容的路径
+get_change_paths(){
+  # 提取已经 git add 的修改内容，并且判断，如果目录层级大于2，则提取二级目录名，否则使用以及目录名或者根目录文件名
+  git status --porcelain | grep -E "^(M|A|D|R|C|U)" | awk '{print $2}' | awk -F/ '{if (NF>2) print $(NF-2)"/"$(NF-1); else print $1}'
+}
+
+auto_prepend_type "$1"
+auto_append_id "$1"

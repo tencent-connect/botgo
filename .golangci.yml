@@ -1,0 +1,104 @@
+# details in https://golangci-lint.run/usage/configuration/
+run:
+  timeout: 3m
+
+output:
+  sort-results: true
+
+linters-settings:
+  funlen:
+    lines: 80
+    statements: 80
+  goconst:
+    min-len: 2
+    min-occurrences: 2
+  gocyclo:
+    min-complexity: 10
+  goimports:
+    local-prefixes: tencent-connect/
+  govet:
+    check-shadowing: true
+  lll:
+    line-length: 120
+    tab-width: 4
+  gocritic:
+    enabled-checks:
+      - nestingReduce
+    settings:
+      nestingReduce:
+        bodyWidth: 5
+
+linters:
+  disable-all: true
+  enable:
+    - revive # Fast, configurable, extensible, flexible, and beautiful linter for Go. Drop-in replacement of golint.
+    - deadcode
+    - funlen
+    - goconst
+    - gocyclo
+    - gofmt
+    - ineffassign
+    - staticcheck
+    - structcheck # 当非导出结构嵌入另一个结构, 前一个结构被使用就不会监测到, 这个需要每个业务自己屏蔽
+    - typecheck
+    - goimports
+    - gosimple
+    - govet
+    - lll
+    - rowserrcheck
+    - errcheck
+    - unused
+    - varcheck
+    - gocritic
+    - dupl
+    - ifshort
+    - whitespace
+    - bodyclose
+    - sqlclosecheck
+
+issues:
+  exclude-use-default: true
+
+  # The list of ids of default excludes to include or disable. By default it's empty.
+  # 为了避免 exclude default 导致一些问题被隐藏，所以需要自己声明不想要排除的问题，在 https://golangci-lint.run/usage/configuration/ 搜索  --exclude-use-default
+  include:
+    - EXC0004 # govet (possible misuse of unsafe.Pointer|should have signature)
+    - EXC0005 # staticcheck ineffective break statement. Did you mean to break out of the outer loop
+    - EXC0011 # stylecheck (comment on exported (method|function|type|const)|should have( a package)? comment|comment should be of the form)
+    - EXC0012 # revive
+    - EXC0013 # revive
+    - EXC0014 # revive
+    - EXC0015 # revive
+
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - funlen # 规范说单测函数，单个函数可以到160行，但是工具不好做区分处理，这里就直接不检查单测的函数长度
+        - lll
+        - goconst
+        - gocyclo
+        - golint
+        - staticcheck
+        - revive
+        - dupl
+        - ifshort
+    - linters:
+        - staticcheck
+      text: "SA1019: package github.com/golang/protobuf" # 它会说 'SA1019: package github.com/golang/protobuf/proto is deprecated: Use the "google.golang.org/protobuf/proto" package instead.', 但是这个库更更新很稳定
+    - linters:
+        - staticcheck
+      text: "SA6002: argument should be pointer-like to avoid allocations" # sync.pool.Put(buf), slice `var buf []byte` will tiger this
+    - linters:
+        - staticcheck
+      text: "SA3000: TestMain should call os.Exit to set exit code"
+    - linters:
+        - lll
+      source: "^//go:generate " # Exclude lll issues for long lines with go:generate
+
+  max-same-issues: 0
+  new: false
+  max-issues-per-linter: 0
+  fix: false # 如果设置为 true，会导致一些问题不被扫描出来，而且也不会自动 fix，而且在ci上跑，会莫名的报错
+
+service:
+  golangci-lint-version: 1.23.x
