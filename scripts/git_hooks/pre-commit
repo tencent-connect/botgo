@@ -1,0 +1,33 @@
+#!/bin/sh
+
+
+# 检查当前目录下是否有 golang 文件，如果有则执行 golangci-lint run
+go_lint() {
+  # 当前目录是否有 go 文件
+  if [ -z "$(search_go_mod)" ]; then
+    exit 0
+  fi
+  echo "发现 go mod，执行 golint 检查" && golangci-lint version && golangci-lint run
+}
+
+# 递归向上寻找 go.mod
+search_go_mod() {
+  pwd=$(pwd)
+  git_top=$(git rev-parse --show-toplevel)
+
+  go_mod=$(find . -maxdepth 1 -name "go.mod")
+  if [ -n "$go_mod" ];then
+    echo "$go_mod"
+  fi
+
+  if [ "$pwd" == "$git_top" ]; then
+    return 0
+  fi
+
+  up=$(git rev-parse --show-cdup)
+  if [ -n "$up" ]; then
+    cd $up && search_go_mod
+  fi
+}
+
+go_lint

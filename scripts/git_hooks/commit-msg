@@ -1,0 +1,33 @@
+#!/bin/sh
+
+# 检查是否携带了 scope:
+COMMIT_MSG=$(cat $1 | grep -E "^.+:\s.+(\s|\S)*")
+if [ -z "$COMMIT_MSG" ]; then
+    echo -e "提交信息不符合标准规范, 请使用规范格式, Example: \n\nserver: 增加某某错误处理处理 \n\n--issue=#123"
+    exit 1
+fi
+
+# 检查是否携带了需求ID
+COMMIT_MSG=$(cat $1 | grep -E "\-\-(bug|story|task|issue)=(\#)?([0-9])+")
+if [ -z "$COMMIT_MSG" ]; then
+    echo -e "提交信息不符合标准规范, 请使用规范格式, Example: \n\nserver: 增加某某错误处理处理 \n\n--issue=#123"
+    exit 1
+fi
+
+# 检查第一行是否有需求ID
+COMMIT_MSG=$(head -n 1 $1 | grep -E "\-\-(bug|story|task|issue)=(\#)?([0-9])+")
+if [ -n "$COMMIT_MSG" ]; then
+    echo "请不要在标题携带 bug/story/task/issue 等 \n\n"
+    echo "${COMMIT_MSG}"
+    exit 1
+fi
+
+# 检查第一行是否超长，75 字节
+COMMIT_MSG=$(head -n 1 $1)
+if [ ${#COMMIT_MSG} -gt 75 ]; then
+    echo "CommitMsg 第一行过长，请保持在 75 字节以内 \n\n"
+    echo "${COMMIT_MSG}"
+    exit 1
+fi
+
+exit 0
