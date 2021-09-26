@@ -20,6 +20,11 @@ type Channel struct {
 	ID string `json:"id"`
 	// 群ID
 	GuildID string `json:"guild_id"`
+	ChannelValueObject
+}
+
+// ChannelValueObject 频道的值对象部分
+type ChannelValueObject struct {
 	// 频道名称
 	Name string `json:"name"`
 	// 频道类型
