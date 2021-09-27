@@ -3,21 +3,6 @@ package dto
 // EventType 事件类型
 type EventType string
 
-// 事件类型
-const (
-	EventGuildCreate       EventType = "GUILD_CREATE"
-	EventGuildUpdate       EventType = "GUILD_UPDATE"
-	EventGuildDelete       EventType = "GUILD_DELETE"
-	EventChannelCreate     EventType = "CHANNEL_CREATE"
-	EventChannelUpdate     EventType = "CHANNEL_UPDATE"
-	EventChannelDelete     EventType = "CHANNEL_DELETE"
-	EventGuildMemberAdd    EventType = "GUILD_MEMBER_ADD"
-	EventGuildMemberUpdate EventType = "GUILD_MEMBER_UPDATE"
-	EventGuildMemberRemove EventType = "GUILD_MEMBER_REMOVE"
-	EventMessageCreate     EventType = "MESSAGE_CREATE"
-	EventAtMessageCreate   EventType = "AT_MESSAGE_CREATE"
-)
-
 // WSPayload websocket 消息结构
 type WSPayload struct {
 	WSPayloadBase
@@ -85,3 +70,6 @@ type WSMessageData Message
 
 // WSATMessageData only at 机器人的消息 payload
 type WSATMessageData Message
+
+// WSAudioData 音频机器人的音频流事件
+type WSAudioData AudioAction

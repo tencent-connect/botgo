@@ -16,6 +16,7 @@ type OpenAPI interface {
 	MessageAPI
 	GuildAPI
 	ChannelAPI
+	AudioAPI
 }
 
 // Base 基础能力接口
@@ -62,4 +63,10 @@ type ChannelAPI interface {
 	PostChannel(ctx context.Context, guildID string, value *dto.ChannelValueObject) (*dto.Channel, error)
 	PatchChannel(ctx context.Context, channelID string, value *dto.ChannelValueObject) (*dto.Channel, error)
 	DeleteChannel(ctx context.Context, channelID string) error
+}
+
+// AudioAPI 音频接口
+type AudioAPI interface {
+	// PostAudio 执行音频播放，暂停等操作
+	PostAudio(ctx context.Context, channelID string, value *dto.AudioControl) (*dto.AudioControl, error)
 }

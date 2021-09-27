@@ -38,32 +38,11 @@ const (
 	IntentDirectMessageReactions
 	IntentDirectMessageTyping
 
-	IntentsGuildAtMessage Intent = 1 << 30 // 只接收@消息事件
+	// IntentAudio
+	//  - AUDIO_START           // 音频开始播放时
+	//  - AUDIO_FINISH          // 音频播放结束时
+	IntentAudio          Intent = 1 << 29 // 音频机器人事件
+	IntentGuildAtMessage Intent = 1 << 30 // 只接收@消息事件
 
 	IntentNone Intent = 0
 )
-
-var eventIntentMap = map[EventType]Intent{
-	EventGuildCreate:   IntentGuilds,
-	EventGuildUpdate:   IntentGuilds,
-	EventGuildDelete:   IntentGuilds,
-	EventChannelCreate: IntentGuilds,
-	EventChannelUpdate: IntentGuilds,
-	EventChannelDelete: IntentGuilds,
-
-	EventGuildMemberAdd:    IntentGuildMembers,
-	EventGuildMemberUpdate: IntentGuildMembers,
-	EventGuildMemberRemove: IntentGuildMembers,
-
-	EventMessageCreate:   IntentGuildMessages,
-	EventAtMessageCreate: IntentsGuildAtMessage,
-}
-
-// EventToIntent 事件转换对应的Intent
-func EventToIntent(events ...EventType) Intent {
-	var i Intent
-	for _, event := range events {
-		i = i | eventIntentMap[event]
-	}
-	return i
-}
