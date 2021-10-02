@@ -24,7 +24,7 @@ const (
 	userMeGuildsURI uri = "/users/@me/guilds"
 	gatewayURI      uri = "/gateway" // nolint
 	gatewayBotURI   uri = "/gateway/bot"
-	audioControlURI uri = "/channels/{channel.id}/audio"
+	audioControlURI uri = "/channels/{channel_id}/audio"
 )
 
 func getURL(endpoint uri, sandbox bool) string {
