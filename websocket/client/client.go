@@ -148,7 +148,7 @@ func (c *Client) Identify() error {
 			Intents: c.session.Intent,
 			Shard: []uint32{
 				c.session.Shards.ShardID,
-				c.session.Shards.ShardMaxNum,
+				c.session.Shards.ShardCount,
 			},
 		},
 	}
@@ -222,7 +222,7 @@ func (c *Client) readyHandler(message []byte) {
 	// 基于 ready 事件，更新 session 信息
 	c.session.ID = readyData.SessionID
 	c.session.Shards.ShardID = readyData.Shard[0]
-	c.session.Shards.ShardMaxNum = readyData.Shard[1]
+	c.session.Shards.ShardCount = readyData.Shard[1]
 	c.user = &dto.WSUser{
 		ID:       readyData.User.ID,
 		Username: readyData.User.Username,

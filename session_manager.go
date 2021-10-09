@@ -65,8 +65,8 @@ func (l *localSession) Start(apInfo *dto.WebsocketAP, token *token.Token, intent
 			Intent:  *intents,
 			LastSeq: 0,
 			Shards: dto.ShardConfig{
-				ShardID:     i,
-				ShardMaxNum: apInfo.Shards,
+				ShardID:    i,
+				ShardCount: apInfo.Shards,
 			},
 		}
 		l.sessionChan <- session

@@ -21,10 +21,10 @@ type SessionStartLimit struct {
 	MaxConcurrency uint32 `json:"max_concurrency"`
 }
 
-// ShardConfig 连接的 shard 配置，ShardID 从 0 开始，ShardMaxNum 最小为 1
+// ShardConfig 连接的 shard 配置，ShardID 从 0 开始，ShardCount 最小为 1
 type ShardConfig struct {
-	ShardID     uint32
-	ShardMaxNum uint32
+	ShardID    uint32
+	ShardCount uint32
 }
 
 // Session 连接的 session 结构，包括链接的所有必要字段
@@ -40,7 +40,7 @@ type Session struct {
 // String 输出session字符串
 func (s *Session) String() string {
 	return fmt.Sprintf("[ws][ID:%s][Shard:(%d/%d)][Intent:%d]",
-		s.ID, s.Shards.ShardID, s.Shards.ShardMaxNum, s.Intent)
+		s.ID, s.Shards.ShardID, s.Shards.ShardCount, s.Intent)
 }
 
 // WSUser 当前连接的用户信息
