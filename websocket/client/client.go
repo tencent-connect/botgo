@@ -95,36 +95,30 @@ func (c *Client) Listening() error {
 }
 
 func (c *Client) listenMessageAndHandle() {
-	for {
-		select {
-		case message, ok := <-c.messageQueue:
-			// 连接被关闭，queue 也要被关闭，goroutine 退出
-			if !ok {
-				log.Debugf("%s message queue is closed", c.session)
-				return
-			}
-			log.Debugf("%s listened message", c.session)
-			event := &dto.WSPayload{}
-			if err := json.Unmarshal(message, event); err != nil {
-				log.Errorf("%s json failed, %v", c.session, err)
-				continue
-			}
-			c.writeSeq(event.Seq)
-			// 处理内置的一些事件，如果处理成功，则这个事件不再投递给业务
-			if c.isHandleBuildIn(event, message) {
-				continue
-			}
-			// ready 事件需要特殊处理
-			if event.Type == "READY" {
-				c.readyHandler(message)
-				continue
-			}
-			// 解析具体事件，并投递给业务注册的 handler
-			if err := parseAndHandle(event, message); err != nil {
-				log.Errorf("%s parseAndHandle failed, %v", c.session, err)
-			}
+	for message := range c.messageQueue {
+		// 连接被关闭，queue 也要被关闭，goroutine 退出
+		log.Debugf("%s listened message", c.session)
+		event := &dto.WSPayload{}
+		if err := json.Unmarshal(message, event); err != nil {
+			log.Errorf("%s json failed, %v", c.session, err)
+			continue
+		}
+		c.writeSeq(event.Seq)
+		// 处理内置的一些事件，如果处理成功，则这个事件不再投递给业务
+		if c.isHandleBuildIn(event, message) {
+			continue
+		}
+		// ready 事件需要特殊处理
+		if event.Type == "READY" {
+			c.readyHandler(message)
+			continue
+		}
+		// 解析具体事件，并投递给业务注册的 handler
+		if err := parseAndHandle(event, message); err != nil {
+			log.Errorf("%s parseAndHandle failed, %v", c.session, err)
 		}
 	}
+	log.Infof("%s message queue is closed", c.session)
 }
 
 func (c *Client) Write(message *dto.WSPayload) error {
@@ -177,7 +171,6 @@ func (c *Client) Close() {
 	if err := c.conn.Close(); err != nil {
 		log.Errorf("%s, close conn err: %v", c.session, err)
 	}
-	close(c.messageQueue)
 	c.heartBeatTicker.Stop()
 }
 
@@ -221,6 +214,7 @@ func (c *Client) readMessageToQueue() {
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
 			log.Errorf("%s read message failed, %v, message %s", c.session, err, string(message))
+			close(c.messageQueue)
 			c.closeChan <- err
 			return
 		}
