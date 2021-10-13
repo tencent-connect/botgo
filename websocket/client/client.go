@@ -66,6 +66,8 @@ func (c *Client) Listening() error {
 	defer c.Close()
 	// reading message
 	go c.readMessageToQueue()
+	// read message from queue and handle,in goroutine to avoid business logic block closeChan and heartBeatTicker
+	go c.listenMessageAndHandle()
 
 	// handler message
 	for {
@@ -79,6 +81,7 @@ func (c *Client) Listening() error {
 			}
 			return err
 		case <-c.heartBeatTicker.C:
+			log.Debugf("%s listened heartBeat", c.session)
 			heartBeatEvent := &dto.WSPayload{
 				WSPayloadBase: dto.WSPayloadBase{
 					OPCode: dto.WSHeartbeat,
@@ -87,7 +90,20 @@ func (c *Client) Listening() error {
 			}
 			// 不处理错误，Write 内部会处理，如果发生发包异常，会通知主协程退出
 			_ = c.Write(heartBeatEvent)
-		case message := <-c.messageQueue:
+		}
+	}
+}
+
+func (c *Client) listenMessageAndHandle() {
+	for {
+		select {
+		case message, ok := <-c.messageQueue:
+			// 连接被关闭，queue 也要被关闭，goroutine 退出
+			if !ok {
+				log.Debugf("%s message queue is closed", c.session)
+				return
+			}
+			log.Debugf("%s listened message", c.session)
 			event := &dto.WSPayload{}
 			if err := json.Unmarshal(message, event); err != nil {
 				log.Errorf("%s json failed, %v", c.session, err)
@@ -161,6 +177,7 @@ func (c *Client) Close() {
 	if err := c.conn.Close(); err != nil {
 		log.Errorf("%s, close conn err: %v", c.session, err)
 	}
+	close(c.messageQueue)
 	c.heartBeatTicker.Stop()
 }
 
@@ -203,11 +220,11 @@ func (c *Client) readMessageToQueue() {
 	for {
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
-			log.Errorf("%s read message failed, %v, message %v", c.session, err, message)
+			log.Errorf("%s read message failed, %v, message %s", c.session, err, string(message))
 			c.closeChan <- err
 			return
 		}
-		log.Infof("%s receive message, %v", c.session, string(message))
+		log.Infof("%s receive message, %s", c.session, string(message))
 		c.messageQueue <- message
 	}
 }
