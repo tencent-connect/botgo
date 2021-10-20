@@ -95,7 +95,7 @@ func atMessageHandler(event *dto.WSPayload, message []byte) error {
 	if err := parseData(message, data); err != nil {
 		return err
 	}
-	if websocket.DefaultHandlers.Message != nil {
+	if websocket.DefaultHandlers.ATMessage != nil {
 		return websocket.DefaultHandlers.ATMessage(event, data)
 	}
 	return nil
