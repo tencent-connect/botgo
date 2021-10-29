@@ -41,8 +41,8 @@ func main() {
 	ws, err := api.WS(ctx, nil, "")
 	log.Printf("%+v, err:%v", ws, err)
 
-	// me, err := api.Me(ctx, nil, "")
-	// log.Printf("%+v, err:%v", me, err)
+	me, err := api.Me(ctx)
+	log.Printf("%+v, err:%v", me, err)
 	//
 	// run(func() (interface{}, error) {
 	// 	return api.MeGuilds(ctx)
