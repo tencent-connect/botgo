@@ -17,6 +17,8 @@ type OpenAPI interface {
 	GuildAPI
 	ChannelAPI
 	AudioAPI
+	RoleAPI
+	MemberAPI
 }
 
 // Base 基础能力接口
@@ -69,4 +71,18 @@ type ChannelAPI interface {
 type AudioAPI interface {
 	// PostAudio 执行音频播放，暂停等操作
 	PostAudio(ctx context.Context, channelID string, value *dto.AudioControl) (*dto.AudioControl, error)
+}
+
+// RoleAPI 用户组相关接口
+type RoleAPI interface {
+	Roles(ctx context.Context, guildID string) (*dto.GuildRoles, error)
+	PostRole(ctx context.Context, guildID string, role *dto.Role) (dto.RoleID, error)
+	PatchRole(ctx context.Context, guildID string, roleID dto.RoleID, role *dto.Role) (dto.RoleID, error)
+	DeleteRole(ctx context.Context, guildID string, roleID dto.RoleID) error
+}
+
+// MemberAPI 成员相关接口，添加成员到用户组等
+type MemberAPI interface {
+	MemberAddRole(ctx context.Context, guildID string, roleID dto.RoleID, userID string) error
+	MemberDeleteRole(ctx context.Context, guildID string, roleID dto.RoleID, userID string) error
 }

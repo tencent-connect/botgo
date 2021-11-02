@@ -29,12 +29,12 @@ func Setup() {
 }
 
 // Version ...
-func (o openAPI) Version() openapi.APIVersion {
+func (o *openAPI) Version() openapi.APIVersion {
 	return openapi.APIv1
 }
 
 // New ...
-func (o openAPI) New(token *token.Token, inSandbox bool) openapi.OpenAPI {
+func (o *openAPI) New(token *token.Token, inSandbox bool) openapi.OpenAPI {
 	return &openAPI{
 		token:   token,
 		timeout: 3 * time.Second,
@@ -295,6 +295,10 @@ func (o *openAPI) request(ctx context.Context) *resty.Request {
 
 // respInfo 用于输出日志的时候格式化数据
 func respInfo(resp *resty.Response) string {
-	return fmt.Sprintf("[OPENAPI]URL:%v, Trace:%v, status:%v, body:%v",
-		resp.Request.URL, resp.Header().Get(openapi.TraceIDKey), resp.Status(), string(resp.Body()))
+	bodyJSON, _ := json.Marshal(resp.Request.Body)
+	return fmt.Sprintf("[OPENAPI]%v,URL:%v, Trace:%v, status:%v, reqbody: %v, respbody:%v",
+		resp.Request.Method,
+		resp.Request.URL, resp.Header().Get(openapi.TraceIDKey), resp.Status(),
+		string(bodyJSON), string(resp.Body()),
+	)
 }
