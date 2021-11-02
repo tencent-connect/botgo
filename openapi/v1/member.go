@@ -6,7 +6,7 @@ import (
 	"github.com/tencent-connect/botgo/dto"
 )
 
-func (o openAPI) MemberAddRole(ctx context.Context, guildID string, roleID dto.RoleID, userID string) error {
+func (o *openAPI) MemberAddRole(ctx context.Context, guildID string, roleID dto.RoleID, userID string) error {
 	_, err := o.request(ctx).
 		SetPathParam("guild_id", guildID).
 		SetPathParam("role_id", string(roleID)).
@@ -15,7 +15,7 @@ func (o openAPI) MemberAddRole(ctx context.Context, guildID string, roleID dto.R
 	return err
 }
 
-func (o openAPI) MemberDeleteRole(ctx context.Context, guildID string, roleID dto.RoleID, userID string) error {
+func (o *openAPI) MemberDeleteRole(ctx context.Context, guildID string, roleID dto.RoleID, userID string) error {
 	_, err := o.request(ctx).
 		SetPathParam("guild_id", guildID).
 		SetPathParam("role_id", string(roleID)).
