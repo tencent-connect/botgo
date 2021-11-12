@@ -28,6 +28,8 @@ type Message struct {
 	Mentions []*User `json:"mentions"`
 	// ark 消息
 	Ark *Ark `json:"ark"`
+	// 私信消息
+	DirectMessage bool `json:"direct_message"`
 }
 
 // Embed 结构

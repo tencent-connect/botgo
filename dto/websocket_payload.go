@@ -71,5 +71,8 @@ type WSMessageData Message
 // WSATMessageData only at 机器人的消息 payload
 type WSATMessageData Message
 
+// WSDirectMessageData 私信消息 payload
+type WSDirectMessageData Message
+
 // WSAudioData 音频机器人的音频流事件
 type WSAudioData AudioAction

@@ -22,8 +22,9 @@ var eventParseFuncMap = map[dto.OPCode]map[dto.EventType]eventParseFunc{
 		dto.EventGuildMemberUpdate: guildMemberHandler,
 		dto.EventGuildMemberRemove: guildMemberHandler,
 
-		dto.EventMessageCreate:   messageHandler,
-		dto.EventAtMessageCreate: atMessageHandler,
+		dto.EventMessageCreate:       messageHandler,
+		dto.EventAtMessageCreate:     atMessageHandler,
+		dto.EventDirectMessageCreate: directMessageHandler,
 
 		dto.EventAudioStart:  audioHandler,
 		dto.EventAudioFinish: audioHandler,
@@ -97,6 +98,17 @@ func atMessageHandler(event *dto.WSPayload, message []byte) error {
 	}
 	if websocket.DefaultHandlers.ATMessage != nil {
 		return websocket.DefaultHandlers.ATMessage(event, data)
+	}
+	return nil
+}
+
+func directMessageHandler(event *dto.WSPayload, message []byte) error {
+	data := &dto.WSDirectMessageData{}
+	if err := parseData(message, data); err != nil {
+		return err
+	}
+	if websocket.DefaultHandlers.DirectMessage != nil {
+		return websocket.DefaultHandlers.DirectMessage(event, data)
 	}
 	return nil
 }

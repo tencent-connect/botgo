@@ -25,6 +25,7 @@ const (
 
 	userMeURI       uri = "/users/@me"
 	userMeGuildsURI uri = "/users/@me/guilds"
+	userMeDMURI     uri = "/users/@me/dms"
 
 	gatewayURI    uri = "/gateway" // nolint
 	gatewayBotURI uri = "/gateway/bot"
@@ -35,6 +36,8 @@ const (
 	roleURI  uri = "/guilds/{guild_id}/roles/{role_id}"
 
 	memberRoleURI uri = "/guilds/{guild_id}/members/{user_id}/roles/{role_id}"
+
+	dmsURI uri = "/dms/{guild_id}/messages"
 )
 
 func getURL(endpoint uri, sandbox bool) string {

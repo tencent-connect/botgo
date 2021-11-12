@@ -14,6 +14,7 @@ type OpenAPI interface {
 	WebsocketAPI
 	UserAPI
 	MessageAPI
+	DirectMessageAPI
 	GuildAPI
 	ChannelAPI
 	AudioAPI
@@ -85,4 +86,12 @@ type RoleAPI interface {
 type MemberAPI interface {
 	MemberAddRole(ctx context.Context, guildID string, roleID dto.RoleID, userID string) error
 	MemberDeleteRole(ctx context.Context, guildID string, roleID dto.RoleID, userID string) error
+}
+
+// DirectMessageAPI 信息相关接口
+type DirectMessageAPI interface {
+	// 创建私信频道
+	CreateDirectMessage(ctx context.Context, dm *dto.DirectMessageToCreate) (*dto.DirectMessage, error)
+	// 在私信频道内发消息
+	PostDirectMessage(ctx context.Context, dm *dto.DirectMessage, msg *dto.MessageToCreate) (*dto.Message, error)
 }
