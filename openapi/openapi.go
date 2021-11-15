@@ -16,9 +16,10 @@ var (
 	once           sync.Once
 )
 
+// 这些状态码不会当做错误处理
+// 未排除 201 : 用于提示创建异步任务成功，所以不屏蔽错误
 var successStatusSet = map[int]bool{
 	http.StatusOK:        true,
-	http.StatusCreated:   true,
 	http.StatusAccepted:  true,
 	http.StatusNoContent: true,
 }
