@@ -16,3 +16,4 @@
 .idea
 # 用于存储demo中使用的 token，不提交到仓库
 testcase/config.yaml
+config.yaml
