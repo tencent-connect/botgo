@@ -13,7 +13,7 @@ func Test_websocket(t *testing.T) {
 	ws, err := api.WS(ctx, nil, "")
 	log.Printf("%+v, err:%v", ws, err)
 
-	var message websocket.MessageEventHandler = func(event *dto.WSPayload, data *dto.WSMessageData) error {
+	var message websocket.ATMessageEventHandler = func(event *dto.WSPayload, data *dto.WSATMessageData) error {
 		log.Println(event, data)
 		return nil
 	}
