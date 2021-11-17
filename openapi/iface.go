@@ -20,6 +20,7 @@ type OpenAPI interface {
 	AudioAPI
 	RoleAPI
 	MemberAPI
+	ChannelPermissionsAPI
 }
 
 // Base 基础能力接口
@@ -66,6 +67,14 @@ type ChannelAPI interface {
 	PostChannel(ctx context.Context, guildID string, value *dto.ChannelValueObject) (*dto.Channel, error)
 	PatchChannel(ctx context.Context, channelID string, value *dto.ChannelValueObject) (*dto.Channel, error)
 	DeleteChannel(ctx context.Context, channelID string) error
+}
+
+// ChannelPermissionsAPI 子频道权限相关接口
+type ChannelPermissionsAPI interface {
+	// ChannelPermissions 获取指定子频道的权限
+	ChannelPermissions(ctx context.Context, channelID, userID string) (*dto.ChannelPermissions, error)
+	// PutChannelPermissions 修改指定子频道的权限
+	PutChannelPermissions(ctx context.Context, channelID, userID string, p *dto.UpdateChannelPermissions) error
 }
 
 // AudioAPI 音频接口
