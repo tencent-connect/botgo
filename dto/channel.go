@@ -14,6 +14,17 @@ const (
 	ChannelTypeApplication // 应用子频道
 )
 
+// ChannelSubType 子频道子类型定义
+type ChannelSubType int
+
+// 子频道子类型定义
+const (
+	ChannelSubTypeChat     ChannelSubType = iota // 闲聊，默认子类型
+	ChannelSubTypeNotice                         // 公告
+	ChannelSubTypeGuide                          // 攻略
+	ChannelSubTypeTeamGame                       // 开黑
+)
+
 // Channel 频道结构定义
 type Channel struct {
 	// 频道ID
@@ -35,4 +46,6 @@ type ChannelValueObject struct {
 	ParentID string `json:"parent_id"`
 	// 拥有者ID
 	OwnerID string `json:"owner_id"`
+	// 子频道子类型
+	SubType ChannelSubType `json:"sub_type"`
 }
