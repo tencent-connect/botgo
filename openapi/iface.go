@@ -93,8 +93,8 @@ type RoleAPI interface {
 
 // MemberAPI 成员相关接口，添加成员到用户组等
 type MemberAPI interface {
-	MemberAddRole(ctx context.Context, guildID string, roleID dto.RoleID, userID string) error
-	MemberDeleteRole(ctx context.Context, guildID string, roleID dto.RoleID, userID string) error
+	MemberAddRole(ctx context.Context, guildID string, roleID dto.RoleID, userID string, value *dto.MemberAddRoleBody) error
+	MemberDeleteRole(ctx context.Context, guildID string, roleID dto.RoleID, userID string, value *dto.MemberAddRoleBody) error
 }
 
 // DirectMessageAPI 信息相关接口

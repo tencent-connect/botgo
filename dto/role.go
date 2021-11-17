@@ -48,3 +48,9 @@ type UpdateRole struct {
 type UpdateResult struct {
 	RoleID `json:"role_id"`
 }
+
+// MemberAddRoleBody 增加子频道管理员身份组时附加内容
+type MemberAddRoleBody struct {
+	// 子频道对象
+	Channel *Channel `json:"channel"`
+}

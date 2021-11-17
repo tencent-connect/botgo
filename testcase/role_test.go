@@ -1,9 +1,15 @@
 package testcase
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/tencent-connect/botgo/dto"
+)
+
+const (
+	manageChannelPermission     = uint64(1) << 1
+	defaultRoleTypeChannelAdmin = "5"
 )
 
 // Test_role 用户组相关接口用例
@@ -41,7 +47,7 @@ func Test_role(t *testing.T) {
 			t.Error(err)
 		}
 		userID := members[0].User.ID
-		err = api.MemberAddRole(ctx, testGuildID, roleID, userID)
+		err = api.MemberAddRole(ctx, testGuildID, roleID, userID, nil)
 		if err != nil {
 			t.Error(err)
 		}
@@ -54,6 +60,79 @@ func Test_role(t *testing.T) {
 		}
 		if !roleFound {
 			t.Error("not found role id been add")
+		}
+	})
+	t.Run("添加人到子频道管理员身份组并指定子频道", func(t *testing.T) {
+		members, err := api.GuildMembers(ctx, testGuildID, &dto.GuildMembersPager{
+			After: "0",
+			Limit: "1",
+		})
+		if err != nil {
+			t.Error(err)
+		}
+		userID := members[0].User.ID
+		channels, err := api.Channels(ctx, testGuildID)
+		if err != nil {
+			t.Error(err)
+		}
+		channelID := channels[len(channels)-1].ID
+		t.Logf("testGuildID: %+v, channelID: %+v", testGuildID, channelID)
+		err = api.MemberAddRole(ctx, testGuildID, defaultRoleTypeChannelAdmin, userID, &dto.MemberAddRoleBody{
+			Channel: &dto.Channel{
+				ID: channelID,
+			},
+		})
+		if err != nil {
+			t.Error(err)
+		}
+		channelPermissions, err := api.ChannelPermissions(ctx, channelID, userID)
+		if err != nil {
+			t.Error(err)
+		}
+		channelPermissionsUint, err := strconv.ParseUint(channelPermissions.Permissions, 10, 64)
+		if err != nil {
+			t.Error(err)
+		}
+		t.Logf("channelPermissionsUint: %+v, channelPermissions.Permissions: %+v",
+			channelPermissionsUint, channelPermissions.Permissions)
+		if channelPermissionsUint&manageChannelPermission != 2 {
+			t.Error("not found channel permissions been add")
+		}
+	})
+	t.Run("删除人到子频道管理员身份组并指定子频道", func(t *testing.T) {
+		members, err := api.GuildMembers(ctx, testGuildID, &dto.GuildMembersPager{
+			After: "0",
+			Limit: "1",
+		})
+		if err != nil {
+			t.Error(err)
+		}
+		userID := members[0].User.ID
+		channels, err := api.Channels(ctx, testGuildID)
+		if err != nil {
+			t.Error(err)
+		}
+		channelID := channels[len(channels)-1].ID
+		t.Logf("testGuildID: %+v, channelID: %+v", testGuildID, channelID)
+		err = api.MemberDeleteRole(ctx, testGuildID, defaultRoleTypeChannelAdmin, userID, &dto.MemberAddRoleBody{
+			Channel: &dto.Channel{
+				ID: channelID,
+			},
+		})
+		if err != nil {
+			t.Error(err)
+		}
+		channelPermissions, err := api.ChannelPermissions(ctx, channelID, userID)
+		if err != nil {
+			t.Error(err)
+		}
+		channelPermissionsUint, err := strconv.ParseUint(channelPermissions.Permissions, 10, 64)
+		if err != nil {
+			t.Error(err)
+		}
+		t.Logf("channelPermissionsUint: %+v", channelPermissionsUint)
+		if channelPermissionsUint&manageChannelPermission == 2 {
+			t.Error("not found channel permissions been add")
 		}
 	})
 	t.Run("删除用户组", func(t *testing.T) {
