@@ -101,8 +101,8 @@ type MemberAPI interface {
 
 // DirectMessageAPI 信息相关接口
 type DirectMessageAPI interface {
-	// 创建私信频道
+	// CreateDirectMessage 创建私信频道
 	CreateDirectMessage(ctx context.Context, dm *dto.DirectMessageToCreate) (*dto.DirectMessage, error)
-	// 在私信频道内发消息
+	// PostDirectMessage 在私信频道内发消息
 	PostDirectMessage(ctx context.Context, dm *dto.DirectMessage, msg *dto.MessageToCreate) (*dto.Message, error)
 }
