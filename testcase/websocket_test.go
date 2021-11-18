@@ -13,10 +13,25 @@ func Test_websocket(t *testing.T) {
 	ws, err := api.WS(ctx, nil, "")
 	log.Printf("%+v, err:%v", ws, err)
 
-	var message websocket.ATMessageEventHandler = func(event *dto.WSPayload, data *dto.WSATMessageData) error {
-		log.Println(event, data)
-		return nil
-	}
-	intent := websocket.RegisterHandlers(message)
-	botgo.NewSessionManager().Start(ws, botToken, &intent)
+	t.Run("at message", func(t *testing.T) {
+		var message websocket.ATMessageEventHandler = func(event *dto.WSPayload, data *dto.WSATMessageData) error {
+			log.Println(event, data)
+			return nil
+		}
+		intent := websocket.RegisterHandlers(message)
+		botgo.NewSessionManager().Start(ws, botToken, &intent)
+	})
+	t.Run("at message and guild event", func(t *testing.T) {
+		var message websocket.ATMessageEventHandler = func(event *dto.WSPayload, data *dto.WSATMessageData) error {
+			log.Println(event, data)
+			return nil
+		}
+		var guildEvent websocket.GuildEventHandler = func(event *dto.WSPayload, data *dto.WSGuildData) error {
+			log.Println(event, data)
+			return nil
+		}
+		intent := websocket.RegisterHandlers(message, guildEvent)
+		botgo.NewSessionManager().Start(ws, botToken, &intent)
+	})
+
 }
