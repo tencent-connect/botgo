@@ -229,6 +229,9 @@ func (o *openAPI) Channels(ctx context.Context, guildID string) ([]*dto.Channel,
 // PostChannel ...
 func (o *openAPI) PostChannel(ctx context.Context,
 	guildID string, value *dto.ChannelValueObject) (*dto.Channel, error) {
+	if value.Position == 0 {
+		value.Position = time.Now().Unix()
+	}
 	resp, err := o.request(ctx).
 		SetResult(dto.Channel{}).
 		SetPathParam("guild_id", guildID).
@@ -244,6 +247,9 @@ func (o *openAPI) PostChannel(ctx context.Context,
 // PatchChannel ...
 func (o *openAPI) PatchChannel(ctx context.Context,
 	channelID string, value *dto.ChannelValueObject) (*dto.Channel, error) {
+	if value.Position == 0 {
+		value.Position = time.Now().Unix()
+	}
 	resp, err := o.request(ctx).
 		SetResult(dto.Channel{}).
 		SetPathParam("channel_id", channelID).

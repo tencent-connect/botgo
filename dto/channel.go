@@ -41,7 +41,7 @@ type ChannelValueObject struct {
 	// 频道类型
 	Type ChannelType `json:"type"`
 	// 排序位置
-	Position int `json:"position"`
+	Position int64 `json:"position"`
 	// 父频道的ID
 	ParentID string `json:"parent_id"`
 	// 拥有者ID
