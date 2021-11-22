@@ -1,6 +1,7 @@
 package testcase
 
 import (
+	"reflect"
 	"strconv"
 	"testing"
 
@@ -10,14 +11,15 @@ import (
 const (
 	manageChannelPermission     = uint64(1) << 1
 	defaultRoleTypeChannelAdmin = "5"
+	patchRoleModifyName         = "test role modify"
 )
 
-// Test_role 用户组相关接口用例
+// Test_role 身份组相关接口用例
 func Test_role(t *testing.T) {
 	var roleID dto.RoleID
 	var err error
 
-	t.Run("拉取用户组列表", func(t *testing.T) {
+	t.Run("拉取身份组列表", func(t *testing.T) {
 		roles, err := api.Roles(ctx, testGuildID)
 		if err != nil {
 			t.Error(err)
@@ -27,15 +29,8 @@ func Test_role(t *testing.T) {
 			t.Logf("%+v", role)
 		}
 	})
-	t.Run("修改用户组", func(t *testing.T) {
-		api.PatchRole(ctx, testGuildID, dto.RoleID("10001854"), &dto.Role{
-			Name:  "假的管理员",
-			Color: 4279419354,
-			Hoist: 1,
-		})
-	})
-	t.Run("创建用户组", func(t *testing.T) {
-		roleID, err = api.PostRole(ctx, testGuildID, &dto.Role{
+	t.Run("创建身份组", func(t *testing.T) {
+		postRoleResult, err := api.PostRole(ctx, testGuildID, &dto.Role{
 			Name:  "test role",
 			Color: 4278245297,
 			Hoist: 0,
@@ -43,9 +38,10 @@ func Test_role(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		t.Logf("role id : %v", roleID)
+		roleID = postRoleResult.RoleID
+		t.Logf("postRoleResult: %+v", postRoleResult)
 	})
-	t.Run("添加人到用户组", func(t *testing.T) {
+	t.Run("添加人到身份组", func(t *testing.T) {
 		members, err := api.GuildMembers(ctx, testGuildID, &dto.GuildMembersPager{
 			After: "0",
 			Limit: "1",
@@ -68,6 +64,16 @@ func Test_role(t *testing.T) {
 		if !roleFound {
 			t.Error("not found role id been add")
 		}
+	})
+	t.Run("修改身份组", func(t *testing.T) {
+		patchRoleResult, err := api.PatchRole(ctx, testGuildID, roleID, &dto.Role{
+			Name: patchRoleModifyName,
+		})
+		if err != nil {
+			t.Error(err)
+		}
+		reflect.DeepEqual(patchRoleModifyName, patchRoleResult.Role.Name)
+		t.Logf("patchRoleResult: %+v", patchRoleResult)
 	})
 	t.Run("添加人到子频道管理员身份组并指定子频道", func(t *testing.T) {
 		members, err := api.GuildMembers(ctx, testGuildID, &dto.GuildMembersPager{
@@ -106,7 +112,7 @@ func Test_role(t *testing.T) {
 			t.Error("not found channel permissions been add")
 		}
 	})
-	t.Run("删除人到子频道管理员身份组并指定子频道", func(t *testing.T) {
+	t.Run("在子频道管理员身份组删除用户并指定子频道", func(t *testing.T) {
 		members, err := api.GuildMembers(ctx, testGuildID, &dto.GuildMembersPager{
 			After: "0",
 			Limit: "1",
@@ -142,7 +148,7 @@ func Test_role(t *testing.T) {
 			t.Error("not found channel permissions been add")
 		}
 	})
-	t.Run("删除用户组", func(t *testing.T) {
+	t.Run("删除身份组", func(t *testing.T) {
 		err = api.DeleteRole(ctx, testGuildID, roleID)
 		if err != nil {
 			t.Error(err)

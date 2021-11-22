@@ -19,7 +19,7 @@ func (o *openAPI) Roles(ctx context.Context, guildID string) (*dto.GuildRoles, e
 	return resp.Result().(*dto.GuildRoles), nil
 }
 
-func (o *openAPI) PostRole(ctx context.Context, guildID string, role *dto.Role) (dto.RoleID, error) {
+func (o *openAPI) PostRole(ctx context.Context, guildID string, role *dto.Role) (*dto.UpdateResult, error) {
 	if role.Color == 0 {
 		role.Color = dto.DefaultColor
 	}
@@ -41,14 +41,14 @@ func (o *openAPI) PostRole(ctx context.Context, guildID string, role *dto.Role) 
 		SetBody(body).
 		Post(getURL(rolesURI, o.sandbox))
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return resp.Result().(*dto.UpdateResult).RoleID, nil
+	return resp.Result().(*dto.UpdateResult), nil
 }
 
 func (o *openAPI) PatchRole(ctx context.Context,
-	guildID string, roleID dto.RoleID, role *dto.Role) (dto.RoleID, error) {
+	guildID string, roleID dto.RoleID, role *dto.Role) (*dto.UpdateResult, error) {
 	if role.Color == 0 {
 		role.Color = dto.DefaultColor
 	}
@@ -69,10 +69,10 @@ func (o *openAPI) PatchRole(ctx context.Context,
 		SetBody(body).
 		Patch(getURL(roleURI, o.sandbox))
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return resp.Result().(*dto.UpdateResult).RoleID, nil
+	return resp.Result().(*dto.UpdateResult), nil
 }
 
 func (o *openAPI) DeleteRole(ctx context.Context, guildID string, roleID dto.RoleID) error {

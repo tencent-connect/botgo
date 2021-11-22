@@ -46,7 +46,9 @@ type UpdateRole struct {
 
 // UpdateResult 创建，删除等行为的返回
 type UpdateResult struct {
-	RoleID `json:"role_id"`
+	RoleID  `json:"role_id"`
+	GuildID string `json:"guild_id"`
+	Role    *Role  `json:"role"`
 }
 
 // MemberAddRoleBody 增加子频道管理员身份组时附加内容

@@ -86,8 +86,8 @@ type AudioAPI interface {
 // RoleAPI 用户组相关接口
 type RoleAPI interface {
 	Roles(ctx context.Context, guildID string) (*dto.GuildRoles, error)
-	PostRole(ctx context.Context, guildID string, role *dto.Role) (dto.RoleID, error)
-	PatchRole(ctx context.Context, guildID string, roleID dto.RoleID, role *dto.Role) (dto.RoleID, error)
+	PostRole(ctx context.Context, guildID string, role *dto.Role) (*dto.UpdateResult, error)
+	PatchRole(ctx context.Context, guildID string, roleID dto.RoleID, role *dto.Role) (*dto.UpdateResult, error)
 	DeleteRole(ctx context.Context, guildID string, roleID dto.RoleID) error
 }
 
