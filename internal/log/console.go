@@ -5,9 +5,11 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/tencent-connect/botgo/logger"
 )
 
-var _ Logger = (*consoleLogger)(nil)
+var _ logger.Logger = (*consoleLogger)(nil)
 
 // consoleLogger 命令行日志实现
 type consoleLogger struct{}

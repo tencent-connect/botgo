@@ -2,12 +2,13 @@ package botgo
 
 import (
 	"github.com/tencent-connect/botgo/internal/log"
+	"github.com/tencent-connect/botgo/logger"
 	"github.com/tencent-connect/botgo/openapi"
 	"github.com/tencent-connect/botgo/websocket"
 )
 
 // SetLogger 设置 logger，需要实现 sdk 的 log.Logger 接口
-func SetLogger(logger log.Logger) {
+func SetLogger(logger logger.Logger) {
 	log.DefaultLogger = logger
 }
 
