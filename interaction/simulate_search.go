@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/tencent-connect/botgo/dto"
-	"github.com/tencent-connect/botgo/internal/log"
+	"github.com/tencent-connect/botgo/log"
 )
 
 const maxRespBuffer = 65535

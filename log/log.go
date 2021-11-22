@@ -1,11 +1,7 @@
 package log
 
-import (
-	"github.com/tencent-connect/botgo/logger"
-)
-
 // DefaultLogger 默认logger
-var DefaultLogger = logger.Logger(new(consoleLogger))
+var DefaultLogger = Logger(new(consoleLogger))
 
 // Debug log.Debug
 func Debug(v ...interface{}) {

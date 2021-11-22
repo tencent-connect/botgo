@@ -1,4 +1,4 @@
-package logger
+package log
 
 // Logger 日志需要实现的接口定义
 type Logger interface {

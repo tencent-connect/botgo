@@ -3,7 +3,7 @@ package botgo
 
 import (
 	"github.com/tencent-connect/botgo/errs"
-	"github.com/tencent-connect/botgo/internal/log"
+	"github.com/tencent-connect/botgo/log"
 	"github.com/tencent-connect/botgo/openapi"
 	v1 "github.com/tencent-connect/botgo/openapi/v1"
 	"github.com/tencent-connect/botgo/token"

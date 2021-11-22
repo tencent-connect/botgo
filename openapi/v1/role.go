@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/tencent-connect/botgo/dto"
-	"github.com/tencent-connect/botgo/internal/log"
+	"github.com/tencent-connect/botgo/log"
 )
 
 func (o *openAPI) Roles(ctx context.Context, guildID string) (*dto.GuildRoles, error) {

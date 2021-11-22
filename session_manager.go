@@ -6,7 +6,7 @@ import (
 
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/errs"
-	"github.com/tencent-connect/botgo/internal/log"
+	"github.com/tencent-connect/botgo/log"
 	"github.com/tencent-connect/botgo/token"
 	"github.com/tencent-connect/botgo/websocket"
 )
