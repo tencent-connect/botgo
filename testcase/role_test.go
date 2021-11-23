@@ -27,6 +27,13 @@ func Test_role(t *testing.T) {
 			t.Logf("%+v", role)
 		}
 	})
+	t.Run("修改用户组", func(t *testing.T) {
+		api.PatchRole(ctx, testGuildID, dto.RoleID("10001854"), &dto.Role{
+			Name:  "假的管理员",
+			Color: 4279419354,
+			Hoist: 1,
+		})
+	})
 	t.Run("创建用户组", func(t *testing.T) {
 		roleID, err = api.PostRole(ctx, testGuildID, &dto.Role{
 			Name:  "test role",
