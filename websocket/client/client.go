@@ -76,7 +76,8 @@ func (c *Client) Listening() error {
 			log.Errorf("%s Listening stop. err is %v", c.session, err)
 			// 远端发来的 close error，都不应该触发 resume
 			// 这里用 UnexpectedCloseError，如果有需要排除在外的 close error code，可以补充在第二个参数上
-			if wss.IsUnexpectedCloseError(err) {
+			// 4009: session time out, 发了 reconnect 之后马上关闭连接时候的错误码
+			if wss.IsUnexpectedCloseError(err, 4009) {
 				return errs.New(errs.CodeConnCloseErr, err.Error())
 			}
 			return err
