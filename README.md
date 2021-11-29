@@ -42,13 +42,13 @@ func main() {
     }
 
     // 监听哪类事件就需要实现哪类的 handler，定义：websocket/event_handler.go
-    var atMessage websocket.ATMessageEventHandler = func(event *dto.WSMsg, data *dto.WSATMessageData) error {
+    var atMessage websocket.ATMessageEventHandler = func(event *dto.WSPayload, data *dto.WSATMessageData) error {
         fmt.Println(event, data)
         return nil
     }
     intent := websocket.RegisterHandlers(atMessage)
     // 启动 session manager 进行 ws 连接的管理，如果接口返回需要启动多个 shard 的连接，这里也会自动启动多个
-    botgo.Session.Start(ws, token, &intent)
+    botgo.NewSessionManager().Start(ws, token, &intent)
 }
 ```
 
