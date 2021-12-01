@@ -32,6 +32,8 @@ type Base interface {
 	WithBody(body interface{}) OpenAPI
 	// Transport 透传请求，如果 sdk 没有及时跟进新的接口的变更，可以使用该方法进行透传，openapi 实现时可以按需选择是否实现该接口
 	Transport(ctx context.Context, method, url string, body interface{}) ([]byte, error)
+	// TraceID 返回上一次请求的 trace id
+	TraceID() string
 }
 
 // WebsocketAPI websocket 接入地址

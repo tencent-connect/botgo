@@ -15,6 +15,7 @@ func TestChannel(t *testing.T) {
 		for _, channel := range list {
 			t.Logf("%+v", channel)
 		}
+		t.Logf(api.TraceID())
 	})
 	t.Run("create live channel", func(t *testing.T) {
 		api.PostChannel(ctx, testGuildID, &dto.ChannelValueObject{

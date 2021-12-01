@@ -29,16 +29,21 @@ const (
 
 // Err sdk err
 type Err struct {
-	code int
-	text string
+	code  int
+	text  string
+	trace string // 错误追踪ID，可用于向平台反馈问题
 }
 
 // New 创建一个新错误
-func New(code int, text string) error {
-	return &Err{
+func New(code int, text string, trace ...string) error {
+	err := &Err{
 		code: code,
 		text: text,
 	}
+	if len(trace) > 0 {
+		err.trace = trace[0]
+	}
+	return err
 }
 
 // Error 将错误转换为 sdk 的错误类型
@@ -53,7 +58,7 @@ func Error(err error) *Err {
 }
 
 func (e Err) Error() string {
-	return fmt.Sprintf("code:%v, text:%v", e.code, e.text)
+	return fmt.Sprintf("code:%v, text:%v, traceID:%s", e.code, e.text, e.trace)
 }
 
 // Code 获取错误码
@@ -64,4 +69,9 @@ func (e Err) Code() int {
 // Text 获取错误信息
 func (e Err) Text() string {
 	return e.text
+}
+
+// Trace 获取错误追踪ID
+func (e Err) Trace() string {
+	return e.trace
 }

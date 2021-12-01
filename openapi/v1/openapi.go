@@ -21,6 +21,7 @@ type openAPI struct {
 	body    interface{}
 	sandbox bool
 	debug   bool
+	trace   string // trace id
 }
 
 // Setup 注册
@@ -31,6 +32,11 @@ func Setup() {
 // Version ...
 func (o *openAPI) Version() openapi.APIVersion {
 	return openapi.APIv1
+}
+
+// TraceID 获取 trace id
+func (o *openAPI) TraceID() string {
+	return o.trace
 }
 
 // New ...
@@ -286,11 +292,12 @@ func (o *openAPI) request(ctx context.Context) *resty.Request {
 		SetAuthScheme(string(o.token.Type)).
 		SetHeader("User-Agent", version.String()).
 		// 设置请求之后的钩子，打印日志，判断状态码
-		OnAfterResponse(func(client *resty.Client, response *resty.Response) error {
-			log.Infof("%v", respInfo(response))
+		OnAfterResponse(func(client *resty.Client, resp *resty.Response) error {
+			log.Infof("%v", respInfo(resp))
+			o.trace = resp.Header().Get(openapi.TraceIDKey)
 			// 非成功含义的状态码，需要返回 error 供调用方识别
-			if !openapi.IsSuccessStatus(response.StatusCode()) {
-				return errs.New(response.StatusCode(), string(response.Body()))
+			if !openapi.IsSuccessStatus(resp.StatusCode()) {
+				return errs.New(resp.StatusCode(), string(resp.Body()), o.trace)
 			}
 			return nil
 		})
@@ -302,7 +309,7 @@ func (o *openAPI) request(ctx context.Context) *resty.Request {
 // respInfo 用于输出日志的时候格式化数据
 func respInfo(resp *resty.Response) string {
 	bodyJSON, _ := json.Marshal(resp.Request.Body)
-	return fmt.Sprintf("[OPENAPI]%v,URL:%v, Trace:%v, status:%v, reqbody: %v, respbody:%v",
+	return fmt.Sprintf("[OPENAPI]%v,URL:%v, trace:%v, status:%v, reqbody: %v, respbody:%v",
 		resp.Request.Method,
 		resp.Request.URL, resp.Header().Get(openapi.TraceIDKey), resp.Status(),
 		string(bodyJSON), string(resp.Body()),
