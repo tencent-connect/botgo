@@ -29,6 +29,11 @@ jobs:
       - name: Build
         run: go build -v ./...
 
+      - name: Redis Server in GitHub Actions
+        uses: supercharge/redis-github-action@1.1.0
+        with:
+          # Redis version to use
+          redis-version: # optional, default is latest
+
       - name: Test
         run: go test -v ./...
-
