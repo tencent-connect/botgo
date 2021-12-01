@@ -21,6 +21,15 @@ func Test_websocket(t *testing.T) {
 		intent := websocket.RegisterHandlers(message)
 		botgo.NewSessionManager().Start(ws, botToken, &intent)
 	})
+	t.Run("at message assign shard to 2", func(t *testing.T) {
+		var message websocket.ATMessageEventHandler = func(event *dto.WSPayload, data *dto.WSATMessageData) error {
+			log.Println(event, data)
+			return nil
+		}
+		ws.Shards = 2
+		intent := websocket.RegisterHandlers(message)
+		botgo.NewSessionManager().Start(ws, botToken, &intent)
+	})
 	t.Run("at message and guild event", func(t *testing.T) {
 		var message websocket.ATMessageEventHandler = func(event *dto.WSPayload, data *dto.WSATMessageData) error {
 			log.Println(event, data)

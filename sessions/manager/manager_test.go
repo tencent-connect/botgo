@@ -1,4 +1,4 @@
-package botgo
+package manager
 
 import (
 	"testing"
@@ -18,6 +18,7 @@ func Test_calcInterval(t *testing.T) {
 		{"c3", args{maxConcurrency: 3}, 2 * time.Second},
 		{"c5", args{maxConcurrency: 5}, 1 * time.Second},
 		{"c10", args{maxConcurrency: 10}, 1 * time.Second},
+		{"c100", args{maxConcurrency: 100}, 1 * time.Second},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

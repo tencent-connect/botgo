@@ -2,6 +2,7 @@ package client
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	wss "github.com/gorilla/websocket" // 是一个流行的 websocket 客户端，服务端实现
@@ -11,8 +12,8 @@ import (
 	"github.com/tencent-connect/botgo/websocket"
 )
 
-// MaxQueueMax 监听队列的缓冲长度
-const MaxQueueMax = 1000
+// DefaultQueueSize 监听队列的缓冲长度
+const DefaultQueueSize = 10000
 
 // Setup 依赖注册
 func Setup() {
@@ -22,7 +23,7 @@ func Setup() {
 // New 新建一个连接对象
 func (c *Client) New(session dto.Session) websocket.WebSocket {
 	return &Client{
-		messageQueue:    make(messageChan, MaxQueueMax),
+		messageQueue:    make(messageChan, DefaultQueueSize),
 		session:         &session,
 		closeChan:       make(closeErrorChan, 10),
 		heartBeatTicker: time.NewTicker(60 * time.Second), // 先给一个默认 ticker，在收到 hello 包之后，会 reset
@@ -96,8 +97,15 @@ func (c *Client) Listening() error {
 }
 
 func (c *Client) listenMessageAndHandle() {
+	defer func() {
+		// panic，一般是由于业务自己实现的 handle 不完善导致
+		// 打印日志后，关闭这个连接，进入重连流程
+		if err := recover(); err != nil {
+			log.Errorf("%s panic err: %v", c.session, err)
+			c.closeChan <- fmt.Errorf("panic: %v", err)
+		}
+	}()
 	for message := range c.messageQueue {
-		// 连接被关闭，queue 也要被关闭，goroutine 退出
 		log.Debugf("%s listened message", c.session)
 		event := &dto.WSPayload{}
 		if err := json.Unmarshal(message, event); err != nil {
