@@ -40,6 +40,9 @@ const (
 	memberRoleURI uri = "/guilds/{guild_id}/members/{user_id}/roles/{role_id}"
 
 	dmsURI uri = "/dms/{guild_id}/messages"
+
+	announcesURI = "/channels/{channel_id}/announces"
+	announceURI  = "/channels/{channel_id}/announces/{message_id}"
 )
 
 func getURL(endpoint uri, sandbox bool) string {

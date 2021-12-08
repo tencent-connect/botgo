@@ -21,6 +21,7 @@ type OpenAPI interface {
 	RoleAPI
 	MemberAPI
 	ChannelPermissionsAPI
+	AnnouncesAPI
 }
 
 // Base 基础能力接口
@@ -107,4 +108,13 @@ type DirectMessageAPI interface {
 	CreateDirectMessage(ctx context.Context, dm *dto.DirectMessageToCreate) (*dto.DirectMessage, error)
 	// PostDirectMessage 在私信频道内发消息
 	PostDirectMessage(ctx context.Context, dm *dto.DirectMessage, msg *dto.MessageToCreate) (*dto.Message, error)
+}
+
+// AnnouncesAPI 公告相关接口
+type AnnouncesAPI interface {
+	// CreateChannelAnnounces 创建子频道公告
+	CreateChannelAnnounces(ctx context.Context,
+		channelID string, announce *dto.ChannelAnnouncesToCreate) (*dto.Announces, error)
+	// DeleteChannelAnnounces 删除子频道公告,会校验 messageID 是否匹配
+	DeleteChannelAnnounces(ctx context.Context, channelID, messageID string) error
 }
