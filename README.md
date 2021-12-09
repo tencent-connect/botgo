@@ -1,17 +1,8 @@
 # botgo
 
-a golang sdk for guild bot
+QQ频道机器人，官方 GOLANG SDK。
 
-## 设计模式
-
-分为三个主要模块
-
-- openapi 用于请求 http 的 openapi
-- websocket 用于监听事件网关，接收事件消息
-- sessions 实现 session_manager 接口，用于管理 websocket 实例的新建，重连等
-
-openapi 接口定义：`openapi/iface.go`，同时 sdk 中提供了 v1 的实现，后续 openapi 有新版本的时候，可以增加对应新版本的实现。
-websocket 接口定义：`websocket/iface.go`，sdk 实现了默认版本的 client，如果开发者有更好的实现，也可以进行替换
+[文档](https://pkg.go.dev/github.com/tencent-connect/botgo)
 
 ## 使用
 
@@ -91,6 +82,18 @@ sdk 实现了两个 session manager
 - 逻辑层：从 kafka 消费到事件，并进行对应的处理，或者调用机器人的 openapi 进行相关数据的操作。
 
 提前规划好 kafka 的分片，然后从容的针对逻辑层做水平扩容。或者使用 pulsar（腾讯云上叫 tdmq） 来替代 kafka 避免 rebalance 问题。
+
+## SDK 的设计模式
+
+分为三个主要模块
+
+- openapi 用于请求 http 的 openapi
+- websocket 用于监听事件网关，接收事件消息
+- sessions 实现 session_manager 接口，用于管理 websocket 实例的新建，重连等
+
+openapi 接口定义：`openapi/iface.go`，同时 sdk 中提供了 v1 的实现，后续 openapi 有新版本的时候，可以增加对应新版本的实现。
+websocket 接口定义：`websocket/iface.go`，sdk 实现了默认版本的 client，如果开发者有更好的实现，也可以进行替换
+
 
 ## SDK 增加新接口or新事件开发说明
 
