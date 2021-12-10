@@ -6,14 +6,15 @@ import (
 
 // DefaultHandlers 默认的 handler 结构，管理所有支持的 handler 类型
 var DefaultHandlers struct {
-	Plain         PlainEventHandler
-	Guild         GuildEventHandler
-	GuildMember   GuildMemberEventHandler
-	Channel       ChannelEventHandler
-	Message       MessageEventHandler
-	ATMessage     ATMessageEventHandler
-	DirectMessage DirectMessageEventHandler
-	Audio         AudioEventHandler
+	Plain           PlainEventHandler
+	Guild           GuildEventHandler
+	GuildMember     GuildMemberEventHandler
+	Channel         ChannelEventHandler
+	Message         MessageEventHandler
+	MessageReaction MessageReactionEventHandler
+	ATMessage       ATMessageEventHandler
+	DirectMessage   DirectMessageEventHandler
+	Audio           AudioEventHandler
 }
 
 // PlainEventHandler 透传handler
@@ -30,6 +31,9 @@ type ChannelEventHandler func(event *dto.WSPayload, data *dto.WSChannelData) err
 
 // MessageEventHandler 消息事件 handler
 type MessageEventHandler func(event *dto.WSPayload, data *dto.WSMessageData) error
+
+// MessageReactionEventHandler 表情表态事件 handler
+type MessageReactionEventHandler func(event *dto.WSPayload, data *dto.WSMessageReactionData) error
 
 // ATMessageEventHandler at 机器人消息事件 handler
 type ATMessageEventHandler func(event *dto.WSPayload, data *dto.WSATMessageData) error
@@ -94,6 +98,9 @@ func registerMessageHandlers(i dto.Intent, handlers ...interface{}) dto.Intent {
 		case DirectMessageEventHandler:
 			DefaultHandlers.DirectMessage = handle
 			i = i | dto.EventToIntent(dto.EventDirectMessageCreate)
+		case MessageReactionEventHandler:
+			DefaultHandlers.MessageReaction = handle
+			i = i | dto.EventToIntent(dto.EventMessageReactionAdd, dto.EventMessageReactionRemove)
 		default:
 		}
 	}

@@ -76,3 +76,6 @@ type WSDirectMessageData Message
 
 // WSAudioData 音频机器人的音频流事件
 type WSAudioData AudioAction
+
+// WSMessageReactionData 表情表态事件
+type WSMessageReactionData MessageReaction

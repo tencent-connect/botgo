@@ -6,33 +6,38 @@ func init() {
 
 // 事件类型
 const (
-	EventGuildCreate         EventType = "GUILD_CREATE"
-	EventGuildUpdate         EventType = "GUILD_UPDATE"
-	EventGuildDelete         EventType = "GUILD_DELETE"
-	EventChannelCreate       EventType = "CHANNEL_CREATE"
-	EventChannelUpdate       EventType = "CHANNEL_UPDATE"
-	EventChannelDelete       EventType = "CHANNEL_DELETE"
-	EventGuildMemberAdd      EventType = "GUILD_MEMBER_ADD"
-	EventGuildMemberUpdate   EventType = "GUILD_MEMBER_UPDATE"
-	EventGuildMemberRemove   EventType = "GUILD_MEMBER_REMOVE"
-	EventMessageCreate       EventType = "MESSAGE_CREATE"
-	EventAtMessageCreate     EventType = "AT_MESSAGE_CREATE"
-	EventDirectMessageCreate EventType = "DIRECT_MESSAGE_CREATE"
-	EventAudioStart          EventType = "AUDIO_START"
-	EventAudioFinish         EventType = "AUDIO_FINISH"
-	EventAudioOnMic          EventType = "AUDIO_ON_MIC"
-	EventAudioOffMic         EventType = "AUDIO_OFF_MIC"
+	EventGuildCreate           EventType = "GUILD_CREATE"
+	EventGuildUpdate           EventType = "GUILD_UPDATE"
+	EventGuildDelete           EventType = "GUILD_DELETE"
+	EventChannelCreate         EventType = "CHANNEL_CREATE"
+	EventChannelUpdate         EventType = "CHANNEL_UPDATE"
+	EventChannelDelete         EventType = "CHANNEL_DELETE"
+	EventGuildMemberAdd        EventType = "GUILD_MEMBER_ADD"
+	EventGuildMemberUpdate     EventType = "GUILD_MEMBER_UPDATE"
+	EventGuildMemberRemove     EventType = "GUILD_MEMBER_REMOVE"
+	EventMessageCreate         EventType = "MESSAGE_CREATE"
+	EventMessageReactionAdd    EventType = "MESSAGE_REACTION_ADD"
+	EventMessageReactionRemove EventType = "MESSAGE_REACTION_REMOVE"
+	EventAtMessageCreate       EventType = "AT_MESSAGE_CREATE"
+	EventDirectMessageCreate   EventType = "DIRECT_MESSAGE_CREATE"
+	EventAudioStart            EventType = "AUDIO_START"
+	EventAudioFinish           EventType = "AUDIO_FINISH"
+	EventAudioOnMic            EventType = "AUDIO_ON_MIC"
+	EventAudioOffMic           EventType = "AUDIO_OFF_MIC"
 )
 
 // intentEventMap 不同 intent 对应的事件定义
 var intentEventMap = map[Intent][]EventType{
-	IntentGuilds: {EventGuildCreate, EventGuildUpdate, EventGuildDelete,
-		EventChannelCreate, EventChannelUpdate, EventChannelDelete},
-	IntentGuildMembers:   {EventGuildMemberAdd, EventGuildMemberUpdate, EventGuildMemberRemove},
-	IntentGuildMessages:  {EventMessageCreate},
-	IntentGuildAtMessage: {EventAtMessageCreate},
-	IntentDirectMessages: {EventDirectMessageCreate},
-	IntentAudio:          {EventAudioStart, EventAudioFinish, EventAudioOnMic, EventAudioOffMic},
+	IntentGuilds: {
+		EventGuildCreate, EventGuildUpdate, EventGuildDelete,
+		EventChannelCreate, EventChannelUpdate, EventChannelDelete,
+	},
+	IntentGuildMembers:          {EventGuildMemberAdd, EventGuildMemberUpdate, EventGuildMemberRemove},
+	IntentGuildMessages:         {EventMessageCreate},
+	IntentGuildMessageReactions: {EventMessageReactionAdd, EventMessageReactionRemove},
+	IntentGuildAtMessage:        {EventAtMessageCreate},
+	IntentDirectMessages:        {EventDirectMessageCreate},
+	IntentAudio:                 {EventAudioStart, EventAudioFinish, EventAudioOnMic, EventAudioOffMic},
 }
 
 var eventIntentMap = transposeIntentEventMap(intentEventMap)

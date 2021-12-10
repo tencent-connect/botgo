@@ -5,6 +5,7 @@ import (
 
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/websocket"
+
 	"github.com/tidwall/gjson" // 由于回包的 d 类型不确定，gjson 用于从回包json中提取 d 并进行针对性的解析
 )
 
@@ -22,7 +23,11 @@ var eventParseFuncMap = map[dto.OPCode]map[dto.EventType]eventParseFunc{
 		dto.EventGuildMemberUpdate: guildMemberHandler,
 		dto.EventGuildMemberRemove: guildMemberHandler,
 
-		dto.EventMessageCreate:       messageHandler,
+		dto.EventMessageCreate: messageHandler,
+
+		dto.EventMessageReactionAdd:    messageReactionHandler,
+		dto.EventMessageReactionRemove: messageReactionHandler,
+
 		dto.EventAtMessageCreate:     atMessageHandler,
 		dto.EventDirectMessageCreate: directMessageHandler,
 
@@ -87,6 +92,17 @@ func messageHandler(event *dto.WSPayload, message []byte) error {
 	}
 	if websocket.DefaultHandlers.Message != nil {
 		return websocket.DefaultHandlers.Message(event, data)
+	}
+	return nil
+}
+
+func messageReactionHandler(event *dto.WSPayload, message []byte) error {
+	data := &dto.WSMessageReactionData{}
+	if err := parseData(message, data); err != nil {
+		return err
+	}
+	if websocket.DefaultHandlers.MessageReaction != nil {
+		return websocket.DefaultHandlers.MessageReaction(event, data)
 	}
 	return nil
 }

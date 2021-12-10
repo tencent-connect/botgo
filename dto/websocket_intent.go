@@ -32,7 +32,12 @@ const (
 	IntentGuildVoiceStates
 	IntentGuildPresences
 	IntentGuildMessages
+
+	// IntentGuildMessageReactions 包含
+	// - MESSAGE_REACTION_ADD
+	// - MESSAGE_REACTION_REMOVE
 	IntentGuildMessageReactions
+
 	IntentGuildMessageTyping
 	IntentDirectMessages
 	IntentDirectMessageReactions
