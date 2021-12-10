@@ -7,6 +7,13 @@ import (
 )
 
 func TestChannel(t *testing.T) {
+	t.Run("guild info", func(t *testing.T) {
+		guild, err := api.Guild(ctx, testGuildID)
+		if err != nil {
+			t.Error(err)
+		}
+		t.Log(guild)
+	})
 	t.Run("channel list", func(t *testing.T) {
 		list, err := api.Channels(ctx, testGuildID)
 		if err != nil {
