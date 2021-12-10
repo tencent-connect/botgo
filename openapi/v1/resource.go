@@ -43,6 +43,9 @@ const (
 
 	announcesURI = "/channels/{channel_id}/announces"
 	announceURI  = "/channels/{channel_id}/announces/{message_id}"
+
+	schedulesURI uri = "/channels/{channel_id}/schedules"
+	scheduleURI  uri = "/channels/{channel_id}/schedules/{schedule_id}"
 )
 
 func getURL(endpoint uri, sandbox bool) string {

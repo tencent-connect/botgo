@@ -22,6 +22,7 @@ type OpenAPI interface {
 	MemberAPI
 	ChannelPermissionsAPI
 	AnnouncesAPI
+	ScheduleAPI
 }
 
 // Base 基础能力接口
@@ -117,4 +118,18 @@ type AnnouncesAPI interface {
 		channelID string, announce *dto.ChannelAnnouncesToCreate) (*dto.Announces, error)
 	// DeleteChannelAnnounces 删除子频道公告,会校验 messageID 是否匹配
 	DeleteChannelAnnounces(ctx context.Context, channelID, messageID string) error
+}
+
+// ScheduleAPI 日程相关接口
+type ScheduleAPI interface {
+	// ListSchedules 查询某个子频道下，since开始的当天的日程列表。若since为0，默认返回当天的日程列表
+	ListSchedules(ctx context.Context, channelID string, since uint64) ([]*dto.Schedule, error)
+	// GetSchedule 获取单个日程信息
+	GetSchedule(ctx context.Context, channelID, scheduleID string) (*dto.Schedule, error)
+	// CreateSchedule 创建日程
+	CreateSchedule(ctx context.Context, channelID string, schedule *dto.Schedule) (*dto.Schedule, error)
+	// ModifySchedule 修改日程
+	ModifySchedule(ctx context.Context, channelID, scheduleID string, schedule *dto.Schedule) (*dto.Schedule, error)
+	// DeleteSchedule 删除日程
+	DeleteSchedule(ctx context.Context, channelID, scheduleID string) error
 }
