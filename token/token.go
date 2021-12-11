@@ -2,6 +2,10 @@ package token
 
 import (
 	"fmt"
+	"io/ioutil"
+
+	"github.com/tencent-connect/botgo/log"
+	"gopkg.in/yaml.v3"
 )
 
 // Type token 类型
@@ -18,6 +22,13 @@ type Token struct {
 	AppID       uint64
 	AccessToken string
 	Type        Type
+}
+
+// New 创建一个新的 Token
+func New(tokenType Type) *Token {
+	return &Token{
+		Type: tokenType,
+	}
 }
 
 // BotToken 机器人身份的 token
@@ -44,4 +55,24 @@ func (t *Token) GetString() string {
 		return t.AccessToken
 	}
 	return fmt.Sprintf("%v.%s", t.AppID, t.AccessToken)
+}
+
+// LoadFromConfig 从配置中读取 appid 和 token
+func (t *Token) LoadFromConfig(file string) error {
+	var conf struct {
+		AppID uint64 `yaml:"appid"`
+		Token string `yaml:"token"`
+	}
+	content, err := ioutil.ReadFile(file)
+	if err != nil {
+		log.Errorf("read token from file failed, err: %v", err)
+		return err
+	}
+	if err = yaml.Unmarshal(content, &conf); err != nil {
+		log.Errorf("parse config failed, err: %v", err)
+		return err
+	}
+	t.AppID = conf.AppID
+	t.AccessToken = conf.Token
+	return nil
 }
