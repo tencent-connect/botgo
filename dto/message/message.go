@@ -27,7 +27,7 @@ func MentionUser(userID string) string {
 
 // MentionAllUser 返回 at all 的内嵌格式
 func MentionAllUser() string {
-	return "<@all>"
+	return "@everyone"
 }
 
 // MentionChannel 提到子频道的格式
