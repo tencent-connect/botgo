@@ -26,8 +26,8 @@ func TestChannel(t *testing.T) {
 	})
 	t.Run("create live channel", func(t *testing.T) {
 		api.PostChannel(ctx, testGuildID, &dto.ChannelValueObject{
-			Name:     "机器人创建2",
-			Type:     dto.ChannelTypeLive,
+			Name:     "机器人创建分组",
+			Type:     dto.ChannelTypeCategory,
 			Position: 0,   // 默认是当前时间戳，如果传递，则要避免和其他频道的 position 重复，否则会报错
 			ParentID: "0", // 父ID，正常应该找到一个分组ID，如果传0，就不归属在任何一个分组中
 		})
