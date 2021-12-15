@@ -1,3 +1,4 @@
+// Package log 是 SDK 的 logger 接口定义与内置的 logger。
 package log
 
 // DefaultLogger 默认logger

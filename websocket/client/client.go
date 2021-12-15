@@ -1,3 +1,4 @@
+// Package client 默认的 websocket client 实现。
 package client
 
 import (
@@ -74,12 +75,16 @@ func (c *Client) Listening() error {
 	for {
 		select {
 		case err := <-c.closeChan:
+			// 关闭连接的错误码 https://bot.q.qq.com/wiki/develop/api/gateway/error/error.html
 			log.Errorf("%s Listening stop. err is %v", c.session, err)
-			// 远端发来的 close error，都不应该触发 resume
+			// 不能够 identify 的错误
+			if wss.IsCloseError(err, 4914, 4915) {
+				return errs.New(errs.CodeConnCloseCantIdentify, err.Error())
+			}
 			// 这里用 UnexpectedCloseError，如果有需要排除在外的 close error code，可以补充在第二个参数上
-			// 4009: session time out, 发了 reconnect 之后马上关闭连接时候的错误码
+			// 4009: session time out, 发了 reconnect 之后马上关闭连接时候的错误码，这个是允许 resume 的
 			if wss.IsUnexpectedCloseError(err, 4009) {
-				return errs.New(errs.CodeConnCloseErr, err.Error())
+				return errs.New(errs.CodeConnCloseCantResume, err.Error())
 			}
 			return err
 		case <-c.heartBeatTicker.C:

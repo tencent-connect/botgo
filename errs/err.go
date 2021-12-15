@@ -1,3 +1,4 @@
+// Package errs 是 SDK 里面的错误类型的集合，同时封装了 SDK 专用的错误类型。
 package errs
 
 import (
@@ -8,23 +9,28 @@ var (
 	// ErrNeedReConnect reconnect
 	ErrNeedReConnect = New(CodeNeedReConnect, "need reconnect")
 	// ErrInvalidSession 无效的 session
-	ErrInvalidSession = New(CodeInvalidSession, "invalid session")
+	ErrInvalidSession = New(CodeConnCloseCantResume, "invalid session")
 	// ErrURLInvalid ws ap url 异常
-	ErrURLInvalid = New(CodeURLInvalid, "ws ap url is invalid")
+	ErrURLInvalid = New(CodeConnCloseCantIdentify, "ws ap url is invalid")
+	// ErrSessionLimit session 数量受到限制
+	ErrSessionLimit = New(CodeConnCloseCantIdentify, "session num limit")
+
 	// ErrNotFoundOpenAPI 未找到对应版本的openapi实现
 	ErrNotFoundOpenAPI = New(CodeNotFoundOpenAPI, "not found openapi version")
-	// ErrSessionLimit session 数量受到限制
-	ErrSessionLimit = New(CodeSessionLimit, "session num limit")
 )
 
 // sdk 错误码
 const (
 	CodeNeedReConnect = 9000 + iota
+	// CodeInvalidSession 无效的的 session id 请重新连接
 	CodeInvalidSession
 	CodeURLInvalid
 	CodeNotFoundOpenAPI
 	CodeSessionLimit
-	CodeConnCloseErr // 关闭连接错误码，收拢 websocket close error
+	// CodeConnCloseCantResume 关闭连接错误码，收拢 websocket close error，不允许 resume
+	CodeConnCloseCantResume
+	// CodeConnCloseCantIdentify 不允许连接的关闭连接错误
+	CodeConnCloseCantIdentify
 )
 
 // Err sdk err

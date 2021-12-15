@@ -1,3 +1,4 @@
+// Package openapi 声明了 sdk 所使用的 openapi 接口。
 package openapi
 
 import (

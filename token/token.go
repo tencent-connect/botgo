@@ -1,3 +1,4 @@
+// Package token 用于调用 openapi，websocket 的 token 对象。
 package token
 
 import (

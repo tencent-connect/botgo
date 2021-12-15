@@ -1,3 +1,4 @@
+// Package websocket SDK 需要实现的 websocket 定义。
 package websocket
 
 var (
