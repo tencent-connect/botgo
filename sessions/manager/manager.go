@@ -1,3 +1,4 @@
+// Package manager 实现 session manager 所需要的公共方法。
 package manager
 
 import (

@@ -1,3 +1,4 @@
+// Package client 默认的 websocket client 实现。
 package client
 
 import (

@@ -1,3 +1,4 @@
+// Package version sdk 版本声明。
 package version
 
 import (

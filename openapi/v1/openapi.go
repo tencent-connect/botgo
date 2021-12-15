@@ -1,3 +1,4 @@
+// Package v1 是 openapi v1 版本的实现。
 package v1
 
 import (

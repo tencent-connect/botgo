@@ -1,3 +1,4 @@
+// Package lock 一个基于 redis 的分布式锁实现。
 package lock
 
 import (

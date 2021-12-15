@@ -1,4 +1,4 @@
-// Package interaction 用于处理平台和机器人开发者之间的互动请求
+// Package interaction 用于处理平台和机器人开发者之间的互动请求（如内联搜索等）。
 package interaction
 
 import (

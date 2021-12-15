@@ -1,3 +1,4 @@
+// Package errs 是 SDK 里面的错误类型的集合，同时封装了 SDK 专用的错误类型。
 package errs
 
 import (

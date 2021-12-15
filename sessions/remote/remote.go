@@ -1,3 +1,4 @@
+// Package remote 基于 redis list 实现的分布式 session manager。
 package remote
 
 import (
