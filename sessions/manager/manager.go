@@ -15,12 +15,15 @@ var CanNotResumeErrSet = map[int]bool{
 	errs.CodeInvalidSession: true,
 }
 
+// concurrencyTimeWindowSec 并发时间窗口，单位秒
+const concurrencyTimeWindowSec = 2
+
 // CalcInterval 根据并发要求，计算连接启动间隔
 func CalcInterval(maxConcurrency uint32) time.Duration {
 	if maxConcurrency == 0 {
 		maxConcurrency = 1
 	}
-	f := math.Round(5 / float64(maxConcurrency))
+	f := math.Round(concurrencyTimeWindowSec / float64(maxConcurrency))
 	if f == 0 {
 		f = 1
 	}
