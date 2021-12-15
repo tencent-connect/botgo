@@ -2,6 +2,7 @@
 package local
 
 import (
+	"os"
 	"time"
 
 	"github.com/tencent-connect/botgo/dto"
@@ -91,6 +92,11 @@ func (l *ChanManager) newConnect(session dto.Session) {
 		if manager.CanNotResume(err) {
 			currentSession.ID = ""
 			currentSession.LastSeq = 0
+		}
+		// 一些错误不能够鉴权，比如机器人被封禁，这里就直接退出了
+		if manager.CanNotIdentify(err) {
+			log.Errorf("can not identify because server return %+v, so process exit", err)
+			os.Exit(1)
 		}
 		// 将 session 放到 session chan 中，用于启动新的连接，当前连接退出
 		l.sessionChan <- *currentSession

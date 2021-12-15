@@ -11,8 +11,12 @@ import (
 
 // CanNotResumeErrSet 不能进行 resume 操作的错误码
 var CanNotResumeErrSet = map[int]bool{
-	errs.CodeConnCloseErr:   true,
-	errs.CodeInvalidSession: true,
+	errs.CodeConnCloseCantResume: true,
+}
+
+// CanNotIdentifyErrSet 不能进行 identify 操作的错误码
+var CanNotIdentifyErrSet = map[int]bool{
+	errs.CodeConnCloseCantIdentify: true,
 }
 
 // concurrencyTimeWindowSec 并发时间窗口，单位秒
@@ -34,6 +38,15 @@ func CalcInterval(maxConcurrency uint32) time.Duration {
 func CanNotResume(err error) bool {
 	e := errs.Error(err)
 	if flag, ok := CanNotResumeErrSet[e.Code()]; ok {
+		return flag
+	}
+	return false
+}
+
+// CanNotIdentify 是否是不能够 identify 的错误
+func CanNotIdentify(err error) bool {
+	e := errs.Error(err)
+	if flag, ok := CanNotIdentifyErrSet[e.Code()]; ok {
 		return flag
 	}
 	return false
