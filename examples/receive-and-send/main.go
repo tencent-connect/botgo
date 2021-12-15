@@ -52,6 +52,7 @@ func ATMessageEventHandler(api openapi.OpenAPI) websocket.ATMessageEventHandler 
 			if _, err := api.PostMessage(context.Background(), data.ChannelID,
 				&dto.MessageToCreate{
 					Content: message.MentionUser(data.Author.ID) + v,
+					MsgID:   data.ID, // 填充 MsgID 则为被动消息，不填充则为主动消息
 				},
 			); err != nil {
 				log.Fatalln(err)
