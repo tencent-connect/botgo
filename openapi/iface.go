@@ -118,6 +118,13 @@ type AnnouncesAPI interface {
 		channelID string, announce *dto.ChannelAnnouncesToCreate) (*dto.Announces, error)
 	// DeleteChannelAnnounces 删除子频道公告,会校验 messageID 是否匹配
 	DeleteChannelAnnounces(ctx context.Context, channelID, messageID string) error
+	// CleanChannelAnnounces 删除子频道公告,不校验 messageID
+	CleanChannelAnnounces(ctx context.Context, channelID string) error
+	// CreateGuildAnnounces 创建频道全局公告
+	CreateGuildAnnounces(ctx context.Context, guildID string,
+		announce *dto.GuildAnnouncesToCreate) (*dto.Announces, error)
+	// DeleteGuildAnnounces 删除频道全局公告
+	DeleteGuildAnnounces(ctx context.Context, guildID, messageID string) error
 }
 
 // ScheduleAPI 日程相关接口

@@ -41,8 +41,11 @@ const (
 
 	dmsURI uri = "/dms/{guild_id}/messages"
 
-	announcesURI = "/channels/{channel_id}/announces"
-	announceURI  = "/channels/{channel_id}/announces/{message_id}"
+	channelAnnouncesURI = "/channels/{channel_id}/announces"
+	channelAnnounceURI  = "/channels/{channel_id}/announces/{message_id}"
+
+	guildAnnouncesURI = "/guilds/{guild_id}/announces"
+	guildAnnounceURI  = "/guilds/{guild_id}/announces/{message_id}"
 
 	schedulesURI uri = "/channels/{channel_id}/schedules"
 	scheduleURI  uri = "/channels/{channel_id}/schedules/{schedule_id}"
