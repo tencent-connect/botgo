@@ -17,6 +17,8 @@ var (
 
 	// ErrNotFoundOpenAPI 未找到对应版本的openapi实现
 	ErrNotFoundOpenAPI = New(CodeNotFoundOpenAPI, "not found openapi version")
+	// ErrPagerIsNil 分页器为空
+	ErrPagerIsNil = New(CodePagerIsNil, "pager is nil")
 )
 
 // sdk 错误码
@@ -31,6 +33,8 @@ const (
 	CodeConnCloseCantResume
 	// CodeConnCloseCantIdentify 不允许连接的关闭连接错误
 	CodeConnCloseCantIdentify
+	// CodePagerIsNil 分页器为空
+	CodePagerIsNil
 )
 
 // Err sdk err

@@ -71,7 +71,7 @@ func (o *openAPI) WS(ctx context.Context, _ map[string]string, _ string) (*dto.W
 	return resp.Result().(*dto.WebsocketAP), nil
 }
 
-// Me ...
+// Me 拉取当前用户的信息
 func (o *openAPI) Me(ctx context.Context) (*dto.User, error) {
 	resp, err := o.request(ctx).
 		SetResult(dto.User{}).
@@ -83,9 +83,13 @@ func (o *openAPI) Me(ctx context.Context) (*dto.User, error) {
 	return resp.Result().(*dto.User), nil
 }
 
-// MeGuilds ...
-func (o *openAPI) MeGuilds(ctx context.Context) ([]*dto.Guild, error) {
+// MeGuilds 拉取当前用户加入的频道列表
+func (o *openAPI) MeGuilds(ctx context.Context, pager *dto.GuildPager) ([]*dto.Guild, error) {
+	if pager == nil {
+		return nil, errs.ErrPagerIsNil
+	}
 	resp, err := o.request(ctx).
+		SetQueryParams(pager.QueryParams()).
 		Get(getURL(userMeGuildsURI, o.sandbox))
 	if err != nil {
 		return nil, err
@@ -99,7 +103,7 @@ func (o *openAPI) MeGuilds(ctx context.Context) ([]*dto.Guild, error) {
 	return guilds, nil
 }
 
-// Message ...
+// Message 拉取单条消息
 func (o *openAPI) Message(ctx context.Context, channelID string, messageID string) (*dto.Message, error) {
 	resp, err := o.request(ctx).
 		SetResult(dto.Message{}).
@@ -113,12 +117,14 @@ func (o *openAPI) Message(ctx context.Context, channelID string, messageID strin
 	return resp.Result().(*dto.Message), nil
 }
 
-// Messages ...
+// Messages 拉取消息列表
 func (o *openAPI) Messages(ctx context.Context, channelID string, pager *dto.MessagesPager) ([]*dto.Message, error) {
+	if pager == nil {
+		return nil, errs.ErrPagerIsNil
+	}
 	resp, err := o.request(ctx).
 		SetPathParam("channel_id", channelID).
-		SetQueryParam(string(pager.Type), pager.ID).
-		SetQueryParam("limit", pager.Limit).
+		SetQueryParams(pager.QueryParams()).
 		Get(getURL(messagesURI, o.sandbox))
 	if err != nil {
 		return nil, err
@@ -176,10 +182,12 @@ func (o *openAPI) GuildMember(ctx context.Context, guildID, userID string) (*dto
 // GuildMembers ...
 func (o *openAPI) GuildMembers(ctx context.Context,
 	guildID string, pager *dto.GuildMembersPager) ([]*dto.Member, error) {
+	if pager == nil {
+		return nil, errs.ErrPagerIsNil
+	}
 	resp, err := o.request(ctx).
 		SetPathParam("guild_id", guildID).
-		SetQueryParam("after", pager.After).
-		SetQueryParam("limit", pager.Limit).
+		SetQueryParams(pager.QueryParams()).
 		Get(getURL(guildMembersURI, o.sandbox))
 	if err != nil {
 		return nil, err

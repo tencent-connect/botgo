@@ -46,7 +46,7 @@ type WebsocketAPI interface {
 // UserAPI 用户相关接口
 type UserAPI interface {
 	Me(ctx context.Context) (*dto.User, error)
-	MeGuilds(ctx context.Context) ([]*dto.Guild, error)
+	MeGuilds(ctx context.Context, pager *dto.GuildPager) ([]*dto.Guild, error)
 }
 
 // MessageAPI 消息相关接口
