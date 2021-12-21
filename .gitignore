@@ -18,3 +18,5 @@
 testcase/config.yaml
 config.yaml
 demo
+
+.DS_Store
