@@ -62,6 +62,8 @@ type GuildAPI interface {
 	GuildMember(ctx context.Context, guildID, userID string) (*dto.Member, error)
 	GuildMembers(ctx context.Context, guildID string, pager *dto.GuildMembersPager) ([]*dto.Member, error)
 	DeleteGuildMember(ctx context.Context, guildID, userID string) error
+	// 频道禁言
+	GuildMute(ctx context.Context, guildID string, mute *dto.UpdateGuildMute) error
 }
 
 // ChannelAPI 频道相关接口
@@ -101,6 +103,8 @@ type MemberAPI interface {
 		guildID string, roleID dto.RoleID, userID string, value *dto.MemberAddRoleBody) error
 	MemberDeleteRole(ctx context.Context,
 		guildID string, roleID dto.RoleID, userID string, value *dto.MemberAddRoleBody) error
+	// 频道指定成员禁言
+	MemberMute(ctx context.Context, guildID, userID string, mute *dto.UpdateGuildMute) error
 }
 
 // DirectMessageAPI 信息相关接口

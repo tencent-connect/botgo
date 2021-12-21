@@ -13,9 +13,11 @@ type uri string
 
 // 目前提供的接口的 uri
 const (
-	guildURI        uri = "/guilds/{guild_id}"
-	guildMembersURI uri = "/guilds/{guild_id}/members"
-	guildMemberURI  uri = "/guilds/{guild_id}/members/{user_id}"
+	guildURI            uri = "/guilds/{guild_id}"
+	guildMembersURI     uri = "/guilds/{guild_id}/members"
+	guildMemberURI      uri = "/guilds/{guild_id}/members/{user_id}"
+	guildMuteURI        uri = "/guilds/{guild_id}/mute"                   // 频道禁言
+	guildMembersMuteURI uri = "/guilds/{guild_id}/members/{user_id}/mute" // 频道指定成员禁言
 
 	channelsURI uri = "/guilds/{guild_id}/channels"
 	channelURI  uri = "/channels/{channel_id}"
