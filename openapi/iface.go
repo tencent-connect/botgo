@@ -81,6 +81,10 @@ type ChannelPermissionsAPI interface {
 	ChannelPermissions(ctx context.Context, channelID, userID string) (*dto.ChannelPermissions, error)
 	// PutChannelPermissions 修改指定子频道的权限
 	PutChannelPermissions(ctx context.Context, channelID, userID string, p *dto.UpdateChannelPermissions) error
+	// ChannelPermissions 获取指定子频道身份组的权限
+	ChannelRolesPermissions(ctx context.Context, channelID, roleID string) (*dto.ChannelRolesPermissions, error)
+	// PutChannelRolesPermissions 修改指定子频道身份组的权限
+	PutChannelRolesPermissions(ctx context.Context, channelID, roleID string, p *dto.UpdateChannelPermissions) error
 }
 
 // AudioAPI 音频接口

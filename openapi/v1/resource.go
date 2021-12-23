@@ -22,7 +22,8 @@ const (
 	channelsURI uri = "/guilds/{guild_id}/channels"
 	channelURI  uri = "/channels/{channel_id}"
 
-	channelPermissionsURI uri = "/channels/{channel_id}/members/{user_id}/permissions"
+	channelPermissionsURI      uri = "/channels/{channel_id}/members/{user_id}/permissions"
+	channelRolesPermissionsURI uri = "/channels/{channel_id}/roles/{role_id}/permissions"
 
 	messagesURI uri = "/channels/{channel_id}/messages"
 	messageURI  uri = "/channels/{channel_id}/messages/{message_id}"
