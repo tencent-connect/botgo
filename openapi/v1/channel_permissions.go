@@ -22,7 +22,8 @@ func (o *openAPI) ChannelPermissions(ctx context.Context, channelID, userID stri
 }
 
 // ChannelRolesPermissions 获取指定子频道身份组的权限
-func (o *openAPI) ChannelRolesPermissions(ctx context.Context, channelID, roleID string) (*dto.ChannelRolesPermissions, error) {
+func (o *openAPI) ChannelRolesPermissions(ctx context.Context,
+	channelID, roleID string) (*dto.ChannelRolesPermissions, error) {
 	rsp, err := o.request(ctx).
 		SetResult(dto.ChannelRolesPermissions{}).
 		SetPathParam("channel_id", channelID).
