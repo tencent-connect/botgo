@@ -16,7 +16,7 @@ var (
 func Test_mute(t *testing.T) {
 	t.Run("频道禁言", func(t *testing.T) {
 		mute := &dto.UpdateGuildMute{
-			MuteEndTimstamp: strconv.FormatInt(time.Now().Unix()+600, 10),
+			MuteEndTimestamp: strconv.FormatInt(time.Now().Unix()+600, 10),
 		}
 		err := api.GuildMute(ctx, testMuteGuildID, mute)
 		if err != nil {
@@ -26,7 +26,7 @@ func Test_mute(t *testing.T) {
 	})
 	t.Run("频道指定成员禁言", func(t *testing.T) {
 		mute := &dto.UpdateGuildMute{
-			MuteEndTimstamp: strconv.FormatInt(time.Now().Unix()+600, 10),
+			MuteEndTimestamp: strconv.FormatInt(time.Now().Unix()+600, 10),
 		}
 		err := api.MemberMute(ctx, testGuildID, testMuteUserID, mute)
 		if err != nil {
