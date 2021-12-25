@@ -11,4 +11,6 @@ type Logger interface {
 	Infof(format string, v ...interface{})
 	Warnf(format string, v ...interface{})
 	Errorf(format string, v ...interface{})
+	// Sync logger Sync calls to flush buffer
+	Sync() error
 }

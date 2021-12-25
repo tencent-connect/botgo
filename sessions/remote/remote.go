@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -54,6 +53,7 @@ func New(client *redis.Client, opts ...Option) *RedisManager {
 
 // Start 启动 redis 的 session 管理器
 func (r *RedisManager) Start(apInfo *dto.WebsocketAP, token *token.Token, intents *dto.Intent) error {
+	defer log.Sync()
 	if err := manager.CheckSessionLimit(apInfo); err != nil {
 		log.Errorf("[ws/session/redis] session limited apInfo: %+v", apInfo)
 		return err
@@ -166,8 +166,9 @@ func (r *RedisManager) newConnect(session dto.Session) {
 		}
 		// 一些错误不能够鉴权，比如机器人被封禁，这里就直接退出了
 		if manager.CanNotIdentify(err) {
-			log.Errorf("can not identify because server return %+v, so process exit", err)
-			os.Exit(1)
+			msg := fmt.Sprintf("can not identify because server return %+v, so process exit", err)
+			log.Errorf(msg)
+			panic(msg) // 当机器人被下架，或者封禁，将不能再连接，所以 panic
 		}
 		// 将 session 放到 session chan 中，用于启动新的连接，释放锁，当前连接退出
 		shardLock.StopRenew()

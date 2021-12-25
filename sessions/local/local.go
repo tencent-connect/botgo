@@ -2,7 +2,7 @@
 package local
 
 import (
-	"os"
+	"fmt"
 	"time"
 
 	"github.com/tencent-connect/botgo/dto"
@@ -24,6 +24,7 @@ type ChanManager struct {
 
 // Start 启动本地 session manager
 func (l *ChanManager) Start(apInfo *dto.WebsocketAP, token *token.Token, intents *dto.Intent) error {
+	defer log.Sync()
 	if err := manager.CheckSessionLimit(apInfo); err != nil {
 		log.Errorf("[ws/session/local] session limited apInfo: %+v", apInfo)
 		return err
@@ -95,8 +96,9 @@ func (l *ChanManager) newConnect(session dto.Session) {
 		}
 		// 一些错误不能够鉴权，比如机器人被封禁，这里就直接退出了
 		if manager.CanNotIdentify(err) {
-			log.Errorf("can not identify because server return %+v, so process exit", err)
-			os.Exit(1)
+			msg := fmt.Sprintf("can not identify because server return %+v, so process exit", err)
+			log.Errorf(msg)
+			panic(msg) // 当机器人被下架，或者封禁，将不能再连接，所以 panic
 		}
 		// 将 session 放到 session chan 中，用于启动新的连接，当前连接退出
 		l.sessionChan <- *currentSession

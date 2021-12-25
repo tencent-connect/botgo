@@ -52,6 +52,11 @@ func (consoleLogger) Errorf(format string, v ...interface{}) {
 	output("Error", fmt.Sprintf(format, v...))
 }
 
+// Sync 控制台 logger 不需要 sync
+func (consoleLogger) Sync() error {
+	return nil
+}
+
 func output(level string, v ...interface{}) {
 	_, file, line, _ := runtime.Caller(3)
 	files := strings.Split(file, "/")
