@@ -13,14 +13,17 @@ type uri string
 
 // 目前提供的接口的 uri
 const (
-	guildURI        uri = "/guilds/{guild_id}"
-	guildMembersURI uri = "/guilds/{guild_id}/members"
-	guildMemberURI  uri = "/guilds/{guild_id}/members/{user_id}"
+	guildURI            uri = "/guilds/{guild_id}"
+	guildMembersURI     uri = "/guilds/{guild_id}/members"
+	guildMemberURI      uri = "/guilds/{guild_id}/members/{user_id}"
+	guildMuteURI        uri = "/guilds/{guild_id}/mute"                   // 频道禁言
+	guildMembersMuteURI uri = "/guilds/{guild_id}/members/{user_id}/mute" // 频道指定成员禁言
 
 	channelsURI uri = "/guilds/{guild_id}/channels"
 	channelURI  uri = "/channels/{channel_id}"
 
-	channelPermissionsURI uri = "/channels/{channel_id}/members/{user_id}/permissions"
+	channelPermissionsURI      uri = "/channels/{channel_id}/members/{user_id}/permissions"
+	channelRolesPermissionsURI uri = "/channels/{channel_id}/roles/{role_id}/permissions"
 
 	messagesURI uri = "/channels/{channel_id}/messages"
 	messageURI  uri = "/channels/{channel_id}/messages/{message_id}"
@@ -41,8 +44,11 @@ const (
 
 	dmsURI uri = "/dms/{guild_id}/messages"
 
-	announcesURI = "/channels/{channel_id}/announces"
-	announceURI  = "/channels/{channel_id}/announces/{message_id}"
+	channelAnnouncesURI = "/channels/{channel_id}/announces"
+	channelAnnounceURI  = "/channels/{channel_id}/announces/{message_id}"
+
+	guildAnnouncesURI = "/guilds/{guild_id}/announces"
+	guildAnnounceURI  = "/guilds/{guild_id}/announces/{message_id}"
 
 	schedulesURI uri = "/channels/{channel_id}/schedules"
 	scheduleURI  uri = "/channels/{channel_id}/schedules/{schedule_id}"

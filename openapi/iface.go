@@ -46,7 +46,7 @@ type WebsocketAPI interface {
 // UserAPI 用户相关接口
 type UserAPI interface {
 	Me(ctx context.Context) (*dto.User, error)
-	MeGuilds(ctx context.Context) ([]*dto.Guild, error)
+	MeGuilds(ctx context.Context, pager *dto.GuildPager) ([]*dto.Guild, error)
 }
 
 // MessageAPI 消息相关接口
@@ -62,6 +62,8 @@ type GuildAPI interface {
 	GuildMember(ctx context.Context, guildID, userID string) (*dto.Member, error)
 	GuildMembers(ctx context.Context, guildID string, pager *dto.GuildMembersPager) ([]*dto.Member, error)
 	DeleteGuildMember(ctx context.Context, guildID, userID string) error
+	// 频道禁言
+	GuildMute(ctx context.Context, guildID string, mute *dto.UpdateGuildMute) error
 }
 
 // ChannelAPI 频道相关接口
@@ -79,6 +81,10 @@ type ChannelPermissionsAPI interface {
 	ChannelPermissions(ctx context.Context, channelID, userID string) (*dto.ChannelPermissions, error)
 	// PutChannelPermissions 修改指定子频道的权限
 	PutChannelPermissions(ctx context.Context, channelID, userID string, p *dto.UpdateChannelPermissions) error
+	// ChannelPermissions 获取指定子频道身份组的权限
+	ChannelRolesPermissions(ctx context.Context, channelID, roleID string) (*dto.ChannelRolesPermissions, error)
+	// PutChannelRolesPermissions 修改指定子频道身份组的权限
+	PutChannelRolesPermissions(ctx context.Context, channelID, roleID string, p *dto.UpdateChannelPermissions) error
 }
 
 // AudioAPI 音频接口
@@ -101,6 +107,8 @@ type MemberAPI interface {
 		guildID string, roleID dto.RoleID, userID string, value *dto.MemberAddRoleBody) error
 	MemberDeleteRole(ctx context.Context,
 		guildID string, roleID dto.RoleID, userID string, value *dto.MemberAddRoleBody) error
+	// 频道指定成员禁言
+	MemberMute(ctx context.Context, guildID, userID string, mute *dto.UpdateGuildMute) error
 }
 
 // DirectMessageAPI 信息相关接口
@@ -118,6 +126,13 @@ type AnnouncesAPI interface {
 		channelID string, announce *dto.ChannelAnnouncesToCreate) (*dto.Announces, error)
 	// DeleteChannelAnnounces 删除子频道公告,会校验 messageID 是否匹配
 	DeleteChannelAnnounces(ctx context.Context, channelID, messageID string) error
+	// CleanChannelAnnounces 删除子频道公告,不校验 messageID
+	CleanChannelAnnounces(ctx context.Context, channelID string) error
+	// CreateGuildAnnounces 创建频道全局公告
+	CreateGuildAnnounces(ctx context.Context, guildID string,
+		announce *dto.GuildAnnouncesToCreate) (*dto.Announces, error)
+	// DeleteGuildAnnounces 删除频道全局公告
+	DeleteGuildAnnounces(ctx context.Context, guildID, messageID string) error
 }
 
 // ScheduleAPI 日程相关接口

@@ -8,8 +8,8 @@
 # Test binary, built with `go test -c`
 *.test
 
-# Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+*.log
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
@@ -18,3 +18,5 @@
 testcase/config.yaml
 config.yaml
 demo
+
+.DS_Store

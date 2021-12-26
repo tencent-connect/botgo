@@ -43,3 +43,8 @@ func Warnf(format string, v ...interface{}) {
 func Errorf(format string, v ...interface{}) {
 	DefaultLogger.Errorf(format, v...)
 }
+
+// Sync logger Sync calls to flush buffer
+func Sync() {
+	_ = DefaultLogger.Sync()
+}
