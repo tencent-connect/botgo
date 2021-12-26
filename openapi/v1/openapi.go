@@ -180,8 +180,10 @@ func (o *openAPI) GuildMember(ctx context.Context, guildID, userID string) (*dto
 }
 
 // GuildMembers ...
-func (o *openAPI) GuildMembers(ctx context.Context,
-	guildID string, pager *dto.GuildMembersPager) ([]*dto.Member, error) {
+func (o *openAPI) GuildMembers(
+	ctx context.Context,
+	guildID string, pager *dto.GuildMembersPager,
+) ([]*dto.Member, error) {
 	if pager == nil {
 		return nil, errs.ErrPagerIsNil
 	}
@@ -242,8 +244,10 @@ func (o *openAPI) Channels(ctx context.Context, guildID string) ([]*dto.Channel,
 }
 
 // PostChannel ...
-func (o *openAPI) PostChannel(ctx context.Context,
-	guildID string, value *dto.ChannelValueObject) (*dto.Channel, error) {
+func (o *openAPI) PostChannel(
+	ctx context.Context,
+	guildID string, value *dto.ChannelValueObject,
+) (*dto.Channel, error) {
 	if value.Position == 0 {
 		value.Position = time.Now().Unix()
 	}
@@ -260,8 +264,10 @@ func (o *openAPI) PostChannel(ctx context.Context,
 }
 
 // PatchChannel ...
-func (o *openAPI) PatchChannel(ctx context.Context,
-	channelID string, value *dto.ChannelValueObject) (*dto.Channel, error) {
+func (o *openAPI) PatchChannel(
+	ctx context.Context,
+	channelID string, value *dto.ChannelValueObject,
+) (*dto.Channel, error) {
 	if value.Position == 0 {
 		value.Position = time.Now().Unix()
 	}
@@ -318,9 +324,13 @@ func (o *openAPI) request(ctx context.Context) *resty.Request {
 // respInfo 用于输出日志的时候格式化数据
 func respInfo(resp *resty.Response) string {
 	bodyJSON, _ := json.Marshal(resp.Request.Body)
-	return fmt.Sprintf("[OPENAPI]%v,URL:%v, trace:%v, status:%v, reqbody: %v, respbody:%v",
+	return fmt.Sprintf("[OPENAPI]%v %v, trace:%v, status:%v, elapsed:%v req: %v, resp: %v",
 		resp.Request.Method,
-		resp.Request.URL, resp.Header().Get(openapi.TraceIDKey), resp.Status(),
-		string(bodyJSON), string(resp.Body()),
+		resp.Request.URL,
+		resp.Header().Get(openapi.TraceIDKey),
+		resp.Status(),
+		resp.Time(),
+		string(bodyJSON),
+		string(resp.Body()),
 	)
 }
