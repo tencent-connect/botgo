@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/go-resty/resty/v2" // resty 是一个优秀的 rest api 客户端，可以极大的减少开发基于 rest 标准接口求请求的封装工作量
@@ -306,9 +307,21 @@ func (o *openAPI) request(ctx context.Context) *resty.Request {
 		SetAuthToken(o.token.GetString()).
 		SetAuthScheme(string(o.token.Type)).
 		SetHeader("User-Agent", version.String()).
+		SetPreRequestHook(func(client *resty.Client, request *http.Request) error {
+			// 执行请求前过滤器
+			// 由于在 `OnBeforeRequest` 的时候，request 还没生成，所以 filter 不能使用，所以放到 `PreRequestHook`
+			if err := openapi.DoReqFilterChains(request, nil); err != nil {
+				return err
+			}
+			return nil
+		}).
 		// 设置请求之后的钩子，打印日志，判断状态码
 		OnAfterResponse(func(client *resty.Client, resp *resty.Response) error {
 			log.Infof("%v", respInfo(resp))
+			// 执行请求后过滤器
+			if err := openapi.DoRespFilterChains(resp.Request.RawRequest, resp.RawResponse); err != nil {
+				return err
+			}
 			o.trace = resp.Header().Get(openapi.TraceIDKey)
 			// 非成功含义的状态码，需要返回 error 供调用方识别
 			if !openapi.IsSuccessStatus(resp.StatusCode()) {
