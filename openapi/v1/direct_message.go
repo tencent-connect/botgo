@@ -31,3 +31,12 @@ func (o *openAPI) PostDirectMessage(ctx context.Context,
 	}
 	return resp.Result().(*dto.Message), nil
 }
+
+// RetractDMMessage 撤回私信消息
+func (o *openAPI) RetractDMMessage(ctx context.Context, guildID, msgID string) error {
+	_, err := o.request(ctx).
+		SetPathParam("guild_id", guildID).
+		SetPathParam("message_id", string(msgID)).
+		Delete(getURL(dmsMessageURI, o.sandbox))
+	return err
+}

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/go-redis/redis/v8"
+	redis "github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/log"

@@ -54,6 +54,7 @@ type MessageAPI interface {
 	Message(ctx context.Context, channelID string, messageID string) (*dto.Message, error)
 	Messages(ctx context.Context, channelID string, pager *dto.MessagesPager) ([]*dto.Message, error)
 	PostMessage(ctx context.Context, channelID string, msg *dto.MessageToCreate) (*dto.Message, error)
+	RetractMessage(ctx context.Context, channelID, msgID string) error
 }
 
 // GuildAPI guild 相关接口
@@ -117,6 +118,8 @@ type DirectMessageAPI interface {
 	CreateDirectMessage(ctx context.Context, dm *dto.DirectMessageToCreate) (*dto.DirectMessage, error)
 	// PostDirectMessage 在私信频道内发消息
 	PostDirectMessage(ctx context.Context, dm *dto.DirectMessage, msg *dto.MessageToCreate) (*dto.Message, error)
+	// RetractDMMessage 撤回私信频道消息
+	RetractDMMessage(ctx context.Context, guildID, msgID string) error
 }
 
 // AnnouncesAPI 公告相关接口

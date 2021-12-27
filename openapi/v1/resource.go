@@ -42,7 +42,8 @@ const (
 
 	memberRoleURI uri = "/guilds/{guild_id}/members/{user_id}/roles/{role_id}"
 
-	dmsURI uri = "/dms/{guild_id}/messages"
+	dmsURI        uri = "/dms/{guild_id}/messages"
+	dmsMessageURI uri = "/dms/{guild_id}/messages/{message_id}"
 
 	channelAnnouncesURI = "/channels/{channel_id}/announces"
 	channelAnnounceURI  = "/channels/{channel_id}/announces/{message_id}"

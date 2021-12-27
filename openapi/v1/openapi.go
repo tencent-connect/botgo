@@ -104,55 +104,6 @@ func (o *openAPI) MeGuilds(ctx context.Context, pager *dto.GuildPager) ([]*dto.G
 	return guilds, nil
 }
 
-// Message 拉取单条消息
-func (o *openAPI) Message(ctx context.Context, channelID string, messageID string) (*dto.Message, error) {
-	resp, err := o.request(ctx).
-		SetResult(dto.Message{}).
-		SetPathParam("channel_id", channelID).
-		SetPathParam("message_id", messageID).
-		Get(getURL(messageURI, o.sandbox))
-	if err != nil {
-		return nil, err
-	}
-
-	return resp.Result().(*dto.Message), nil
-}
-
-// Messages 拉取消息列表
-func (o *openAPI) Messages(ctx context.Context, channelID string, pager *dto.MessagesPager) ([]*dto.Message, error) {
-	if pager == nil {
-		return nil, errs.ErrPagerIsNil
-	}
-	resp, err := o.request(ctx).
-		SetPathParam("channel_id", channelID).
-		SetQueryParams(pager.QueryParams()).
-		Get(getURL(messagesURI, o.sandbox))
-	if err != nil {
-		return nil, err
-	}
-
-	messages := make([]*dto.Message, 0)
-	if err := json.Unmarshal(resp.Body(), &messages); err != nil {
-		return nil, err
-	}
-
-	return messages, nil
-}
-
-// PostMessage ...
-func (o *openAPI) PostMessage(ctx context.Context, channelID string, msg *dto.MessageToCreate) (*dto.Message, error) {
-	resp, err := o.request(ctx).
-		SetResult(dto.Message{}).
-		SetPathParam("channel_id", channelID).
-		SetBody(msg).
-		Post(getURL(messagesURI, o.sandbox))
-	if err != nil {
-		return nil, err
-	}
-
-	return resp.Result().(*dto.Message), nil
-}
-
 // Guild ...
 func (o *openAPI) Guild(ctx context.Context, guildID string) (*dto.Guild, error) {
 	resp, err := o.request(ctx).
