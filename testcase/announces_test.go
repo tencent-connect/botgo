@@ -55,4 +55,11 @@ func TestAnnounces(t *testing.T) {
 			t.Error(err)
 		}
 	})
+	t.Run("clean guild announce no check messageID", func(t *testing.T) {
+		time.Sleep(3 * time.Second)
+		err := api.CleanGuildAnnounces(ctx, testGuildID)
+		if err != nil {
+			t.Error(err)
+		}
+	})
 }

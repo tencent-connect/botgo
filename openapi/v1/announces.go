@@ -63,3 +63,13 @@ func (o *openAPI) DeleteGuildAnnounces(ctx context.Context, guildID, messageID s
 		Delete(getURL(guildAnnounceURI, o.sandbox))
 	return err
 }
+
+// CleanGuildAnnounces 删除道全局公告,不校验 messageID
+func (o *openAPI) CleanGuildAnnounces(ctx context.Context, guildID string) error {
+	_, err := o.request(ctx).
+		SetResult(dto.Announces{}).
+		SetPathParam("guild_id", guildID).
+		SetPathParam("message_id", "all").
+		Delete(getURL(guildAnnounceURI, o.sandbox))
+	return err
+}

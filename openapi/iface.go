@@ -136,6 +136,8 @@ type AnnouncesAPI interface {
 		announce *dto.GuildAnnouncesToCreate) (*dto.Announces, error)
 	// DeleteGuildAnnounces 删除频道全局公告
 	DeleteGuildAnnounces(ctx context.Context, guildID, messageID string) error
+	// CleanGuildAnnounces 删除频道全局公告,不校验 messageID
+	CleanGuildAnnounces(ctx context.Context, guildID string) error
 }
 
 // ScheduleAPI 日程相关接口
