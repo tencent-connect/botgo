@@ -12,6 +12,7 @@ const (
 	ChannelTypeCategory
 	ChannelTypeLive        = 10000 + iota // 直播子频道
 	ChannelTypeApplication                // 应用子频道
+	ChannelTypeForum                      // 论坛子频道
 )
 
 // ChannelSubType 子频道子类型定义
