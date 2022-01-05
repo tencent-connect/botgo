@@ -106,7 +106,7 @@ func (c *Client) listenMessageAndHandle() {
 		// panic，一般是由于业务自己实现的 handle 不完善导致
 		// 打印日志后，关闭这个连接，进入重连流程
 		if err := recover(); err != nil {
-			log.Errorf("%s panic err: %v", c.session, err)
+			websocket.PanicHandler(err, c.session)
 			c.closeChan <- fmt.Errorf("panic: %v", err)
 		}
 	}()

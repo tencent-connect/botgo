@@ -65,7 +65,7 @@ func (l *ChanManager) newConnect(session dto.Session) {
 	defer func() {
 		// panic 留下日志，放回 session
 		if err := recover(); err != nil {
-			log.Errorf("[ws/session] panic err: %v", err)
+			websocket.PanicHandler(err, &session)
 			l.sessionChan <- session
 		}
 	}()
