@@ -1,4 +1,4 @@
-package testcase
+package apitest
 
 import (
 	"context"
@@ -9,9 +9,17 @@ import (
 	"time"
 
 	"github.com/tencent-connect/botgo"
+	"github.com/tencent-connect/botgo/openapi"
 	"github.com/tencent-connect/botgo/token"
 	"gopkg.in/yaml.v2"
 )
+
+var conf struct {
+	AppID uint64 `yaml:"appid"`
+	Token string `yaml:"token"`
+}
+var botToken *token.Token
+var api openapi.OpenAPI
 
 var (
 	testGuildID   = "3326534247441079828" // replace your guild id

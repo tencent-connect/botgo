@@ -1,4 +1,4 @@
-package testcase
+package apitest
 
 import (
 	"log"

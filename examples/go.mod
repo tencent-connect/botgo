@@ -4,15 +4,13 @@ go 1.17
 
 require (
 	github.com/go-redis/redis/v8 v8.11.4
+	github.com/google/uuid v1.3.0
 	github.com/tencent-connect/botgo v0.0.0-00010101000000-000000000000
 	go.uber.org/zap v1.19.1
-)
-
-require (
+	gopkg.in/yaml.v2 v2.4.0
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/go-resty/resty/v2 v2.6.0 // indirect
-	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/tidwall/gjson v1.9.3 // indirect
 	github.com/tidwall/match v1.1.1 // indirect

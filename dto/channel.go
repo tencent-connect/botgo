@@ -26,6 +26,16 @@ const (
 	ChannelSubTypeTeamGame                       // 开黑
 )
 
+// ChannelPrivateType 频道可见性类型定义
+type ChannelPrivateType int
+
+// 频道可见性类型定义
+const (
+	ChannelPrivateTypePublic         ChannelPrivateType = iota // 公开频道
+	ChannelPrivateTypeOnlyAdmin                                // 群主管理员可见
+	ChannelPrivateTypeAdminAndMember                           // 群主管理员+指定成员
+)
+
 // Channel 频道结构定义
 type Channel struct {
 	// 频道ID
@@ -44,9 +54,14 @@ type ChannelValueObject struct {
 	// 排序位置
 	Position int64 `json:"position"`
 	// 父频道的ID
-	ParentID string `json:"parent_id"`
+	ParentID string `json:"parent_id,omitempty"`
 	// 拥有者ID
-	OwnerID string `json:"owner_id"`
+	OwnerID string `json:"owner_id,omitempty"`
 	// 子频道子类型
 	SubType ChannelSubType `json:"sub_type"`
+	// 子频道可见性类型
+	PrivateType ChannelPrivateType `json:"private_type"`
+	// 创建私密子频道的时候，同时带上 userID，能够将这些成员添加为私密子频道的成员
+	// 注意：只有创建私密子频道的时候才支持这个参数
+	PrivateUserIDs []string `json:"private_user_ids,omitempty"`
 }

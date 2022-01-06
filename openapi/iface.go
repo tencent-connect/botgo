@@ -29,6 +29,7 @@ type OpenAPI interface {
 type Base interface {
 	Version() APIVersion
 	New(token *token.Token, inSandbox bool) OpenAPI
+	// WithTimeout 设置请求接口超时时间
 	WithTimeout(duration time.Duration) OpenAPI
 	// WithBody 设置 body，如果 openapi 提供设置 body 的功能，则需要自行识别 body 类型
 	WithBody(body interface{}) OpenAPI
@@ -69,11 +70,19 @@ type GuildAPI interface {
 
 // ChannelAPI 频道相关接口
 type ChannelAPI interface {
+	// Channel 拉取指定子频道信息
 	Channel(ctx context.Context, channelID string) (*dto.Channel, error)
+	// Channels 拉取子频道列表
 	Channels(ctx context.Context, guildID string) ([]*dto.Channel, error)
+	// PostChannel 创建子频道
 	PostChannel(ctx context.Context, guildID string, value *dto.ChannelValueObject) (*dto.Channel, error)
+	// PatchChannel 修改子频道
 	PatchChannel(ctx context.Context, channelID string, value *dto.ChannelValueObject) (*dto.Channel, error)
+	// DeleteChannel 删除指定子频道
 	DeleteChannel(ctx context.Context, channelID string) error
+	// CreatePrivateChannel 创建私密子频道
+	CreatePrivateChannel(ctx context.Context,
+		guildID string, value *dto.ChannelValueObject, userIds []string) (*dto.Channel, error)
 }
 
 // ChannelPermissionsAPI 子频道权限相关接口
@@ -82,7 +91,7 @@ type ChannelPermissionsAPI interface {
 	ChannelPermissions(ctx context.Context, channelID, userID string) (*dto.ChannelPermissions, error)
 	// PutChannelPermissions 修改指定子频道的权限
 	PutChannelPermissions(ctx context.Context, channelID, userID string, p *dto.UpdateChannelPermissions) error
-	// ChannelPermissions 获取指定子频道身份组的权限
+	// ChannelRolesPermissions  获取指定子频道身份组的权限
 	ChannelRolesPermissions(ctx context.Context, channelID, roleID string) (*dto.ChannelRolesPermissions, error)
 	// PutChannelRolesPermissions 修改指定子频道身份组的权限
 	PutChannelRolesPermissions(ctx context.Context, channelID, roleID string, p *dto.UpdateChannelPermissions) error
@@ -104,10 +113,14 @@ type RoleAPI interface {
 
 // MemberAPI 成员相关接口，添加成员到用户组等
 type MemberAPI interface {
-	MemberAddRole(ctx context.Context,
-		guildID string, roleID dto.RoleID, userID string, value *dto.MemberAddRoleBody) error
-	MemberDeleteRole(ctx context.Context,
-		guildID string, roleID dto.RoleID, userID string, value *dto.MemberAddRoleBody) error
+	MemberAddRole(
+		ctx context.Context,
+		guildID string, roleID dto.RoleID, userID string, value *dto.MemberAddRoleBody,
+	) error
+	MemberDeleteRole(
+		ctx context.Context,
+		guildID string, roleID dto.RoleID, userID string, value *dto.MemberAddRoleBody,
+	) error
 	// 频道指定成员禁言
 	MemberMute(ctx context.Context, guildID, userID string, mute *dto.UpdateGuildMute) error
 }
@@ -125,15 +138,19 @@ type DirectMessageAPI interface {
 // AnnouncesAPI 公告相关接口
 type AnnouncesAPI interface {
 	// CreateChannelAnnounces 创建子频道公告
-	CreateChannelAnnounces(ctx context.Context,
-		channelID string, announce *dto.ChannelAnnouncesToCreate) (*dto.Announces, error)
+	CreateChannelAnnounces(
+		ctx context.Context,
+		channelID string, announce *dto.ChannelAnnouncesToCreate,
+	) (*dto.Announces, error)
 	// DeleteChannelAnnounces 删除子频道公告,会校验 messageID 是否匹配
 	DeleteChannelAnnounces(ctx context.Context, channelID, messageID string) error
 	// CleanChannelAnnounces 删除子频道公告,不校验 messageID
 	CleanChannelAnnounces(ctx context.Context, channelID string) error
 	// CreateGuildAnnounces 创建频道全局公告
-	CreateGuildAnnounces(ctx context.Context, guildID string,
-		announce *dto.GuildAnnouncesToCreate) (*dto.Announces, error)
+	CreateGuildAnnounces(
+		ctx context.Context, guildID string,
+		announce *dto.GuildAnnouncesToCreate,
+	) (*dto.Announces, error)
 	// DeleteGuildAnnounces 删除频道全局公告
 	DeleteGuildAnnounces(ctx context.Context, guildID, messageID string) error
 	// CleanGuildAnnounces 删除频道全局公告,不校验 messageID

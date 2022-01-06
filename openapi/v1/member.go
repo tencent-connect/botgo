@@ -2,12 +2,17 @@ package v1
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/tencent-connect/botgo/dto"
+	"github.com/tencent-connect/botgo/errs"
 )
 
-func (o *openAPI) MemberAddRole(ctx context.Context, guildID string, roleID dto.RoleID, userID string,
-	value *dto.MemberAddRoleBody) error {
+// MemberAddRole 添加成员角色
+func (o *openAPI) MemberAddRole(
+	ctx context.Context, guildID string, roleID dto.RoleID, userID string,
+	value *dto.MemberAddRoleBody,
+) error {
 	if value == nil {
 		value = new(dto.MemberAddRoleBody)
 	}
@@ -20,8 +25,11 @@ func (o *openAPI) MemberAddRole(ctx context.Context, guildID string, roleID dto.
 	return err
 }
 
-func (o *openAPI) MemberDeleteRole(ctx context.Context, guildID string, roleID dto.RoleID, userID string,
-	value *dto.MemberAddRoleBody) error {
+// MemberDeleteRole 删除成员角色
+func (o *openAPI) MemberDeleteRole(
+	ctx context.Context, guildID string, roleID dto.RoleID, userID string,
+	value *dto.MemberAddRoleBody,
+) error {
 	if value == nil {
 		value = new(dto.MemberAddRoleBody)
 	}
@@ -31,5 +39,53 @@ func (o *openAPI) MemberDeleteRole(ctx context.Context, guildID string, roleID d
 		SetPathParam("user_id", userID).
 		SetBody(value).
 		Delete(getURL(memberRoleURI, o.sandbox))
+	return err
+}
+
+// GuildMember 拉取频道指定成员
+func (o *openAPI) GuildMember(ctx context.Context, guildID, userID string) (*dto.Member, error) {
+	resp, err := o.request(ctx).
+		SetResult(dto.Member{}).
+		SetPathParam("guild_id", guildID).
+		SetPathParam("user_id", userID).
+		Get(getURL(guildMemberURI, o.sandbox))
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.Result().(*dto.Member), nil
+}
+
+// GuildMembers 分页拉取频道内成员列表
+func (o *openAPI) GuildMembers(
+	ctx context.Context,
+	guildID string, pager *dto.GuildMembersPager,
+) ([]*dto.Member, error) {
+	if pager == nil {
+		return nil, errs.ErrPagerIsNil
+	}
+	resp, err := o.request(ctx).
+		SetPathParam("guild_id", guildID).
+		SetQueryParams(pager.QueryParams()).
+		Get(getURL(guildMembersURI, o.sandbox))
+	if err != nil {
+		return nil, err
+	}
+
+	members := make([]*dto.Member, 0)
+	if err := json.Unmarshal(resp.Body(), &members); err != nil {
+		return nil, err
+	}
+
+	return members, nil
+}
+
+// DeleteGuildMember 将指定成员踢出频道
+func (o *openAPI) DeleteGuildMember(ctx context.Context, guildID, userID string) error {
+	_, err := o.request(ctx).
+		SetResult(dto.Member{}).
+		SetPathParam("guild_id", guildID).
+		SetPathParam("user_id", userID).
+		Delete(getURL(guildMemberURI, o.sandbox))
 	return err
 }
