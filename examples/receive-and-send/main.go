@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -13,12 +14,6 @@ import (
 	"github.com/tencent-connect/botgo/token"
 	"github.com/tencent-connect/botgo/websocket"
 )
-
-// 输入输出词典
-var dict = map[string]string{
-	"hello": "World",
-	"hi":    "NoHi",
-}
 
 func main() {
 	ctx := context.Background()
@@ -47,11 +42,21 @@ func ATMessageEventHandler(api openapi.OpenAPI) websocket.ATMessageEventHandler 
 		log.Printf("[%s] %s", event.Type, data.Content)
 		input := strings.ToLower(message.ETLInput(data.Content))
 		log.Printf("clear input content is: %s", input)
-		// 根据词典中的输入，进行输出
-		if v, ok := dict[input]; ok {
+
+		if input == "time" {
+			msgTime, err := data.Timestamp.Time()
+			if err != nil {
+				log.Fatalln(err)
+			}
+			now := time.Now()
+			elapse := now.Sub(msgTime)
+			content := fmt.Sprintf(`
+收到的消息发送时时间为：%s
+当前本地时间为：%s
+时间延迟：%s`, msgTime, now, elapse)
 			if _, err := api.PostMessage(context.Background(), data.ChannelID,
 				&dto.MessageToCreate{
-					Content: message.MentionUser(data.Author.ID) + v,
+					Content: message.MentionUser(data.Author.ID) + content,
 					MsgID:   data.ID, // 填充 MsgID 则为被动消息，不填充则为主动消息
 				},
 			); err != nil {
