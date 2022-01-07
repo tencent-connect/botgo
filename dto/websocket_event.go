@@ -24,6 +24,8 @@ const (
 	EventAudioFinish           EventType = "AUDIO_FINISH"
 	EventAudioOnMic            EventType = "AUDIO_ON_MIC"
 	EventAudioOffMic           EventType = "AUDIO_OFF_MIC"
+	EventMessageAuditPass      EventType = "MESSAGE_AUDIT_PASS"
+	EventMessageAuditReject    EventType = "MESSAGE_AUDIT_REJECT"
 )
 
 // intentEventMap 不同 intent 对应的事件定义
@@ -38,6 +40,7 @@ var intentEventMap = map[Intent][]EventType{
 	IntentGuildAtMessage:        {EventAtMessageCreate},
 	IntentDirectMessages:        {EventDirectMessageCreate},
 	IntentAudio:                 {EventAudioStart, EventAudioFinish, EventAudioOnMic, EventAudioOffMic},
+	IntentAudit:                 {EventMessageAuditPass, EventMessageAuditReject},
 }
 
 var eventIntentMap = transposeIntentEventMap(intentEventMap)

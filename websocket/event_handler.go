@@ -15,6 +15,7 @@ var DefaultHandlers struct {
 	ATMessage       ATMessageEventHandler
 	DirectMessage   DirectMessageEventHandler
 	Audio           AudioEventHandler
+	MessageAudit    MessageAuditEventHandler
 }
 
 // PlainEventHandler 透传handler
@@ -43,6 +44,9 @@ type DirectMessageEventHandler func(event *dto.WSPayload, data *dto.WSDirectMess
 
 // AudioEventHandler 音频机器人事件 handler
 type AudioEventHandler func(event *dto.WSPayload, data *dto.WSAudioData) error
+
+// MessageAuditEventHandler 消息审核事件 handler
+type MessageAuditEventHandler func(event *dto.WSPayload, data *dto.WSMessageAuditData) error
 
 // RegisterHandlers 注册事件回调，并返回 intent 用于 websocket 的鉴权
 func RegisterHandlers(handlers ...interface{}) dto.Intent {
@@ -101,6 +105,9 @@ func registerMessageHandlers(i dto.Intent, handlers ...interface{}) dto.Intent {
 		case MessageReactionEventHandler:
 			DefaultHandlers.MessageReaction = handle
 			i = i | dto.EventToIntent(dto.EventMessageReactionAdd, dto.EventMessageReactionRemove)
+		case MessageAuditEventHandler:
+			DefaultHandlers.MessageAudit = handle
+			i = i | dto.EventToIntent(dto.EventMessageAuditPass, dto.EventMessageAuditReject)
 		default:
 		}
 	}

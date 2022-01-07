@@ -79,3 +79,6 @@ type WSAudioData AudioAction
 
 // WSMessageReactionData 表情表态事件
 type WSMessageReactionData MessageReaction
+
+// WSMessageAuditData 消息审核事件
+type WSMessageAuditData MessageAudit

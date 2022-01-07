@@ -35,6 +35,9 @@ var eventParseFuncMap = map[dto.OPCode]map[dto.EventType]eventParseFunc{
 		dto.EventAudioFinish: audioHandler,
 		dto.EventAudioOnMic:  audioHandler,
 		dto.EventAudioOffMic: audioHandler,
+
+		dto.EventMessageAuditPass:   messageAuditHandler,
+		dto.EventMessageAuditReject: messageAuditHandler,
 	},
 }
 
@@ -143,4 +146,15 @@ func audioHandler(event *dto.WSPayload, message []byte) error {
 func parseData(message []byte, target interface{}) error {
 	data := gjson.Get(string(message), "d")
 	return json.Unmarshal([]byte(data.String()), target)
+}
+
+func messageAuditHandler(event *dto.WSPayload, message []byte) error {
+	data := &dto.WSMessageAuditData{}
+	if err := parseData(message, data); err != nil {
+		return err
+	}
+	if websocket.DefaultHandlers.MessageAudit != nil {
+		return websocket.DefaultHandlers.MessageAudit(event, data)
+	}
+	return nil
 }

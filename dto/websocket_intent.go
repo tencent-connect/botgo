@@ -43,6 +43,7 @@ const (
 	IntentDirectMessageReactions
 	IntentDirectMessageTyping
 
+	IntentAudit Intent = 1 << 27 // 审核事件
 	// IntentAudio
 	//  - AUDIO_START           // 音频开始播放时
 	//  - AUDIO_FINISH          // 音频播放结束时
