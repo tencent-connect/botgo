@@ -72,6 +72,7 @@ func (l *ChanManager) newConnect(session dto.Session) {
 	wsClient := websocket.ClientImpl.New(session)
 	if err := wsClient.Connect(); err != nil {
 		log.Error(err)
+		l.sessionChan <- session // 连接失败，丢回去队列排队重连
 		return
 	}
 	var err error

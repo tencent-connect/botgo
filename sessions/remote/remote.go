@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	redis "github.com/go-redis/redis/v8"
+	"github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/log"
@@ -142,6 +142,7 @@ func (r *RedisManager) newConnect(session dto.Session) {
 	wsClient := websocket.ClientImpl.New(session)
 	if err := wsClient.Connect(); err != nil {
 		log.Error(err)
+		r.sessionProduceChan <- session // 连接失败，丢回去队列排队重连
 		return
 	}
 	var err error
