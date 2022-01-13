@@ -93,3 +93,9 @@ sdk 中实现了两个 SessionManager
 ## 四、SDK 开发说明
 
 请查看：[开发说明](./DEVELOP.md)
+
+## 五、加入官方社区
+
+欢迎扫码加入 **QQ 频道开发者社区**。
+
+<img alt="QQ频道开发者社区" src="https://mpqq.gtimg.cn/privacy-info/qq-guild.png" width="400">
