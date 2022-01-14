@@ -4,22 +4,26 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"path"
+	"runtime"
 	"strings"
 	"time"
 
 	"github.com/tencent-connect/botgo"
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/dto/message"
-	"github.com/tencent-connect/botgo/openapi"
 	"github.com/tencent-connect/botgo/token"
 	"github.com/tencent-connect/botgo/websocket"
 )
+
+// 消息处理器，持有 openapi 对象
+var processor Processor
 
 func main() {
 	ctx := context.Background()
 	// 加载 appid 和 token
 	botToken := token.New(token.TypeBot)
-	if err := botToken.LoadFromConfig("config.yaml"); err != nil {
+	if err := botToken.LoadFromConfig(getConfigPath("config.yaml")); err != nil {
 		log.Fatalln(err)
 	}
 	// 初始化 openapi
@@ -29,40 +33,28 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	processor = Processor{api: api}
+
 	// 根据不同的回调，生成 intents
-	intent := websocket.RegisterHandlers(ATMessageEventHandler(api))
+	intent := websocket.RegisterHandlers(ATMessageEventHandler())
 	if err = botgo.NewSessionManager().Start(wsInfo, botToken, &intent); err != nil {
 		log.Fatalln(err)
 	}
 }
 
 // ATMessageEventHandler 实现处理 at 消息的回调
-func ATMessageEventHandler(api openapi.OpenAPI) websocket.ATMessageEventHandler {
+func ATMessageEventHandler() websocket.ATMessageEventHandler {
 	return func(event *dto.WSPayload, data *dto.WSATMessageData) error {
-		log.Printf("[%s] %s", event.Type, data.Content)
 		input := strings.ToLower(message.ETLInput(data.Content))
-		log.Printf("clear input content is: %s", input)
-
-		if input == "time" {
-			msgTime, err := data.Timestamp.Time()
-			if err != nil {
-				log.Fatalln(err)
-			}
-			now := time.Now()
-			elapse := now.Sub(msgTime)
-			content := fmt.Sprintf(`
-收到的消息发送时时间为：%s
-当前本地时间为：%s
-时间延迟：%s`, msgTime, now, elapse)
-			if _, err := api.PostMessage(context.Background(), data.ChannelID,
-				&dto.MessageToCreate{
-					Content: message.MentionUser(data.Author.ID) + content,
-					MsgID:   data.ID, // 填充 MsgID 则为被动消息，不填充则为主动消息
-				},
-			); err != nil {
-				log.Fatalln(err)
-			}
-		}
-		return nil
+		return processor.ProcessMessage(input, data)
 	}
+}
+
+func getConfigPath(name string) string {
+	_, filename, _, ok := runtime.Caller(1)
+	if ok {
+		return fmt.Sprintf("%s/%s", path.Dir(filename), name)
+	}
+	return ""
 }
