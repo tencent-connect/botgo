@@ -6,6 +6,7 @@ import (
 
 // DefaultHandlers 默认的 handler 结构，管理所有支持的 handler 类型
 var DefaultHandlers struct {
+	Ready           ReadyHandler
 	Plain           PlainEventHandler
 	Guild           GuildEventHandler
 	GuildMember     GuildMemberEventHandler
@@ -17,6 +18,9 @@ var DefaultHandlers struct {
 	Audio           AudioEventHandler
 	MessageAudit    MessageAuditEventHandler
 }
+
+// ReadyHandler 可以处理 ws 的 ready 事件
+type ReadyHandler func(event *dto.WSPayload, data *dto.WSReadyData)
 
 // PlainEventHandler 透传handler
 type PlainEventHandler func(event *dto.WSPayload, message []byte) error
@@ -53,6 +57,8 @@ func RegisterHandlers(handlers ...interface{}) dto.Intent {
 	var i dto.Intent
 	for _, h := range handlers {
 		switch handle := h.(type) {
+		case ReadyHandler:
+			DefaultHandlers.Ready = handle
 		case PlainEventHandler:
 			DefaultHandlers.Plain = handle
 		case AudioEventHandler:

@@ -124,7 +124,7 @@ func (c *Client) listenMessageAndHandle() {
 		}
 		// ready 事件需要特殊处理
 		if event.Type == "READY" {
-			c.readyHandler(message)
+			c.readyHandler(event, message)
 			continue
 		}
 		// 解析具体事件，并投递给业务注册的 handler
@@ -237,8 +237,14 @@ func (c *Client) readMessageToQueue() {
 	}
 }
 
+func (c *Client) writeSeq(seq uint32) {
+	if seq > 0 {
+		c.session.LastSeq = seq
+	}
+}
+
 // readyHandler 针对ready返回的处理，需要记录 sessionID 等相关信息
-func (c *Client) readyHandler(message []byte) {
+func (c *Client) readyHandler(event *dto.WSPayload, message []byte) {
 	readyData := &dto.WSReadyData{}
 	if err := parseData(message, readyData); err != nil {
 		log.Errorf("%s parseReadyData failed, %v, message %v", c.session, err, message)
@@ -253,10 +259,8 @@ func (c *Client) readyHandler(message []byte) {
 		Username: readyData.User.Username,
 		Bot:      readyData.User.Bot,
 	}
-}
-
-func (c *Client) writeSeq(seq uint32) {
-	if seq > 0 {
-		c.session.LastSeq = seq
+	// 调用自定义的 ready 回调
+	if websocket.DefaultHandlers.Ready != nil {
+		websocket.DefaultHandlers.Ready(event, readyData)
 	}
 }
