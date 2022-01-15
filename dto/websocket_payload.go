@@ -6,7 +6,8 @@ type EventType string
 // WSPayload websocket 消息结构
 type WSPayload struct {
 	WSPayloadBase
-	Data interface{} `json:"d,omitempty"`
+	Data       interface{} `json:"d,omitempty"`
+	RawMessage []byte      `json:"-"` // 原始的 message 数据
 }
 
 // WSPayloadBase 基础消息结构，排除了 data

@@ -37,7 +37,9 @@ func main() {
 	processor = Processor{api: api}
 
 	// 根据不同的回调，生成 intents
-	intent := websocket.RegisterHandlers(ATMessageEventHandler(), ReadyHandler())
+	intent := websocket.RegisterHandlers(
+		ATMessageEventHandler(), ReadyHandler(), ErrorNotifyHandler(),
+	)
 	if err = botgo.NewSessionManager().Start(wsInfo, botToken, &intent); err != nil {
 		log.Fatalln(err)
 	}
@@ -47,6 +49,12 @@ func main() {
 func ReadyHandler() websocket.ReadyHandler {
 	return func(event *dto.WSPayload, data *dto.WSReadyData) {
 		log.Println("ready event receive: ", data)
+	}
+}
+
+func ErrorNotifyHandler() websocket.ErrorNotifyHandler {
+	return func(err error) {
+		log.Println("error notify receive: ", err)
 	}
 }
 
