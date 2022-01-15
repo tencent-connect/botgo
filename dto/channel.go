@@ -48,19 +48,19 @@ type Channel struct {
 // ChannelValueObject 频道的值对象部分
 type ChannelValueObject struct {
 	// 频道名称
-	Name string `json:"name"`
+	Name string `json:"name,omitempty"`
 	// 频道类型
-	Type ChannelType `json:"type"`
+	Type ChannelType `json:"type,omitempty"`
 	// 排序位置
-	Position int64 `json:"position"`
+	Position int64 `json:"position,omitempty"`
 	// 父频道的ID
 	ParentID string `json:"parent_id,omitempty"`
 	// 拥有者ID
 	OwnerID string `json:"owner_id,omitempty"`
 	// 子频道子类型
-	SubType ChannelSubType `json:"sub_type"`
+	SubType ChannelSubType `json:"sub_type,omitempty"`
 	// 子频道可见性类型
-	PrivateType ChannelPrivateType `json:"private_type"`
+	PrivateType ChannelPrivateType `json:"private_type,omitempty"`
 	// 创建私密子频道的时候，同时带上 userID，能够将这些成员添加为私密子频道的成员
 	// 注意：只有创建私密子频道的时候才支持这个参数
 	PrivateUserIDs []string `json:"private_user_ids,omitempty"`

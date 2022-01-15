@@ -3,7 +3,6 @@ package v1
 import (
 	"context"
 	"encoding/json"
-	"time"
 
 	"github.com/tencent-connect/botgo/dto"
 )
@@ -41,9 +40,6 @@ func (o *openAPI) Channels(ctx context.Context, guildID string) ([]*dto.Channel,
 // PostChannel 创建子频道
 func (o *openAPI) PostChannel(ctx context.Context,
 	guildID string, value *dto.ChannelValueObject) (*dto.Channel, error) {
-	if value.Position == 0 {
-		value.Position = time.Now().Unix()
-	}
 	resp, err := o.request(ctx).
 		SetResult(dto.Channel{}).
 		SetPathParam("guild_id", guildID).
@@ -59,9 +55,6 @@ func (o *openAPI) PostChannel(ctx context.Context,
 // PatchChannel 修改子频道
 func (o *openAPI) PatchChannel(ctx context.Context,
 	channelID string, value *dto.ChannelValueObject) (*dto.Channel, error) {
-	if value.Position == 0 {
-		value.Position = time.Now().Unix()
-	}
 	resp, err := o.request(ctx).
 		SetResult(dto.Channel{}).
 		SetPathParam("channel_id", channelID).

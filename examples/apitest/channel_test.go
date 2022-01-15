@@ -26,7 +26,7 @@ func TestChannel(t *testing.T) {
 				ctx, testGuildID, &dto.ChannelValueObject{
 					Name:     "机器人创建的频道",
 					Type:     dto.ChannelTypeText,
-					Position: 0,   // 默认是当前时间戳，如果传递，则要避免和其他频道的 position 重复，否则会报错
+					Position: 0,
 					ParentID: "0", // 父ID，正常应该找到一个分组ID，如果传0，就不归属在任何一个分组中
 				}, nil,
 			)
