@@ -43,14 +43,14 @@ var eventParseFuncMap = map[dto.OPCode]map[dto.EventType]eventParseFunc{
 
 type eventParseFunc func(event *dto.WSPayload, message []byte) error
 
-func parseAndHandle(event *dto.WSPayload, message []byte) error {
+func parseAndHandle(event *dto.WSPayload) error {
 	// 指定类型的 handler
 	if h, ok := eventParseFuncMap[event.OPCode][event.Type]; ok {
-		return h(event, message)
+		return h(event, event.RawMessage)
 	}
 	// 透传handler，如果未注册具体类型的 handler，会统一投递到这个 handler
 	if websocket.DefaultHandlers.Plain != nil {
-		return websocket.DefaultHandlers.Plain(event, message)
+		return websocket.DefaultHandlers.Plain(event, event.RawMessage)
 	}
 	return nil
 }

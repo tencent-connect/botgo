@@ -31,7 +31,7 @@ const (
 	CodeSessionLimit
 	// CodeConnCloseCantResume 关闭连接错误码，收拢 websocket close error，不允许 resume
 	CodeConnCloseCantResume
-	// CodeConnCloseCantIdentify 不允许连接的关闭连接错误
+	// CodeConnCloseCantIdentify 不允许连接的关闭连接错误，比如机器人被封禁
 	CodeConnCloseCantIdentify
 	// CodePagerIsNil 分页器为空
 	CodePagerIsNil

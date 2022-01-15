@@ -6,7 +6,10 @@ import (
 
 // DefaultHandlers 默认的 handler 结构，管理所有支持的 handler 类型
 var DefaultHandlers struct {
-	Plain           PlainEventHandler
+	Ready       ReadyHandler
+	ErrorNotify ErrorNotifyHandler
+	Plain       PlainEventHandler
+
 	Guild           GuildEventHandler
 	GuildMember     GuildMemberEventHandler
 	Channel         ChannelEventHandler
@@ -17,6 +20,13 @@ var DefaultHandlers struct {
 	Audio           AudioEventHandler
 	MessageAudit    MessageAuditEventHandler
 }
+
+// ReadyHandler 可以处理 ws 的 ready 事件
+type ReadyHandler func(event *dto.WSPayload, data *dto.WSReadyData)
+
+// ErrorNotifyHandler 当 ws 连接发生错误的时候，会回调，方便使用方监控相关错误
+// 比如 reconnect invalidSession 等错误，错误可以转换为 bot.Err
+type ErrorNotifyHandler func(err error)
 
 // PlainEventHandler 透传handler
 type PlainEventHandler func(event *dto.WSPayload, message []byte) error
@@ -53,6 +63,10 @@ func RegisterHandlers(handlers ...interface{}) dto.Intent {
 	var i dto.Intent
 	for _, h := range handlers {
 		switch handle := h.(type) {
+		case ReadyHandler:
+			DefaultHandlers.Ready = handle
+		case ErrorNotifyHandler:
+			DefaultHandlers.ErrorNotify = handle
 		case PlainEventHandler:
 			DefaultHandlers.Plain = handle
 		case AudioEventHandler:
@@ -64,14 +78,14 @@ func RegisterHandlers(handlers ...interface{}) dto.Intent {
 		default:
 		}
 	}
-	i = i | registerGuildHandlers(i, handlers...)
+	i = i | registerRelationHandlers(i, handlers...)
 	i = i | registerMessageHandlers(i, handlers...)
 
 	return i
 }
 
-// registerGuildHandlers 注册频道相关handlers
-func registerGuildHandlers(i dto.Intent, handlers ...interface{}) dto.Intent {
+// registerRelationHandlers 注册频道关系链相关handlers
+func registerRelationHandlers(i dto.Intent, handlers ...interface{}) dto.Intent {
 	for _, h := range handlers {
 		switch handle := h.(type) {
 		case GuildEventHandler:

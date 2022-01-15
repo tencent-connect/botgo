@@ -42,7 +42,7 @@ type Client struct {
 	heartBeatTicker *time.Ticker // 用于维持定时心跳
 }
 
-type messageChan chan []byte
+type messageChan chan *dto.WSPayload
 type closeErrorChan chan error
 
 // Connect 连接到 websocket
@@ -79,12 +79,16 @@ func (c *Client) Listening() error {
 			log.Errorf("%s Listening stop. err is %v", c.session, err)
 			// 不能够 identify 的错误
 			if wss.IsCloseError(err, 4914, 4915) {
-				return errs.New(errs.CodeConnCloseCantIdentify, err.Error())
+				err = errs.New(errs.CodeConnCloseCantIdentify, err.Error())
 			}
 			// 这里用 UnexpectedCloseError，如果有需要排除在外的 close error code，可以补充在第二个参数上
 			// 4009: session time out, 发了 reconnect 之后马上关闭连接时候的错误码，这个是允许 resume 的
 			if wss.IsUnexpectedCloseError(err, 4009) {
-				return errs.New(errs.CodeConnCloseCantResume, err.Error())
+				err = errs.New(errs.CodeConnCloseCantResume, err.Error())
+			}
+			if websocket.DefaultHandlers.ErrorNotify != nil {
+				// 通知到使用方错误
+				websocket.DefaultHandlers.ErrorNotify(err)
 			}
 			return err
 		case <-c.heartBeatTicker.C:
@@ -101,43 +105,9 @@ func (c *Client) Listening() error {
 	}
 }
 
-func (c *Client) listenMessageAndHandle() {
-	defer func() {
-		// panic，一般是由于业务自己实现的 handle 不完善导致
-		// 打印日志后，关闭这个连接，进入重连流程
-		if err := recover(); err != nil {
-			websocket.PanicHandler(err, c.session)
-			c.closeChan <- fmt.Errorf("panic: %v", err)
-		}
-	}()
-	for message := range c.messageQueue {
-		log.Debugf("%s listened message", c.session)
-		event := &dto.WSPayload{}
-		if err := json.Unmarshal(message, event); err != nil {
-			log.Errorf("%s json failed, %v", c.session, err)
-			continue
-		}
-		c.writeSeq(event.Seq)
-		// 处理内置的一些事件，如果处理成功，则这个事件不再投递给业务
-		if c.isHandleBuildIn(event, message) {
-			continue
-		}
-		// ready 事件需要特殊处理
-		if event.Type == "READY" {
-			c.readyHandler(message)
-			continue
-		}
-		// 解析具体事件，并投递给业务注册的 handler
-		if err := parseAndHandle(event, message); err != nil {
-			log.Errorf("%s parseAndHandle failed, %v", c.session, err)
-		}
-	}
-	log.Infof("%s message queue is closed", c.session)
-}
-
 func (c *Client) Write(message *dto.WSPayload) error {
 	m, _ := json.Marshal(message)
-	log.Infof("%s write message, %v", c.session, string(m))
+	log.Infof("%s write %s message, %v", c.session, dto.OPMeans(message.OPCode), string(m))
 
 	if err := c.conn.WriteMessage(wss.TextMessage, m); err != nil {
 		log.Errorf("%s WriteMessage failed, %v", c.session, err)
@@ -193,24 +163,75 @@ func (c *Client) Session() *dto.Session {
 	return c.session
 }
 
+func (c *Client) readMessageToQueue() {
+	for {
+		_, message, err := c.conn.ReadMessage()
+		if err != nil {
+			log.Errorf("%s read message failed, %v, message %s", c.session, err, string(message))
+			close(c.messageQueue)
+			c.closeChan <- err
+			return
+		}
+		event := &dto.WSPayload{}
+		if err := json.Unmarshal(message, event); err != nil {
+			log.Errorf("%s json failed, %v", c.session, err)
+			continue
+		}
+		event.RawMessage = message
+		log.Infof("%s receive %s message, %s", c.session, dto.OPMeans(event.OPCode), string(message))
+		// 处理内置的一些事件，如果处理成功，则这个事件不再投递给业务
+		if c.isHandleBuildIn(event) {
+			continue
+		}
+		c.messageQueue <- event
+	}
+}
+
+func (c *Client) listenMessageAndHandle() {
+	defer func() {
+		// panic，一般是由于业务自己实现的 handle 不完善导致
+		// 打印日志后，关闭这个连接，进入重连流程
+		if err := recover(); err != nil {
+			websocket.PanicHandler(err, c.session)
+			c.closeChan <- fmt.Errorf("panic: %v", err)
+		}
+	}()
+	for event := range c.messageQueue {
+		c.saveSeq(event.Seq)
+		// ready 事件需要特殊处理
+		if event.Type == "READY" {
+			c.readyHandler(event)
+			continue
+		}
+		// 解析具体事件，并投递给业务注册的 handler
+		if err := parseAndHandle(event); err != nil {
+			log.Errorf("%s parseAndHandle failed, %v", c.session, err)
+		}
+	}
+	log.Infof("%s message queue is closed", c.session)
+}
+
+func (c *Client) saveSeq(seq uint32) {
+	if seq > 0 {
+		c.session.LastSeq = seq
+	}
+}
+
 // isHandleBuildIn 内置的事件处理，处理那些不需要业务方处理的事件
 // return true 的时候说明事件已经被处理了
-func (c *Client) isHandleBuildIn(event *dto.WSPayload, message []byte) bool {
+func (c *Client) isHandleBuildIn(event *dto.WSPayload) bool {
 	switch event.OPCode {
 	case dto.WSHello: // 接收到 hello 后需要开始发心跳
-		c.startHeartBeatTicker(message)
-		return true
+		c.startHeartBeatTicker(event.RawMessage)
 	case dto.WSHeartbeatAck: // 心跳 ack 不需要业务处理
-		return true
 	case dto.WSReconnect: // 达到连接时长，需要重新连接，此时可以通过 resume 续传原连接上的事件
 		c.closeChan <- errs.ErrNeedReConnect
-		return true
 	case dto.WSInvalidSession: // 无效的 sessionLog，需要重新鉴权
 		c.closeChan <- errs.ErrInvalidSession
-		return true
 	default:
 		return false
 	}
+	return true
 }
 
 // startHeartBeatTicker 启动定时心跳
@@ -223,25 +244,11 @@ func (c *Client) startHeartBeatTicker(message []byte) {
 	c.heartBeatTicker.Reset(time.Duration(helloData.HeartbeatInterval) * time.Millisecond)
 }
 
-func (c *Client) readMessageToQueue() {
-	for {
-		_, message, err := c.conn.ReadMessage()
-		if err != nil {
-			log.Errorf("%s read message failed, %v, message %s", c.session, err, string(message))
-			close(c.messageQueue)
-			c.closeChan <- err
-			return
-		}
-		log.Infof("%s receive message, %s", c.session, string(message))
-		c.messageQueue <- message
-	}
-}
-
 // readyHandler 针对ready返回的处理，需要记录 sessionID 等相关信息
-func (c *Client) readyHandler(message []byte) {
+func (c *Client) readyHandler(event *dto.WSPayload) {
 	readyData := &dto.WSReadyData{}
-	if err := parseData(message, readyData); err != nil {
-		log.Errorf("%s parseReadyData failed, %v, message %v", c.session, err, message)
+	if err := parseData(event.RawMessage, readyData); err != nil {
+		log.Errorf("%s parseReadyData failed, %v, message %v", c.session, err, event.RawMessage)
 	}
 	c.version = readyData.Version
 	// 基于 ready 事件，更新 session 信息
@@ -253,10 +260,8 @@ func (c *Client) readyHandler(message []byte) {
 		Username: readyData.User.Username,
 		Bot:      readyData.User.Bot,
 	}
-}
-
-func (c *Client) writeSeq(seq uint32) {
-	if seq > 0 {
-		c.session.LastSeq = seq
+	// 调用自定义的 ready 回调
+	if websocket.DefaultHandlers.Ready != nil {
+		websocket.DefaultHandlers.Ready(event, readyData)
 	}
 }
