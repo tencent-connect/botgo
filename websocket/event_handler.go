@@ -70,14 +70,14 @@ func RegisterHandlers(handlers ...interface{}) dto.Intent {
 		default:
 		}
 	}
-	i = i | registerGuildHandlers(i, handlers...)
+	i = i | registerRelationHandlers(i, handlers...)
 	i = i | registerMessageHandlers(i, handlers...)
 
 	return i
 }
 
-// registerGuildHandlers 注册频道相关handlers
-func registerGuildHandlers(i dto.Intent, handlers ...interface{}) dto.Intent {
+// registerRelationHandlers 注册频道关系链相关handlers
+func registerRelationHandlers(i dto.Intent, handlers ...interface{}) dto.Intent {
 	for _, h := range handlers {
 		switch handle := h.(type) {
 		case GuildEventHandler:
