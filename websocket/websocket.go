@@ -11,7 +11,8 @@ import (
 
 var (
 	// ClientImpl websocket 实现
-	ClientImpl   WebSocket
+	ClientImpl WebSocket
+	// ResumeSignal 用于强制 resume 连接的信号量
 	ResumeSignal syscall.Signal
 )
 
