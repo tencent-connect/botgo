@@ -4,6 +4,9 @@ package client
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	wss "github.com/gorilla/websocket" // 是一个流行的 websocket 客户端，服务端实现
@@ -71,9 +74,18 @@ func (c *Client) Listening() error {
 	// read message from queue and handle,in goroutine to avoid business logic block closeChan and heartBeatTicker
 	go c.listenMessageAndHandle()
 
+	// 接收 resume signal
+	resumeSignal := make(chan os.Signal, 1)
+	if websocket.ResumeSignal >= syscall.SIGHUP {
+		signal.Notify(resumeSignal, websocket.ResumeSignal)
+	}
+
 	// handler message
 	for {
 		select {
+		case <-resumeSignal: // 使用信号量控制连接立即重连
+			log.Infof("%s, received resumeSignal signal", c.session)
+			return errs.ErrNeedReConnect
 		case err := <-c.closeChan:
 			// 关闭连接的错误码 https://bot.q.qq.com/wiki/develop/api/gateway/error/error.html
 			log.Errorf("%s Listening stop. err is %v", c.session, err)
@@ -82,7 +94,7 @@ func (c *Client) Listening() error {
 				err = errs.New(errs.CodeConnCloseCantIdentify, err.Error())
 			}
 			// 这里用 UnexpectedCloseError，如果有需要排除在外的 close error code，可以补充在第二个参数上
-			// 4009: session time out, 发了 reconnect 之后马上关闭连接时候的错误码，这个是允许 resume 的
+			// 4009: session time out, 发了 reconnect 之后马上关闭连接时候的错误码，这个是允许 resumeSignal 的
 			if wss.IsUnexpectedCloseError(err, 4009) {
 				err = errs.New(errs.CodeConnCloseCantResume, err.Error())
 			}

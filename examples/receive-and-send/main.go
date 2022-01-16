@@ -7,6 +7,7 @@ import (
 	"path"
 	"runtime"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/tencent-connect/botgo"
@@ -36,6 +37,7 @@ func main() {
 
 	processor = Processor{api: api}
 
+	websocket.RegisterResumeSignal(syscall.SIGUSR1)
 	// 根据不同的回调，生成 intents
 	intent := websocket.RegisterHandlers(
 		ATMessageEventHandler(), ReadyHandler(), ErrorNotifyHandler(),

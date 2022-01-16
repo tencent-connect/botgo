@@ -8,6 +8,9 @@ require (
 	github.com/tencent-connect/botgo v0.0.0-00010101000000-000000000000
 	go.uber.org/zap v1.19.1
 	gopkg.in/yaml.v2 v2.4.0
+)
+
+require (
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/go-resty/resty/v2 v2.6.0 // indirect

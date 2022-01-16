@@ -3,6 +3,7 @@ package websocket
 
 import (
 	"runtime"
+	"syscall"
 
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/log"
@@ -10,12 +11,18 @@ import (
 
 var (
 	// ClientImpl websocket 实现
-	ClientImpl WebSocket
+	ClientImpl   WebSocket
+	ResumeSignal syscall.Signal
 )
 
 // Register 注册 websocket 实现
 func Register(ws WebSocket) {
 	ClientImpl = ws
+}
+
+// RegisterResumeSignal 注册用于通知 client 将连接进行 resume 的信号
+func RegisterResumeSignal(signal syscall.Signal) {
+	ResumeSignal = signal
 }
 
 // PanicBufLen Panic 堆栈大小
