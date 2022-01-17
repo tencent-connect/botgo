@@ -81,11 +81,16 @@ func (o *openAPI) GuildMembers(
 }
 
 // DeleteGuildMember 将指定成员踢出频道
-func (o *openAPI) DeleteGuildMember(ctx context.Context, guildID, userID string) error {
+func (o *openAPI) DeleteGuildMember(ctx context.Context, guildID, userID string, opts ...dto.MemberDeleteOption) error {
+	opt := &dto.MemberDeleteOpts{}
+	for _, o := range opts {
+		o(opt)
+	}
 	_, err := o.request(ctx).
 		SetResult(dto.Member{}).
 		SetPathParam("guild_id", guildID).
 		SetPathParam("user_id", userID).
+		SetBody(opt).
 		Delete(getURL(guildMemberURI, o.sandbox))
 	return err
 }
