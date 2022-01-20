@@ -2,6 +2,7 @@ package log
 
 import (
 	"fmt"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
@@ -58,11 +59,12 @@ func (consoleLogger) Sync() error {
 }
 
 func output(level string, v ...interface{}) {
-	_, file, line, _ := runtime.Caller(3)
-	files := strings.Split(file, "/")
-	file = files[len(files)-1]
+	pc, file, line, _ := runtime.Caller(3)
+	file = filepath.Base(file)
+	funcFullName := runtime.FuncForPC(pc).Name()
+	funcName := strings.TrimPrefix(filepath.Ext(funcFullName), ".")
 
-	logFormat := "[%s] %s %s:%d " + fmt.Sprint(v...) + "\n"
+	logFormat := "[%s] %s %s:%d (%s) " + fmt.Sprint(v...) + "\n"
 	date := time.Now().Format("2006-01-02 15:04:05")
-	fmt.Printf(logFormat, level, date, file, line)
+	fmt.Printf(logFormat, level, date, file, line, funcName)
 }
