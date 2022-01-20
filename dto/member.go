@@ -7,6 +7,4 @@ type Member struct {
 	Nick     string    `json:"nick"`
 	User     *User     `json:"user"`
 	Roles    []string  `json:"roles"`
-	Deaf     bool      `json:"deaf"`
-	Mute     bool      `json:"mute"`
 }
