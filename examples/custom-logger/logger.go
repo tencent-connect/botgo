@@ -82,7 +82,7 @@ func output(v ...interface{}) string {
 	funcFullName := runtime.FuncForPC(pc).Name()
 	funcName := strings.TrimPrefix(filepath.Ext(funcFullName), ".")
 
-	logFormat := "%s %s:%d (%s)" + fmt.Sprint(v...) + "\n"
+	logFormat := "%s %s:%d:%s" + fmt.Sprint(v...) + "\n"
 	date := time.Now().Format("2006-01-02 15:04:05")
 	return fmt.Sprintf(logFormat, date, file, line, funcName)
 }
