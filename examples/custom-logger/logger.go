@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
@@ -76,11 +77,11 @@ func (f FileLogger) Sync() error {
 }
 
 func output(v ...interface{}) string {
-	_, file, line, _ := runtime.Caller(3)
-	files := strings.Split(file, "/")
-	file = files[len(files)-1]
+	pc, file, line, _ := runtime.Caller(3)
+	file = filepath.Base(file)
+	funcName := strings.TrimPrefix(filepath.Ext(runtime.FuncForPC(pc).Name()), ".")
 
-	logFormat := "%s %s:%d " + fmt.Sprint(v...) + "\n"
+	logFormat := "%s %s:%d:%s " + fmt.Sprint(v...) + "\n"
 	date := time.Now().Format("2006-01-02 15:04:05")
-	return fmt.Sprintf(logFormat, date, file, line)
+	return fmt.Sprintf(logFormat, date, file, line, funcName)
 }
