@@ -36,6 +36,15 @@ const (
 	ChannelPrivateTypeAdminAndMember                           // 群主管理员+指定成员
 )
 
+// SpeakPermissionType 发言权限类型定义
+type SpeakPermissionType int
+
+// 发言权限类型定义
+const (
+	SpeakPermissionTypePublic         SpeakPermissionType = iota + 1 // 公开发言权限
+	SpeakPermissionTypeAdminAndMember                                // 指定成员可发言
+)
+
 // Channel 频道结构定义
 type Channel struct {
 	// 频道ID
@@ -64,4 +73,8 @@ type ChannelValueObject struct {
 	// 创建私密子频道的时候，同时带上 userID，能够将这些成员添加为私密子频道的成员
 	// 注意：只有创建私密子频道的时候才支持这个参数
 	PrivateUserIDs []string `json:"private_user_ids,omitempty"`
+	// 发言权限
+	SpeakPermission SpeakPermissionType `json:"speak_permission,omitempty"`
+	// 应用子频道的应用ID，仅应用子频道有效，定义请参考 [文档](https://bot.q.qq.com/wiki/develop/api/openapi/channel/model.html)
+	ApplicationID string `json:"application_id,omitempty"`
 }
