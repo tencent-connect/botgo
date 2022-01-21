@@ -79,8 +79,7 @@ func (f FileLogger) Sync() error {
 func output(v ...interface{}) string {
 	pc, file, line, _ := runtime.Caller(3)
 	file = filepath.Base(file)
-	funcFullName := runtime.FuncForPC(pc).Name()
-	funcName := strings.TrimPrefix(filepath.Ext(funcFullName), ".")
+	funcName := strings.TrimPrefix(filepath.Ext(runtime.FuncForPC(pc).Name()), ".")
 
 	logFormat := "%s %s:%d:%s" + fmt.Sprint(v...) + "\n"
 	date := time.Now().Format("2006-01-02 15:04:05")
