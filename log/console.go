@@ -61,8 +61,7 @@ func (consoleLogger) Sync() error {
 func output(level string, v ...interface{}) {
 	pc, file, line, _ := runtime.Caller(3)
 	file = filepath.Base(file)
-	funcFullName := runtime.FuncForPC(pc).Name()
-	funcName := strings.TrimPrefix(filepath.Ext(funcFullName), ".")
+	funcName := strings.TrimPrefix(filepath.Ext(runtime.FuncForPC(pc).Name()), ".")
 
 	logFormat := "[%s] %s %s:%d:%s" + fmt.Sprint(v...) + "\n"
 	date := time.Now().Format("2006-01-02 15:04:05")
