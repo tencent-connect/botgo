@@ -14,7 +14,7 @@ func (o *openAPI) Message(ctx context.Context, channelID string, messageID strin
 		SetResult(dto.Message{}).
 		SetPathParam("channel_id", channelID).
 		SetPathParam("message_id", messageID).
-		Get(getURL(messageURI, o.sandbox))
+		Get(o.getURL(messageURI))
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func (o *openAPI) Messages(ctx context.Context, channelID string, pager *dto.Mes
 	resp, err := o.request(ctx).
 		SetPathParam("channel_id", channelID).
 		SetQueryParams(pager.QueryParams()).
-		Get(getURL(messagesURI, o.sandbox))
+		Get(o.getURL(messagesURI))
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (o *openAPI) PostMessage(ctx context.Context, channelID string, msg *dto.Me
 		SetResult(dto.Message{}).
 		SetPathParam("channel_id", channelID).
 		SetBody(msg).
-		Post(getURL(messagesURI, o.sandbox))
+		Post(o.getURL(messagesURI))
 	if err != nil {
 		return nil, err
 	}
@@ -62,6 +62,6 @@ func (o *openAPI) RetractMessage(ctx context.Context, channelID, msgID string) e
 	_, err := o.request(ctx).
 		SetPathParam("channel_id", channelID).
 		SetPathParam("message_id", string(msgID)).
-		Delete(getURL(messageURI, o.sandbox))
+		Delete(o.getURL(messageURI))
 	return err
 }

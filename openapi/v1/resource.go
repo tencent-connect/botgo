@@ -55,9 +55,10 @@ const (
 	scheduleURI  uri = "/channels/{channel_id}/schedules/{schedule_id}"
 )
 
-func getURL(endpoint uri, sandbox bool) string {
+// getURL 获取接口地址，会处理沙箱环境判断
+func (o *openAPI) getURL(endpoint uri) string {
 	d := domain
-	if sandbox {
+	if o.sandbox {
 		d = sandBoxDomain
 	}
 	return fmt.Sprintf("%s://%s%s", scheme, d, endpoint)

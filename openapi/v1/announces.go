@@ -13,7 +13,7 @@ func (o *openAPI) CreateChannelAnnounces(ctx context.Context, channelID string,
 		SetResult(dto.Announces{}).
 		SetPathParam("channel_id", channelID).
 		SetBody(announce).
-		Post(getURL(channelAnnouncesURI, o.sandbox))
+		Post(o.getURL(channelAnnouncesURI))
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +26,7 @@ func (o *openAPI) DeleteChannelAnnounces(ctx context.Context, channelID, message
 		SetResult(dto.Announces{}).
 		SetPathParam("channel_id", channelID).
 		SetPathParam("message_id", messageID).
-		Delete(getURL(channelAnnounceURI, o.sandbox))
+		Delete(o.getURL(channelAnnounceURI))
 	return err
 }
 
@@ -36,7 +36,7 @@ func (o *openAPI) CleanChannelAnnounces(ctx context.Context, channelID string) e
 		SetResult(dto.Announces{}).
 		SetPathParam("channel_id", channelID).
 		SetPathParam("message_id", "all").
-		Delete(getURL(channelAnnounceURI, o.sandbox))
+		Delete(o.getURL(channelAnnounceURI))
 	return err
 }
 
@@ -47,7 +47,7 @@ func (o *openAPI) CreateGuildAnnounces(ctx context.Context, guildID string,
 		SetResult(dto.Announces{}).
 		SetPathParam("guild_id", guildID).
 		SetBody(announce).
-		Post(getURL(guildAnnouncesURI, o.sandbox))
+		Post(o.getURL(guildAnnouncesURI))
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (o *openAPI) DeleteGuildAnnounces(ctx context.Context, guildID, messageID s
 		SetResult(dto.Announces{}).
 		SetPathParam("guild_id", guildID).
 		SetPathParam("message_id", messageID).
-		Delete(getURL(guildAnnounceURI, o.sandbox))
+		Delete(o.getURL(guildAnnounceURI))
 	return err
 }
 
@@ -70,6 +70,6 @@ func (o *openAPI) CleanGuildAnnounces(ctx context.Context, guildID string) error
 		SetResult(dto.Announces{}).
 		SetPathParam("guild_id", guildID).
 		SetPathParam("message_id", "all").
-		Delete(getURL(guildAnnounceURI, o.sandbox))
+		Delete(o.getURL(guildAnnounceURI))
 	return err
 }

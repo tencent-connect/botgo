@@ -11,7 +11,7 @@ func (o *openAPI) GuildMute(ctx context.Context, guildID string, mute *dto.Updat
 	_, err := o.request(ctx).
 		SetPathParam("guild_id", guildID).
 		SetBody(mute).
-		Patch(getURL(guildMuteURI, o.sandbox))
+		Patch(o.getURL(guildMuteURI))
 	if err != nil {
 		return err
 	}
@@ -25,7 +25,7 @@ func (o *openAPI) MemberMute(ctx context.Context, guildID, userID string,
 		SetPathParam("guild_id", guildID).
 		SetPathParam("user_id", userID).
 		SetBody(mute).
-		Patch(getURL(guildMembersMuteURI, o.sandbox))
+		Patch(o.getURL(guildMembersMuteURI))
 	if err != nil {
 		return err
 	}

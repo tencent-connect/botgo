@@ -10,7 +10,7 @@ import (
 func (o *openAPI) WS(ctx context.Context, _ map[string]string, _ string) (*dto.WebsocketAP, error) {
 	resp, err := o.request(ctx).
 		SetResult(dto.WebsocketAP{}).
-		Get(getURL(gatewayBotURI, o.sandbox))
+		Get(o.getURL(gatewayBotURI))
 	if err != nil {
 		return nil, err
 	}

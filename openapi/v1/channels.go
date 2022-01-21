@@ -12,7 +12,7 @@ func (o *openAPI) Channel(ctx context.Context, channelID string) (*dto.Channel, 
 	resp, err := o.request(ctx).
 		SetResult(dto.Channel{}).
 		SetPathParam("channel_id", channelID).
-		Get(getURL(channelURI, o.sandbox))
+		Get(o.getURL(channelURI))
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +24,7 @@ func (o *openAPI) Channel(ctx context.Context, channelID string) (*dto.Channel, 
 func (o *openAPI) Channels(ctx context.Context, guildID string) ([]*dto.Channel, error) {
 	resp, err := o.request(ctx).
 		SetPathParam("guild_id", guildID).
-		Get(getURL(channelsURI, o.sandbox))
+		Get(o.getURL(channelsURI))
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func (o *openAPI) PostChannel(ctx context.Context,
 		SetResult(dto.Channel{}).
 		SetPathParam("guild_id", guildID).
 		SetBody(value).
-		Post(getURL(channelsURI, o.sandbox))
+		Post(o.getURL(channelsURI))
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (o *openAPI) PatchChannel(ctx context.Context,
 		SetResult(dto.Channel{}).
 		SetPathParam("channel_id", channelID).
 		SetBody(value).
-		Patch(getURL(channelURI, o.sandbox))
+		Patch(o.getURL(channelURI))
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (o *openAPI) DeleteChannel(ctx context.Context, channelID string) error {
 	_, err := o.request(ctx).
 		SetResult(dto.Channel{}).
 		SetPathParam("channel_id", channelID).
-		Delete(getURL(channelURI, o.sandbox))
+		Delete(o.getURL(channelURI))
 	return err
 }
 

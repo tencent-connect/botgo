@@ -13,7 +13,7 @@ func (o openAPI) PostAudio(ctx context.Context, channelID string, value *dto.Aud
 		SetResult(dto.Channel{}).
 		SetPathParam("channel_id", channelID).
 		SetBody(value).
-		Post(getURL(audioControlURI, o.sandbox))
+		Post(o.getURL(audioControlURI))
 	if err != nil {
 		return nil, err
 	}

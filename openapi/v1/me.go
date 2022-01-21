@@ -12,7 +12,7 @@ import (
 func (o *openAPI) Me(ctx context.Context) (*dto.User, error) {
 	resp, err := o.request(ctx).
 		SetResult(dto.User{}).
-		Get(getURL(userMeURI, o.sandbox))
+		Get(o.getURL(userMeURI))
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +27,7 @@ func (o *openAPI) MeGuilds(ctx context.Context, pager *dto.GuildPager) ([]*dto.G
 	}
 	resp, err := o.request(ctx).
 		SetQueryParams(pager.QueryParams()).
-		Get(getURL(userMeGuildsURI, o.sandbox))
+		Get(o.getURL(userMeGuildsURI))
 	if err != nil {
 		return nil, err
 	}

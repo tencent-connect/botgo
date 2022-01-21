@@ -21,7 +21,7 @@ func (o *openAPI) MemberAddRole(
 		SetPathParam("role_id", string(roleID)).
 		SetPathParam("user_id", userID).
 		SetBody(value).
-		Put(getURL(memberRoleURI, o.sandbox))
+		Put(o.getURL(memberRoleURI))
 	return err
 }
 
@@ -38,7 +38,7 @@ func (o *openAPI) MemberDeleteRole(
 		SetPathParam("role_id", string(roleID)).
 		SetPathParam("user_id", userID).
 		SetBody(value).
-		Delete(getURL(memberRoleURI, o.sandbox))
+		Delete(o.getURL(memberRoleURI))
 	return err
 }
 
@@ -48,7 +48,7 @@ func (o *openAPI) GuildMember(ctx context.Context, guildID, userID string) (*dto
 		SetResult(dto.Member{}).
 		SetPathParam("guild_id", guildID).
 		SetPathParam("user_id", userID).
-		Get(getURL(guildMemberURI, o.sandbox))
+		Get(o.getURL(guildMemberURI))
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (o *openAPI) GuildMembers(
 	resp, err := o.request(ctx).
 		SetPathParam("guild_id", guildID).
 		SetQueryParams(pager.QueryParams()).
-		Get(getURL(guildMembersURI, o.sandbox))
+		Get(o.getURL(guildMembersURI))
 	if err != nil {
 		return nil, err
 	}
@@ -91,6 +91,6 @@ func (o *openAPI) DeleteGuildMember(ctx context.Context, guildID, userID string,
 		SetPathParam("guild_id", guildID).
 		SetPathParam("user_id", userID).
 		SetBody(opt).
-		Delete(getURL(guildMemberURI, o.sandbox))
+		Delete(o.getURL(guildMemberURI))
 	return err
 }

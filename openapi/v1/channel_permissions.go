@@ -14,7 +14,7 @@ func (o *openAPI) ChannelPermissions(ctx context.Context, channelID, userID stri
 		SetResult(dto.ChannelPermissions{}).
 		SetPathParam("channel_id", channelID).
 		SetPathParam("user_id", userID).
-		Get(getURL(channelPermissionsURI, o.sandbox))
+		Get(o.getURL(channelPermissionsURI))
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +28,7 @@ func (o *openAPI) ChannelRolesPermissions(ctx context.Context,
 		SetResult(dto.ChannelRolesPermissions{}).
 		SetPathParam("channel_id", channelID).
 		SetPathParam("role_id", roleID).
-		Get(getURL(channelRolesPermissionsURI, o.sandbox))
+		Get(o.getURL(channelRolesPermissionsURI))
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (o *openAPI) PutChannelPermissions(ctx context.Context, channelID, userID s
 		SetPathParam("channel_id", channelID).
 		SetPathParam("user_id", userID).
 		SetBody(p).
-		Put(getURL(channelPermissionsURI, o.sandbox))
+		Put(o.getURL(channelPermissionsURI))
 	return err
 }
 
@@ -73,6 +73,6 @@ func (o *openAPI) PutChannelRolesPermissions(ctx context.Context, channelID, rol
 		SetPathParam("channel_id", channelID).
 		SetPathParam("role_id", roleID).
 		SetBody(p).
-		Put(getURL(channelRolesPermissionsURI, o.sandbox))
+		Put(o.getURL(channelRolesPermissionsURI))
 	return err
 }
