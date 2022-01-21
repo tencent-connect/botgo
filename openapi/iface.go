@@ -28,11 +28,9 @@ type OpenAPI interface {
 // Base 基础能力接口
 type Base interface {
 	Version() APIVersion
-	New(token *token.Token, inSandbox bool) OpenAPI
+	Setup(token *token.Token, inSandbox bool) OpenAPI
 	// WithTimeout 设置请求接口超时时间
 	WithTimeout(duration time.Duration) OpenAPI
-	// WithBody 设置 body，如果 openapi 提供设置 body 的功能，则需要自行识别 body 类型
-	WithBody(body interface{}) OpenAPI
 	// Transport 透传请求，如果 sdk 没有及时跟进新的接口的变更，可以使用该方法进行透传，openapi 实现时可以按需选择是否实现该接口
 	Transport(ctx context.Context, method, url string, body interface{}) ([]byte, error)
 	// TraceID 返回上一次请求的 trace id

@@ -31,7 +31,7 @@ func (p Processor) ProcessMessage(input string, data *dto.WSATMessageData) error
 		toCreate.Ark = genReplyArk(data)
 	}
 	if _, err := p.api.PostMessage(context.Background(), data.ChannelID, toCreate); err != nil {
-		log.Fatalln(err)
+		log.Println(err)
 	}
 	return nil
 }
@@ -60,7 +60,8 @@ func genReplyContent(data *dto.WSATMessageData) string {
 `
 
 	msgTime, _ := data.Timestamp.Time()
-	return fmt.Sprintf(tpl,
+	return fmt.Sprintf(
+		tpl,
 		message.MentionUser(data.Author.ID),
 		message.MentionChannel(data.ChannelID),
 		msgTime, time.Now().Format(time.RFC3339),

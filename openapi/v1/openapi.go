@@ -19,10 +19,12 @@ import (
 type openAPI struct {
 	token   *token.Token
 	timeout time.Duration
-	body    interface{}
-	sandbox bool
-	debug   bool
-	trace   string // trace id
+
+	sandbox     bool   // 请求沙箱环境
+	debug       bool   // debug 模式，调试sdk时候使用
+	lastTraceID string // lastTraceID id
+
+	restyClient *resty.Client // resty client 复用
 }
 
 // Setup 注册
@@ -35,29 +37,25 @@ func (o *openAPI) Version() openapi.APIVersion {
 	return openapi.APIv1
 }
 
-// TraceID 获取 trace id
+// TraceID 获取 lastTraceID id
 func (o *openAPI) TraceID() string {
-	return o.trace
+	return o.lastTraceID
 }
 
-// New 生成一个实例
-func (o *openAPI) New(token *token.Token, inSandbox bool) openapi.OpenAPI {
-	return &openAPI{
+// Setup 生成一个实例
+func (o *openAPI) Setup(token *token.Token, inSandbox bool) openapi.OpenAPI {
+	api := &openAPI{
 		token:   token,
 		timeout: 3 * time.Second,
 		sandbox: inSandbox,
 	}
+	api.setupClient() // 初始化可复用的 client
+	return api
 }
 
 // WithTimeout 设置请求接口超时时间
 func (o *openAPI) WithTimeout(duration time.Duration) openapi.OpenAPI {
-	o.timeout = duration
-	return o
-}
-
-// WithBody 设置 body，如果 openapi 提供设置 body 的功能，则需要自行识别 body 类型
-func (o *openAPI) WithBody(body interface{}) openapi.OpenAPI {
-	o.body = body
+	o.restyClient.SetTimeout(duration)
 	return o
 }
 
@@ -67,42 +65,51 @@ func (o *openAPI) Transport(ctx context.Context, method, url string, body interf
 	return resp.Body(), err
 }
 
-func (o *openAPI) request(ctx context.Context) *resty.Request {
-	client := resty.New().
+// 初始化 client
+func (o *openAPI) setupClient() {
+	o.restyClient = resty.New().
 		SetLogger(log.DefaultLogger).
 		SetDebug(o.debug).
 		SetTimeout(o.timeout).
 		SetAuthToken(o.token.GetString()).
 		SetAuthScheme(string(o.token.Type)).
 		SetHeader("User-Agent", version.String()).
-		SetPreRequestHook(func(client *resty.Client, request *http.Request) error {
-			// 执行请求前过滤器
-			// 由于在 `OnBeforeRequest` 的时候，request 还没生成，所以 filter 不能使用，所以放到 `PreRequestHook`
-			return openapi.DoReqFilterChains(request, nil)
-		}).
+		SetPreRequestHook(
+			func(client *resty.Client, request *http.Request) error {
+				// 执行请求前过滤器
+				// 由于在 `OnBeforeRequest` 的时候，request 还没生成，所以 filter 不能使用，所以放到 `PreRequestHook`
+				return openapi.DoReqFilterChains(request, nil)
+			},
+		).
 		// 设置请求之后的钩子，打印日志，判断状态码
-		OnAfterResponse(func(client *resty.Client, resp *resty.Response) error {
-			log.Infof("%v", respInfo(resp))
-			// 执行请求后过滤器
-			if err := openapi.DoRespFilterChains(resp.Request.RawRequest, resp.RawResponse); err != nil {
-				return err
-			}
-			o.trace = resp.Header().Get(openapi.TraceIDKey)
-			// 非成功含义的状态码，需要返回 error 供调用方识别
-			if !openapi.IsSuccessStatus(resp.StatusCode()) {
-				return errs.New(resp.StatusCode(), string(resp.Body()), o.trace)
-			}
-			return nil
-		})
+		OnAfterResponse(
+			func(client *resty.Client, resp *resty.Response) error {
+				log.Infof("%v", respInfo(resp))
+				// 执行请求后过滤器
+				if err := openapi.DoRespFilterChains(resp.Request.RawRequest, resp.RawResponse); err != nil {
+					return err
+				}
+				traceID := resp.Header().Get(openapi.TraceIDKey)
+				o.lastTraceID = traceID
+				// 非成功含义的状态码，需要返回 error 供调用方识别
+				if !openapi.IsSuccessStatus(resp.StatusCode()) {
+					return errs.New(resp.StatusCode(), string(resp.Body()), traceID)
+				}
+				return nil
+			},
+		)
+}
 
-	return client.R().
-		SetContext(ctx)
+// request 每个请求，都需要创建一个 request
+func (o *openAPI) request(ctx context.Context) *resty.Request {
+	return o.restyClient.R().SetContext(ctx)
 }
 
 // respInfo 用于输出日志的时候格式化数据
 func respInfo(resp *resty.Response) string {
 	bodyJSON, _ := json.Marshal(resp.Request.Body)
-	return fmt.Sprintf("[OPENAPI]%v %v, trace:%v, status:%v, elapsed:%v req: %v, resp: %v",
+	return fmt.Sprintf(
+		"[OPENAPI]%v %v, traceID:%v, status:%v, elapsed:%v req: %v, resp: %v",
 		resp.Request.Method,
 		resp.Request.URL,
 		resp.Header().Get(openapi.TraceIDKey),
