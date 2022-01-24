@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net"
 	"net/http"
 	"time"
 
@@ -15,6 +16,9 @@ import (
 	"github.com/tencent-connect/botgo/token"
 	"github.com/tencent-connect/botgo/version"
 )
+
+// MaxIdleConns 默认指定空闲连接池大小
+const MaxIdleConns = 3000
 
 type openAPI struct {
 	token   *token.Token
@@ -68,6 +72,7 @@ func (o *openAPI) Transport(ctx context.Context, method, url string, body interf
 // 初始化 client
 func (o *openAPI) setupClient() {
 	o.restyClient = resty.New().
+		SetTransport(createTransport(nil, MaxIdleConns)). // 自定义 transport
 		SetLogger(log.DefaultLogger).
 		SetDebug(o.debug).
 		SetTimeout(o.timeout).
@@ -118,4 +123,25 @@ func respInfo(resp *resty.Response) string {
 		string(bodyJSON),
 		string(resp.Body()),
 	)
+}
+
+func createTransport(localAddr net.Addr, idleConns int) *http.Transport {
+	dialer := &net.Dialer{
+		Timeout:   60 * time.Second,
+		KeepAlive: 60 * time.Second,
+	}
+	if localAddr != nil {
+		dialer.LocalAddr = localAddr
+	}
+	return &http.Transport{
+		Proxy:                 http.ProxyFromEnvironment,
+		DialContext:           dialer.DialContext,
+		ForceAttemptHTTP2:     true,
+		MaxIdleConns:          idleConns,
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
+		MaxIdleConnsPerHost:   idleConns,
+		MaxConnsPerHost:       idleConns,
+	}
 }
