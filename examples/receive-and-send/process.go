@@ -23,7 +23,13 @@ type CMD struct {
 
 func (p Processor) ProcessMessage(input string, data *dto.WSATMessageData) error {
 	cmd := parseCommand(input)
-	toCreate := &dto.MessageToCreate{}
+	toCreate := &dto.MessageToCreate{
+		Content: "默认回复",
+		MessageReference: &dto.MessageReference{
+			// 引用这条消息
+			MessageID: data.ID,
+		},
+	}
 	if cmd.Cmd == "time" {
 		toCreate.Content = genReplyContent(data)
 	}
