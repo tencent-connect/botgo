@@ -95,3 +95,59 @@ func TestRetractMessage(t *testing.T) {
 		},
 	)
 }
+
+func TestMessageReference(t *testing.T) {
+	t.Run(
+		"引用消息", func(t *testing.T) {
+			message, err := api.PostMessage(ctx, testChannelID, &dto.MessageToCreate{
+				Content: "文本引用消息",
+				MessageReference: &dto.MessageReference{
+					MessageID:             testMessageID,
+					IgnoreGetMessageError: false,
+				},
+			})
+			if err != nil {
+				t.Error(err)
+			}
+			t.Logf("message : %v", message)
+		},
+	)
+}
+
+func TestMarkdownMessage(t *testing.T) {
+	t.Run(
+		"markdown 消息", func(t *testing.T) {
+			message, err := api.PostMessage(ctx, testChannelID, &dto.MessageToCreate{
+				Markdown: &dto.Markdown{
+					TemplateID: testMarkdownTemplateID,
+					Params: []*dto.MarkdownParams{
+						{
+							Key:    "title",
+							Values: []string{"标题"},
+						},
+						{
+							Key:    "slice",
+							Values: []string{"1", "频道名称<#1146349>", "3"},
+						},
+						{
+							Key:    "image",
+							Values: []string{"https://pub.idqqimg.com/pc/misc/files/20191015/32ed5b691a1138ac452a59e42f3f83b5.png"},
+						},
+						{
+							Key:    "link",
+							Values: []string{"[🔗我的收藏夹](qq.com)"},
+						},
+						{
+							Key:    "desc",
+							Values: []string{"简介"},
+						},
+					},
+				},
+			})
+			if err != nil {
+				t.Error(err)
+			}
+			t.Logf("message : %v", message)
+		},
+	)
+}

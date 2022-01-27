@@ -53,6 +53,9 @@ const (
 
 	schedulesURI uri = "/channels/{channel_id}/schedules"
 	scheduleURI  uri = "/channels/{channel_id}/schedules/{schedule_id}"
+
+	apiPermissionURI       uri = "/guilds/{guild_id}/api_permission"
+	apiPermissionDemandURI uri = "/guilds/{guild_id}/api_permission/demand"
 )
 
 // getURL 获取接口地址，会处理沙箱环境判断

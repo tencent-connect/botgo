@@ -23,6 +23,7 @@ type OpenAPI interface {
 	ChannelPermissionsAPI
 	AnnouncesAPI
 	ScheduleAPI
+	APIPermissionsAPI
 }
 
 // Base 基础能力接口
@@ -167,4 +168,13 @@ type ScheduleAPI interface {
 	ModifySchedule(ctx context.Context, channelID, scheduleID string, schedule *dto.Schedule) (*dto.Schedule, error)
 	// DeleteSchedule 删除日程
 	DeleteSchedule(ctx context.Context, channelID, scheduleID string) error
+}
+
+// APIPermissionsAPI api 权限相关接口
+type APIPermissionsAPI interface {
+	// GetAPIPermissions 获取频道可用权限列表
+	GetAPIPermissions(ctx context.Context, guildID string) (*dto.APIPermissions, error)
+	// RequireAPIPermissions 创建频道 API 接口权限授权链接
+	RequireAPIPermissions(ctx context.Context,
+		guildID string, demand *dto.APIPermissionDemandToCreate) (*dto.APIPermissionDemand, error)
 }
