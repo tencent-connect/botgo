@@ -27,7 +27,8 @@ func (p Processor) ProcessMessage(input string, data *dto.WSATMessageData) error
 		Content: "默认回复",
 		MessageReference: &dto.MessageReference{
 			// 引用这条消息
-			MessageID: data.ID,
+			MessageID:             data.ID,
+			IgnoreGetMessageError: true,
 		},
 	}
 	if cmd.Cmd == "time" {

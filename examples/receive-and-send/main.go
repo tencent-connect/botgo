@@ -40,7 +40,8 @@ func main() {
 	websocket.RegisterResumeSignal(syscall.SIGUSR1)
 	// 根据不同的回调，生成 intents
 	intent := websocket.RegisterHandlers(
-		ATMessageEventHandler(), ReadyHandler(), ErrorNotifyHandler(),
+		ATMessageEventHandler(), ReadyHandler(), ErrorNotifyHandler(), GuildEventHandler(),
+		MemberEventHandler(), ChannelEventHandler(),
 	)
 	if err = botgo.NewSessionManager().Start(wsInfo, botToken, &intent); err != nil {
 		log.Fatalln(err)
@@ -65,6 +66,27 @@ func ATMessageEventHandler() websocket.ATMessageEventHandler {
 	return func(event *dto.WSPayload, data *dto.WSATMessageData) error {
 		input := strings.ToLower(message.ETLInput(data.Content))
 		return processor.ProcessMessage(input, data)
+	}
+}
+
+func GuildEventHandler() websocket.GuildEventHandler {
+	return func(event *dto.WSPayload, data *dto.WSGuildData) error {
+		fmt.Println(data)
+		return nil
+	}
+}
+
+func ChannelEventHandler() websocket.ChannelEventHandler {
+	return func(event *dto.WSPayload, data *dto.WSChannelData) error {
+		fmt.Println(data)
+		return nil
+	}
+}
+
+func MemberEventHandler() websocket.GuildMemberEventHandler {
+	return func(event *dto.WSPayload, data *dto.WSGuildMemberData) error {
+		fmt.Println(data)
+		return nil
 	}
 }
 
