@@ -151,3 +151,17 @@ func TestMarkdownMessage(t *testing.T) {
 		},
 	)
 }
+
+func TestContentMessage(t *testing.T) {
+	t.Run(
+		"content 消息", func(t *testing.T) {
+			message, err := api.PostMessage(ctx, testChannelID, &dto.MessageToCreate{
+				Content: "文本消息",
+			})
+			if err != nil {
+				t.Error(err)
+			}
+			t.Logf("message : %v", message)
+		},
+	)
+}
