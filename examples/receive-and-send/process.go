@@ -36,15 +36,26 @@ func (p Processor) ProcessMessage(input string, data *dto.WSATMessageData) error
 		p.dmHandler(data)
 		return nil
 	}
-	if cmd.Cmd == "time" {
+
+	var reply bool
+	switch cmd.Cmd {
+	case "time":
 		toCreate.Content = genReplyContent(data)
-	}
-	if cmd.Cmd == "ark" {
+		reply = true
+	case "ark":
 		toCreate.Ark = genReplyArk(data)
+		reply = true
+	case "hi":
+		reply = true
+	default:
 	}
-	if _, err := p.api.PostMessage(context.Background(), data.ChannelID, toCreate); err != nil {
-		log.Println(err)
+	// 是否命中上面的指令，不回复多余的内容
+	if reply {
+		if _, err := p.api.PostMessage(context.Background(), data.ChannelID, toCreate); err != nil {
+			log.Println(err)
+		}
 	}
+
 	return nil
 }
 
