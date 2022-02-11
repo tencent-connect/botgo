@@ -41,7 +41,7 @@ func main() {
 	// 根据不同的回调，生成 intents
 	intent := websocket.RegisterHandlers(
 		ATMessageEventHandler(), ReadyHandler(), ErrorNotifyHandler(), GuildEventHandler(),
-		MemberEventHandler(), ChannelEventHandler(),
+		MemberEventHandler(), ChannelEventHandler(), DirectMessageHandler(),
 	)
 	if err = botgo.NewSessionManager().Start(wsInfo, botToken, &intent); err != nil {
 		log.Fatalln(err)
@@ -85,6 +85,13 @@ func ChannelEventHandler() websocket.ChannelEventHandler {
 
 func MemberEventHandler() websocket.GuildMemberEventHandler {
 	return func(event *dto.WSPayload, data *dto.WSGuildMemberData) error {
+		fmt.Println(data)
+		return nil
+	}
+}
+
+func DirectMessageHandler() websocket.DirectMessageEventHandler {
+	return func(event *dto.WSPayload, data *dto.WSDirectMessageData) error {
 		fmt.Println(data)
 		return nil
 	}

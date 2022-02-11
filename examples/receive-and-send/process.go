@@ -31,6 +31,11 @@ func (p Processor) ProcessMessage(input string, data *dto.WSATMessageData) error
 			IgnoreGetMessageError: true,
 		},
 	}
+	// 进入到私信逻辑
+	if cmd.Cmd == "dm" {
+		p.dmHandler(data)
+		return nil
+	}
 	if cmd.Cmd == "time" {
 		toCreate.Content = genReplyContent(data)
 	}
@@ -54,6 +59,30 @@ func parseCommand(input string) *CMD {
 	return &CMD{
 		Cmd:     s[0],
 		Content: strings.Join(s[1:], " "),
+	}
+}
+
+func (p Processor) dmHandler(data *dto.WSATMessageData) {
+	dm, err := p.api.CreateDirectMessage(
+		context.Background(), &dto.DirectMessageToCreate{
+			SourceGuildID: data.GuildID,
+			RecipientID:   data.Author.ID,
+		},
+	)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	toCreate := &dto.MessageToCreate{
+		Content: "默认私信回复",
+	}
+	_, err = p.api.PostDirectMessage(
+		context.Background(), dm, toCreate,
+	)
+	if err != nil {
+		log.Println(err)
+		return
 	}
 }
 
