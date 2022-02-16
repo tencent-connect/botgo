@@ -10,12 +10,21 @@ import (
 // 用于过滤 at 结构的正则
 var atRE = regexp.MustCompile(`<@!\d+>`)
 
+// 用于过滤用户发送消息中的空格符号，\u00A0 是 &nbsp; 的 unicode 编码，某些 mac/pc 版本，连续多个空格的时候会转换成这个符号发送到后台
+const spaceCharSet = " \u00A0"
+
+// CMD 一个简单的指令结构
+type CMD struct {
+	Cmd     string
+	Content string
+}
+
 // ETLInput 清理输出
 //  - 去掉@结构
 //  - trim
 func ETLInput(input string) string {
 	etlData := string(atRE.ReplaceAll([]byte(input), []byte("")))
-	etlData = strings.Trim(etlData, " ")
+	etlData = strings.Trim(etlData, spaceCharSet)
 	return etlData
 }
 
@@ -33,4 +42,20 @@ func MentionAllUser() string {
 // MentionChannel 提到子频道的格式
 func MentionChannel(channelID string) string {
 	return fmt.Sprintf("<#%s>", channelID)
+}
+
+// ParseCommand 解析命令，支持 `{cmd} {content}` 的命令格式
+func ParseCommand(input string) *CMD {
+	input = ETLInput(input)
+	s := strings.Split(input, " ")
+	if len(s) < 2 {
+		return &CMD{
+			Cmd:     strings.Trim(input, spaceCharSet),
+			Content: "",
+		}
+	}
+	return &CMD{
+		Cmd:     strings.Trim(s[0], spaceCharSet),
+		Content: strings.Join(s[1:], " "),
+	}
 }

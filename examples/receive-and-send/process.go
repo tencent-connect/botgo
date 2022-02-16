@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"strings"
 	"time"
 
 	"github.com/tencent-connect/botgo/dto"
@@ -16,15 +15,10 @@ type Processor struct {
 	api openapi.OpenAPI
 }
 
-type CMD struct {
-	Cmd     string
-	Content string
-}
-
 func (p Processor) ProcessMessage(input string, data *dto.WSATMessageData) error {
-	cmd := parseCommand(input)
+	cmd := message.ParseCommand(input)
 	toCreate := &dto.MessageToCreate{
-		Content: "默认回复",
+		Content: "默认回复 <emoji:37>",
 		MessageReference: &dto.MessageReference{
 			// 引用这条消息
 			MessageID:             data.ID,
@@ -49,6 +43,7 @@ func (p Processor) ProcessMessage(input string, data *dto.WSATMessageData) error
 		reply = true
 	default:
 	}
+	fmt.Println("1111111", reply, []byte(cmd.Cmd), len(cmd.Cmd))
 	// 是否命中上面的指令，不回复多余的内容
 	if reply {
 		if _, err := p.api.PostMessage(context.Background(), data.ChannelID, toCreate); err != nil {
@@ -57,20 +52,6 @@ func (p Processor) ProcessMessage(input string, data *dto.WSATMessageData) error
 	}
 
 	return nil
-}
-
-func parseCommand(input string) *CMD {
-	s := strings.Split(input, " ")
-	if len(s) < 2 {
-		return &CMD{
-			Cmd:     input,
-			Content: "",
-		}
-	}
-	return &CMD{
-		Cmd:     s[0],
-		Content: strings.Join(s[1:], " "),
-	}
 }
 
 func (p Processor) dmHandler(data *dto.WSATMessageData) {
