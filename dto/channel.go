@@ -75,6 +75,10 @@ type ChannelValueObject struct {
 	PrivateUserIDs []string `json:"private_user_ids,omitempty"`
 	// 发言权限
 	SpeakPermission SpeakPermissionType `json:"speak_permission,omitempty"`
-	// 应用子频道的应用ID，仅应用子频道有效，定义请参考 [文档](https://bot.q.qq.com/wiki/develop/api/openapi/channel/model.html)
+	// 应用子频道的应用ID，仅应用子频道有效，定义请参考
+	// [文档](https://bot.q.qq.com/wiki/develop/api/openapi/channel/model.html)
 	ApplicationID string `json:"application_id,omitempty"`
+	// 机器人在此频道上拥有的权限, 定义请参考
+	// [文档](https://bot.q.qq.com/wiki/develop/api/openapi/channel_permissions/model.html#permissions)
+	Permissions string `json:"permissions,omitempty"`
 }
