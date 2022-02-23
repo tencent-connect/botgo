@@ -32,6 +32,8 @@ type Message struct {
 	DirectMessage bool `json:"direct_message"`
 	// 子频道 seq，用于消息间的排序，seq 在同一子频道中按从先到后的顺序递增，不同的子频道之前消息无法排序
 	SeqInChannel string `json:"seq_in_channel"`
+	// 引用的消息
+	MessageReference *MessageReference `json:"message_reference,omitempty"`
 }
 
 // Embed 结构
