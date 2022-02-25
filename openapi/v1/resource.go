@@ -56,6 +56,8 @@ const (
 
 	apiPermissionURI       uri = "/guilds/{guild_id}/api_permission"
 	apiPermissionDemandURI uri = "/guilds/{guild_id}/api_permission/demand"
+
+	messageReactionURI uri = "/channels/{channel_id}/messages/{message_id}/reactions/{emoji_type}/{emoji_id}"
 )
 
 // getURL 获取接口地址，会处理沙箱环境判断

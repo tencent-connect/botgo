@@ -24,6 +24,7 @@ type OpenAPI interface {
 	AnnouncesAPI
 	ScheduleAPI
 	APIPermissionsAPI
+	MessageReactionAPI
 }
 
 // Base 基础能力接口
@@ -177,4 +178,12 @@ type APIPermissionsAPI interface {
 	// RequireAPIPermissions 创建频道 API 接口权限授权链接
 	RequireAPIPermissions(ctx context.Context,
 		guildID string, demand *dto.APIPermissionDemandToCreate) (*dto.APIPermissionDemand, error)
+}
+
+// MessageReactionAPI 消息表情表态接口
+type MessageReactionAPI interface {
+	// CreateMessageReaction 对消息发表表情表态
+	CreateMessageReaction(ctx context.Context, channelID, messageID string, emoji dto.Emoji) error
+	// DeleteOwnMessageReaction 删除自己的消息表情表态
+	DeleteOwnMessageReaction(ctx context.Context, channelID, messageID string, emoji dto.Emoji) error
 }
