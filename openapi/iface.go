@@ -24,6 +24,7 @@ type OpenAPI interface {
 	AnnouncesAPI
 	ScheduleAPI
 	APIPermissionsAPI
+	PinsAPI
 	MessageReactionAPI
 }
 
@@ -178,6 +179,18 @@ type APIPermissionsAPI interface {
 	// RequireAPIPermissions 创建频道 API 接口权限授权链接
 	RequireAPIPermissions(ctx context.Context,
 		guildID string, demand *dto.APIPermissionDemandToCreate) (*dto.APIPermissionDemand, error)
+}
+
+// PinsAPI 精华消息接口
+type PinsAPI interface {
+	// AddPins 添加精华消息
+	AddPins(ctx context.Context, channelID string, messageID string) (*dto.PinsMessage, error)
+	// DeletePins 删除精华消息
+	DeletePins(ctx context.Context, channelID, messageID string) error
+	// CleanPins 清除全部精华消息
+	CleanPins(ctx context.Context, channelID string) error
+	// GetPins 获取精华消息
+	GetPins(ctx context.Context, channelID string) (*dto.PinsMessage, error)
 }
 
 // MessageReactionAPI 消息表情表态接口

@@ -57,6 +57,9 @@ const (
 	apiPermissionURI       uri = "/guilds/{guild_id}/api_permission"
 	apiPermissionDemandURI uri = "/guilds/{guild_id}/api_permission/demand"
 
+	pinsURI = "/channels/{channel_id}/pins"
+	pinURI  = "/channels/{channel_id}/pins/{message_id}"
+
 	messageReactionURI uri = "/channels/{channel_id}/messages/{message_id}/reactions/{emoji_type}/{emoji_id}"
 )
 

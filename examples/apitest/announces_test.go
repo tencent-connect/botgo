@@ -40,7 +40,7 @@ func TestAnnounces(t *testing.T) {
 		},
 	)
 	t.Run(
-		"clean channel announce no check messageID", func(t *testing.T) {
+		"clean channel announce no check message id", func(t *testing.T) {
 			time.Sleep(3 * time.Second)
 			err := api.CleanChannelAnnounces(ctx, testChannelID)
 			if err != nil {
@@ -64,6 +64,34 @@ func TestAnnounces(t *testing.T) {
 		},
 	)
 	t.Run(
+		"create recommend channel guild announce", func(t *testing.T) {
+			time.Sleep(3 * time.Second)
+			announces, err := api.CreateGuildAnnounces(
+				ctx, testGuildID, &dto.GuildAnnouncesToCreate{
+					AnnouncesType: 0,
+					RecommendChannels: []dto.RecommendChannel{
+						{
+							ChannelID: "1146349",
+							Introduce: "子频道 1146349  欢迎语",
+						},
+						{
+							ChannelID: "1703191",
+							Introduce: "子频道 1703191  欢迎语",
+						},
+						{
+							ChannelID: "2651556",
+							Introduce: "子频道 2651556  欢迎语",
+						},
+					},
+				},
+			)
+			if err != nil {
+				t.Error(err)
+			}
+			t.Logf("announces:%+v", announces)
+		},
+	)
+	t.Run(
 		"delete guild announce", func(t *testing.T) {
 			time.Sleep(3 * time.Second)
 			if err := api.DeleteGuildAnnounces(ctx, testGuildID, testMessageID); err != nil {
@@ -72,7 +100,7 @@ func TestAnnounces(t *testing.T) {
 		},
 	)
 	t.Run(
-		"clean guild announce no check messageID", func(t *testing.T) {
+		"clean guild announce no check message id", func(t *testing.T) {
 			time.Sleep(3 * time.Second)
 			err := api.CleanGuildAnnounces(ctx, testGuildID)
 			if err != nil {
