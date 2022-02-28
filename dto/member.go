@@ -9,9 +9,23 @@ type Member struct {
 	Roles    []string  `json:"roles"`
 }
 
+// DeleteHistoryMsgDay 消息撤回天数
+type DeleteHistoryMsgDay = int
+
+// 支持的消息撤回天数，除这些天数之外，传递其他值将不会撤回任何消息
+const (
+	NoDelete                              = 0  // 不删除任何消息
+	DeleteThreeDays   DeleteHistoryMsgDay = 3  // 3天
+	DeleteSevenDays   DeleteHistoryMsgDay = 7  // 7天
+	DeleteFifteenDays DeleteHistoryMsgDay = 15 // 15天
+	DeleteThirtyDays  DeleteHistoryMsgDay = 30 // 30天
+	DeleteAll         DeleteHistoryMsgDay = -1 // 删除所有消息
+)
+
 // MemberDeleteOpts 删除成员额外参数
 type MemberDeleteOpts struct {
-	AddBlackList bool `json:"add_blacklist"`
+	AddBlackList         bool                `json:"add_blacklist"`
+	DeleteHistoryMsgDays DeleteHistoryMsgDay `json:"delete_history_msg_days"`
 }
 
 // MemberDeleteOption 删除成员选项
@@ -21,5 +35,12 @@ type MemberDeleteOption func(*MemberDeleteOpts)
 func WithAddBlackList(b bool) MemberDeleteOption {
 	return func(o *MemberDeleteOpts) {
 		o.AddBlackList = b
+	}
+}
+
+// WithDeleteHistoryMsg 删除成员时同时撤回消息
+func WithDeleteHistoryMsg(days DeleteHistoryMsgDay) MemberDeleteOption {
+	return func(o *MemberDeleteOpts) {
+		o.DeleteHistoryMsgDays = days
 	}
 }
