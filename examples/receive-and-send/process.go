@@ -16,6 +16,7 @@ type Processor struct {
 }
 
 func (p Processor) ProcessMessage(input string, data *dto.WSATMessageData) error {
+	ctx := context.Background()
 	cmd := message.ParseCommand(input)
 	toCreate := &dto.MessageToCreate{
 		Content: "默认回复 <emoji:37>",
@@ -32,6 +33,7 @@ func (p Processor) ProcessMessage(input string, data *dto.WSATMessageData) error
 	}
 
 	var reply bool
+	var announcement bool
 	switch cmd.Cmd {
 	case "time":
 		toCreate.Content = genReplyContent(data)
@@ -41,12 +43,21 @@ func (p Processor) ProcessMessage(input string, data *dto.WSATMessageData) error
 		reply = true
 	case "hi":
 		reply = true
+	case "公告":
+		announcement = true
 	default:
 	}
-	fmt.Println("1111111", reply, []byte(cmd.Cmd), len(cmd.Cmd))
 	// 是否命中上面的指令，不回复多余的内容
 	if reply {
-		if _, err := p.api.PostMessage(context.Background(), data.ChannelID, toCreate); err != nil {
+		if _, err := p.api.PostMessage(ctx, data.ChannelID, toCreate); err != nil {
+			log.Println(err)
+		}
+	}
+	if announcement {
+		if _, err := p.api.CreateChannelAnnounces(
+			ctx, data.ChannelID,
+			&dto.ChannelAnnouncesToCreate{MessageID: data.ID},
+		); err != nil {
 			log.Println(err)
 		}
 	}
