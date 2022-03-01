@@ -38,11 +38,16 @@ type Message struct {
 
 // Embed 结构
 type Embed struct {
-	Title       string        `json:"title,omitempty"`
-	Description string        `json:"description,omitempty"`
-	Prompt      string        `json:"prompt"` // 消息弹窗内容，消息列表摘要
-	Timestamp   Timestamp     `json:"timestamp,omitempty"`
-	Fields      []*EmbedField `json:"fields,omitempty"`
+	Title       string                `json:"title,omitempty"`
+	Description string                `json:"description,omitempty"`
+	Prompt      string                `json:"prompt"` // 消息弹窗内容，消息列表摘要
+	Thumbnail   MessageEmbedThumbnail `json:"thumbnail,omitempty"`
+	Fields      []*EmbedField         `json:"fields,omitempty"`
+}
+
+// MessageEmbedThumbnail embed 消息的缩略图对象
+type MessageEmbedThumbnail struct {
+	URL string `json:"url"`
 }
 
 // EmbedField Embed字段描述
