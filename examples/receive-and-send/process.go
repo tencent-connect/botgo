@@ -37,34 +37,26 @@ func (p Processor) ProcessMessage(input string, data *dto.WSATMessageData) error
 		return nil
 	}
 
-	var reply bool
-	var announcement bool
 	switch cmd.Cmd {
+	case "hi":
+		p.sendReply(ctx, data.ChannelID, toCreate)
 	case "time":
 		toCreate.Content = genReplyContent(data)
-		reply = true
+		p.sendReply(ctx, data.ChannelID, toCreate)
 	case "ark":
 		toCreate.Ark = genReplyArk(data)
-		reply = true
-	case "hi":
-		reply = true
+		p.sendReply(ctx, data.ChannelID, toCreate)
 	case "公告":
-		announcement = true
+		p.setAnnounces(ctx, data)
+	case "pin":
+		if data.MessageReference != nil {
+			p.setPins(ctx, data.ChannelID, data.MessageReference.MessageID)
+		}
+	case "emoji":
+		if data.MessageReference != nil {
+			p.setEmoji(ctx, data.ChannelID, data.MessageReference.MessageID)
+		}
 	default:
-	}
-	// 是否命中上面的指令，不回复多余的内容
-	if reply {
-		if _, err := p.api.PostMessage(ctx, data.ChannelID, toCreate); err != nil {
-			log.Println(err)
-		}
-	}
-	if announcement {
-		if _, err := p.api.CreateChannelAnnounces(
-			ctx, data.ChannelID,
-			&dto.ChannelAnnouncesToCreate{MessageID: data.ID},
-		); err != nil {
-			log.Println(err)
-		}
 	}
 
 	return nil
