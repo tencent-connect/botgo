@@ -19,7 +19,7 @@ func (p Processor) ProcessMessage(input string, data *dto.WSATMessageData) error
 	ctx := context.Background()
 	cmd := message.ParseCommand(input)
 	toCreate := &dto.MessageToCreate{
-		Content: "默认回复 <emoji:37>",
+		Content: "默认回复" + message.Emoji(307),
 		MessageReference: &dto.MessageReference{
 			// 引用这条消息
 			MessageID:             data.ID,

@@ -44,6 +44,12 @@ func MentionChannel(channelID string) string {
 	return fmt.Sprintf("<#%s>", channelID)
 }
 
+// Emoji emoji 内嵌格式，参考 https://bot.q.qq.com/wiki/develop/api/openapi/emoji/model.html
+// 只支持 type = 1 的系统表情
+func Emoji(ID int) string {
+	return fmt.Sprintf("<emoji:%d>", ID)
+}
+
 // ParseCommand 解析命令，支持 `{cmd} {content}` 的命令格式
 func ParseCommand(input string) *CMD {
 	input = ETLInput(input)
