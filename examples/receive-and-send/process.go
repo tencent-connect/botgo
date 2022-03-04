@@ -26,10 +26,6 @@ func (p Processor) ProcessMessage(input string, data *dto.WSATMessageData) error
 			IgnoreGetMessageError: true,
 		},
 	}
-	// 如果这个消息本身带着引用消息来的，那么继承一下引用关系
-	if data.MessageReference != nil {
-		toCreate.MessageReference.MessageID = data.MessageReference.MessageID
-	}
 
 	// 进入到私信逻辑
 	if cmd.Cmd == "dm" {
