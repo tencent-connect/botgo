@@ -60,4 +60,52 @@ func Test_websocket(t *testing.T) {
 			botgo.NewSessionManager().Start(ws, botToken, &intent)
 		},
 	)
+	t.Run(
+		"thread event", func(t *testing.T) {
+			var message websocket.ThreadEventHandler = func(
+				event *dto.WSPayload, data *dto.WSThreadData,
+			) error {
+				log.Println(event, data)
+				return nil
+			}
+			intent := websocket.RegisterHandlers(message)
+			botgo.NewSessionManager().Start(ws, botToken, &intent)
+		},
+	)
+	t.Run(
+		"post event", func(t *testing.T) {
+			var message websocket.PostEventHandler = func(
+				event *dto.WSPayload, data *dto.WSPostData,
+			) error {
+				log.Println(event, data)
+				return nil
+			}
+			intent := websocket.RegisterHandlers(message)
+			botgo.NewSessionManager().Start(ws, botToken, &intent)
+		},
+	)
+	t.Run(
+		"Reply event", func(t *testing.T) {
+			var message websocket.ReplyEventHandler = func(
+				event *dto.WSPayload, data *dto.WSReplyData,
+			) error {
+				log.Println(event, data)
+				return nil
+			}
+			intent := websocket.RegisterHandlers(message)
+			botgo.NewSessionManager().Start(ws, botToken, &intent)
+		},
+	)
+	t.Run(
+		"Forum audit event", func(t *testing.T) {
+			var message websocket.ForumAuditEventHandler = func(
+				event *dto.WSPayload, data *dto.WSForumAuditData,
+			) error {
+				log.Println(event, data)
+				return nil
+			}
+			intent := websocket.RegisterHandlers(message)
+			botgo.NewSessionManager().Start(ws, botToken, &intent)
+		},
+	)
 }

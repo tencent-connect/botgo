@@ -44,6 +44,17 @@ const (
 	IntentDirectMessageTyping
 
 	IntentAudit Intent = 1 << 27 // 审核事件
+	// IntentForum 论坛事件
+	//  - THREAD_CREATE     // 当用户创建主题时
+	//  - THREAD_UPDATE     // 当用户更新主题时
+	//  - THREAD_DELETE     // 当用户删除主题时
+	//  - POST_CREATE       // 当用户创建帖子时
+	//  - POST_DELETE       // 当用户删除帖子时
+	//  - REPLY_CREATE      // 当用户回复评论时
+	//  - REPLY_DELETE      // 当用户回复评论时
+	//  - FORUM_PUBLISH_AUDIT_RESULT      // 当用户发表审核通过时
+	IntentForum Intent = 1 << 28 // 论坛事件
+
 	// IntentAudio
 	//  - AUDIO_START           // 音频开始播放时
 	//  - AUDIO_FINISH          // 音频播放结束时

@@ -19,6 +19,10 @@ var DefaultHandlers struct {
 	DirectMessage   DirectMessageEventHandler
 	Audio           AudioEventHandler
 	MessageAudit    MessageAuditEventHandler
+	Thread          ThreadEventHandler
+	Post            PostEventHandler
+	Reply           ReplyEventHandler
+	ForumAudit      ForumAuditEventHandler
 }
 
 // ReadyHandler 可以处理 ws 的 ready 事件
@@ -58,6 +62,18 @@ type AudioEventHandler func(event *dto.WSPayload, data *dto.WSAudioData) error
 // MessageAuditEventHandler 消息审核事件 handler
 type MessageAuditEventHandler func(event *dto.WSPayload, data *dto.WSMessageAuditData) error
 
+// ThreadEventHandler 论坛主题事件 handler
+type ThreadEventHandler func(event *dto.WSPayload, data *dto.WSThreadData) error
+
+// PostEventHandler 论坛回帖事件 handler
+type PostEventHandler func(event *dto.WSPayload, data *dto.WSPostData) error
+
+// ReplyEventHandler 论坛帖子回复事件 handler
+type ReplyEventHandler func(event *dto.WSPayload, data *dto.WSReplyData) error
+
+// ForumAuditEventHandler 论坛帖子审核事件 handler
+type ForumAuditEventHandler func(event *dto.WSPayload, data *dto.WSForumAuditData) error
+
 // RegisterHandlers 注册事件回调，并返回 intent 用于 websocket 的鉴权
 func RegisterHandlers(handlers ...interface{}) dto.Intent {
 	var i dto.Intent
@@ -75,6 +91,15 @@ func RegisterHandlers(handlers ...interface{}) dto.Intent {
 				dto.EventAudioStart, dto.EventAudioFinish,
 				dto.EventAudioOnMic, dto.EventAudioOffMic,
 			)
+		case ThreadEventHandler:
+			i = i | dto.EventToIntent(
+				dto.EventForumThreadCreate, dto.EventForumThreadUpdate, dto.EventForumThreadDelete)
+		case PostEventHandler:
+			i = i | dto.EventToIntent(dto.EventForumPostCreate, dto.EventForumPostDelete)
+		case ReplyEventHandler:
+			i = i | dto.EventToIntent(dto.EventForumReplyCreate, dto.EventForumReplyDelete)
+		case ForumAuditEventHandler:
+			i = i | dto.EventToIntent(dto.EventForumAuditResult)
 		default:
 		}
 	}

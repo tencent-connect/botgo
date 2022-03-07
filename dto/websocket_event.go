@@ -26,6 +26,15 @@ const (
 	EventAudioOffMic           EventType = "AUDIO_OFF_MIC"
 	EventMessageAuditPass      EventType = "MESSAGE_AUDIT_PASS"
 	EventMessageAuditReject    EventType = "MESSAGE_AUDIT_REJECT"
+	EventForumThreadCreate     EventType = "FORUM_THREAD_CREATE"
+	EventForumThreadUpdate     EventType = "FORUM_THREAD_UPDATE"
+	EventForumThreadDelete     EventType = "FORUM_THREAD_DELETE"
+	EventForumPostCreate       EventType = "FORUM_POST_CREATE"
+	EventForumPostDelete       EventType = "FORUM_POST_DELETE"
+	EventForumReplyCreate      EventType = "FORUM_REPLY_CREATE"
+	EventForumReplyDelete      EventType = "FORUM_REPLY_DELETE"
+
+	EventForumAuditResult EventType = "FORUM_PUBLISH_AUDIT_RESULT"
 )
 
 // intentEventMap 不同 intent 对应的事件定义
@@ -41,6 +50,10 @@ var intentEventMap = map[Intent][]EventType{
 	IntentDirectMessages:        {EventDirectMessageCreate},
 	IntentAudio:                 {EventAudioStart, EventAudioFinish, EventAudioOnMic, EventAudioOffMic},
 	IntentAudit:                 {EventMessageAuditPass, EventMessageAuditReject},
+	IntentForum: {
+		EventForumThreadCreate, EventForumThreadUpdate, EventForumThreadDelete, EventForumPostCreate,
+		EventForumPostDelete, EventForumReplyCreate, EventForumReplyDelete, EventForumAuditResult,
+	},
 }
 
 var eventIntentMap = transposeIntentEventMap(intentEventMap)

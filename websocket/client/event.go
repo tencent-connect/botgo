@@ -38,6 +38,15 @@ var eventParseFuncMap = map[dto.OPCode]map[dto.EventType]eventParseFunc{
 
 		dto.EventMessageAuditPass:   messageAuditHandler,
 		dto.EventMessageAuditReject: messageAuditHandler,
+
+		dto.EventForumThreadCreate: threadHandler,
+		dto.EventForumThreadUpdate: threadHandler,
+		dto.EventForumThreadDelete: threadHandler,
+		dto.EventForumPostCreate:   postHandler,
+		dto.EventForumPostDelete:   postHandler,
+		dto.EventForumReplyCreate:  replyHandler,
+		dto.EventForumReplyDelete:  replyHandler,
+		dto.EventForumAuditResult:  forumAuditHandler,
 	},
 }
 
@@ -139,6 +148,50 @@ func audioHandler(event *dto.WSPayload, message []byte) error {
 	}
 	if websocket.DefaultHandlers.Audio != nil {
 		return websocket.DefaultHandlers.Audio(event, data)
+	}
+	return nil
+}
+
+func threadHandler(event *dto.WSPayload, message []byte) error {
+	data := &dto.WSThreadData{}
+	if err := parseData(message, data); err != nil {
+		return err
+	}
+	if websocket.DefaultHandlers.Thread != nil {
+		return websocket.DefaultHandlers.Thread(event, data)
+	}
+	return nil
+}
+
+func postHandler(event *dto.WSPayload, message []byte) error {
+	data := &dto.WSPostData{}
+	if err := parseData(message, data); err != nil {
+		return err
+	}
+	if websocket.DefaultHandlers.Post != nil {
+		return websocket.DefaultHandlers.Post(event, data)
+	}
+	return nil
+}
+
+func replyHandler(event *dto.WSPayload, message []byte) error {
+	data := &dto.WSReplyData{}
+	if err := parseData(message, data); err != nil {
+		return err
+	}
+	if websocket.DefaultHandlers.Reply != nil {
+		return websocket.DefaultHandlers.Reply(event, data)
+	}
+	return nil
+}
+
+func forumAuditHandler(event *dto.WSPayload, message []byte) error {
+	data := &dto.WSForumAuditData{}
+	if err := parseData(message, data); err != nil {
+		return err
+	}
+	if websocket.DefaultHandlers.ForumAudit != nil {
+		return websocket.DefaultHandlers.ForumAudit(event, data)
 	}
 	return nil
 }

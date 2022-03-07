@@ -83,3 +83,15 @@ type WSMessageReactionData MessageReaction
 
 // WSMessageAuditData 消息审核事件
 type WSMessageAuditData MessageAudit
+
+// WSThreadData 主题事件
+type WSThreadData Thread
+
+// WSPostData 帖子事件
+type WSPostData Post
+
+// WSReplyData 帖子回复事件
+type WSReplyData Reply
+
+// WSForumAuditData 帖子审核事件
+type WSForumAuditData ForumAuditResult
