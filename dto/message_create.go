@@ -9,7 +9,7 @@ type MessageToCreate struct {
 	MsgID            string            `json:"msg_id,omitempty"` // 要回复的消息id，为空是主动消息，公域机器人会异步审核，不为空是被动消息，公域机器人会校验语料
 	MessageReference *MessageReference `json:"message_reference,omitempty"`
 	Markdown         *Markdown         `json:"markdown,omitempty"`
-	Keyboard         string            `json:"keyboard,omitempty"` // 内嵌键盘
+	Keyboard         *Keyboard         `json:"keyboard,omitempty"` // 内嵌键盘
 }
 
 // MessageReference 引用消息

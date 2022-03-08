@@ -57,6 +57,22 @@ func (o *openAPI) PostMessage(ctx context.Context, channelID string, msg *dto.Me
 	return resp.Result().(*dto.Message), nil
 }
 
+// PatchMessage 编辑消息
+func (o *openAPI) PatchMessage(ctx context.Context,
+	channelID string, messageID string, msg *dto.MessageToCreate) (*dto.Message, error) {
+	resp, err := o.request(ctx).
+		SetResult(dto.Message{}).
+		SetPathParam("channel_id", channelID).
+		SetPathParam("message_id", messageID).
+		SetBody(msg).
+		Patch(o.getURL(messageURI))
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.Result().(*dto.Message), nil
+}
+
 // RetractMessage 撤回消息
 func (o *openAPI) RetractMessage(ctx context.Context, channelID, msgID string) error {
 	_, err := o.request(ctx).

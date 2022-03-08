@@ -165,3 +165,32 @@ func TestContentMessage(t *testing.T) {
 		},
 	)
 }
+
+func TestPatchMessage(t *testing.T) {
+	t.Run(
+		"修改消息", func(t *testing.T) {
+			message, err := api.PatchMessage(ctx, testChannelID, testMessageID, &dto.MessageToCreate{
+				Keyboard: &dto.Keyboard{
+					ID: "62",
+				},
+				Markdown: &dto.Markdown{
+					TemplateID: 65,
+					Params: []*dto.MarkdownParams{
+						{
+							Key:    "title",
+							Values: []string{"标题"},
+						},
+						{
+							Key:    "content",
+							Values: []string{"内容"},
+						},
+					},
+				},
+			})
+			if err != nil {
+				t.Error(err)
+			}
+			t.Logf("message : %v", message)
+		},
+	)
+}

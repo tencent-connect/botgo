@@ -56,6 +56,8 @@ type MessageAPI interface {
 	Message(ctx context.Context, channelID string, messageID string) (*dto.Message, error)
 	Messages(ctx context.Context, channelID string, pager *dto.MessagesPager) ([]*dto.Message, error)
 	PostMessage(ctx context.Context, channelID string, msg *dto.MessageToCreate) (*dto.Message, error)
+	PatchMessage(ctx context.Context,
+		channelID string, messageID string, msg *dto.MessageToCreate) (*dto.Message, error)
 	RetractMessage(ctx context.Context, channelID, msgID string) error
 }
 
