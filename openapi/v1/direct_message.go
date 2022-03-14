@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/tencent-connect/botgo/dto"
+	"github.com/tencent-connect/botgo/openapi"
 )
 
 // CreateDirectMessage 创建私信频道
@@ -33,10 +34,16 @@ func (o *openAPI) PostDirectMessage(ctx context.Context,
 }
 
 // RetractDMMessage 撤回私信消息
-func (o *openAPI) RetractDMMessage(ctx context.Context, guildID, msgID string) error {
-	_, err := o.request(ctx).
+func (o *openAPI) RetractDMMessage(ctx context.Context,
+	guildID, msgID string, options ...openapi.RetractMessageOption) error {
+	request := o.request(ctx).
 		SetPathParam("guild_id", guildID).
-		SetPathParam("message_id", string(msgID)).
-		Delete(o.getURL(dmsMessageURI))
+		SetPathParam("message_id", string(msgID))
+	for _, option := range options {
+		if option == openapi.RetractMessageOptionHidetip {
+			request = request.SetQueryParam("hidetip", "true")
+		}
+	}
+	_, err := request.Delete(o.getURL(dmsMessageURI))
 	return err
 }

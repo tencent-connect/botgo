@@ -6,6 +6,7 @@ import (
 
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/errs"
+	"github.com/tencent-connect/botgo/openapi"
 )
 
 // Message 拉取单条消息
@@ -74,10 +75,16 @@ func (o *openAPI) PatchMessage(ctx context.Context,
 }
 
 // RetractMessage 撤回消息
-func (o *openAPI) RetractMessage(ctx context.Context, channelID, msgID string) error {
-	_, err := o.request(ctx).
+func (o *openAPI) RetractMessage(ctx context.Context,
+	channelID, msgID string, options ...openapi.RetractMessageOption) error {
+	request := o.request(ctx).
 		SetPathParam("channel_id", channelID).
-		SetPathParam("message_id", string(msgID)).
-		Delete(o.getURL(messageURI))
+		SetPathParam("message_id", string(msgID))
+	for _, option := range options {
+		if option == openapi.RetractMessageOptionHidetip {
+			request = request.SetQueryParam("hidetip", "true")
+		}
+	}
+	_, err := request.Delete(o.getURL(messageURI))
 	return err
 }

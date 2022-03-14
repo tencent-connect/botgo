@@ -8,6 +8,14 @@ import (
 	"github.com/tencent-connect/botgo/token"
 )
 
+// RetractMessageOption 撤回消息可选参数
+type RetractMessageOption int
+
+const (
+	// RetractMessageOptionHidetip 撤回消息隐藏小灰条可选参数
+	RetractMessageOptionHidetip RetractMessageOption = 1
+)
+
 // OpenAPI openapi 完整实现
 type OpenAPI interface {
 	Base
@@ -58,7 +66,7 @@ type MessageAPI interface {
 	PostMessage(ctx context.Context, channelID string, msg *dto.MessageToCreate) (*dto.Message, error)
 	PatchMessage(ctx context.Context,
 		channelID string, messageID string, msg *dto.MessageToCreate) (*dto.Message, error)
-	RetractMessage(ctx context.Context, channelID, msgID string) error
+	RetractMessage(ctx context.Context, channelID, msgID string, options ...RetractMessageOption) error
 }
 
 // GuildAPI guild 相关接口
@@ -135,7 +143,7 @@ type DirectMessageAPI interface {
 	// PostDirectMessage 在私信频道内发消息
 	PostDirectMessage(ctx context.Context, dm *dto.DirectMessage, msg *dto.MessageToCreate) (*dto.Message, error)
 	// RetractDMMessage 撤回私信频道消息
-	RetractDMMessage(ctx context.Context, guildID, msgID string) error
+	RetractDMMessage(ctx context.Context, guildID, msgID string, options ...RetractMessageOption) error
 }
 
 // AnnouncesAPI 公告相关接口
