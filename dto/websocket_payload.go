@@ -95,3 +95,6 @@ type WSReplyData Reply
 
 // WSForumAuditData 帖子审核事件
 type WSForumAuditData ForumAuditResult
+
+// WSInteractionData 互动事件
+type WSInteractionData Interaction

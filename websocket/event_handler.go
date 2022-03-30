@@ -23,6 +23,7 @@ var DefaultHandlers struct {
 	Post            PostEventHandler
 	Reply           ReplyEventHandler
 	ForumAudit      ForumAuditEventHandler
+	Interaction     InteractionEventHandler
 }
 
 // ReadyHandler 可以处理 ws 的 ready 事件
@@ -74,6 +75,9 @@ type ReplyEventHandler func(event *dto.WSPayload, data *dto.WSReplyData) error
 // ForumAuditEventHandler 论坛帖子审核事件 handler
 type ForumAuditEventHandler func(event *dto.WSPayload, data *dto.WSForumAuditData) error
 
+// InteractionEventHandler 互动事件 handler
+type InteractionEventHandler func(event *dto.WSPayload, data *dto.WSInteractionData) error
+
 // RegisterHandlers 注册事件回调，并返回 intent 用于 websocket 的鉴权
 func RegisterHandlers(handlers ...interface{}) dto.Intent {
 	var i dto.Intent
@@ -100,6 +104,9 @@ func RegisterHandlers(handlers ...interface{}) dto.Intent {
 			i = i | dto.EventToIntent(dto.EventForumReplyCreate, dto.EventForumReplyDelete)
 		case ForumAuditEventHandler:
 			i = i | dto.EventToIntent(dto.EventForumAuditResult)
+		case InteractionEventHandler:
+			DefaultHandlers.Interaction = handle
+			i = i | dto.EventToIntent(dto.EventInteractionCreate)
 		default:
 		}
 	}

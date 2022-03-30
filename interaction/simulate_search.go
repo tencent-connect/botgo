@@ -26,10 +26,10 @@ type SearchConfig struct {
 // 开发者可以使用本方法请求自己的服务器进行平台内联搜索的模拟，避免在平台上触发搜索请求。提升联调效率。
 func SimulateSearch(config *SearchConfig, keyword string) (*dto.SearchRsp, error) {
 	interactionData := &dto.InteractionData{
-		Name:     "search",
-		Type:     dto.InteractionDataTypeChatSearch,
-		Resolved: dto.SearchInputResolved{Keyword: keyword},
+		Name: "search",
+		Type: dto.InteractionDataTypeChatSearch,
 	}
+	interactionData.Resolved, _ = json.Marshal(dto.SearchInputResolved{Keyword: keyword})
 	interaction := &dto.Interaction{
 		ApplicationID: config.AppID,
 		Type:          dto.InteractionTypeCommand,

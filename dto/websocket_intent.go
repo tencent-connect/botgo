@@ -43,7 +43,8 @@ const (
 	IntentDirectMessageReactions
 	IntentDirectMessageTyping
 
-	IntentAudit Intent = 1 << 27 // 审核事件
+	IntentInteraction Intent = 1 << 26 // 互动事件
+	IntentAudit       Intent = 1 << 27 // 审核事件
 	// IntentForum 论坛事件
 	//  - THREAD_CREATE     // 当用户创建主题时
 	//  - THREAD_UPDATE     // 当用户更新主题时

@@ -33,8 +33,8 @@ const (
 	EventForumPostDelete       EventType = "FORUM_POST_DELETE"
 	EventForumReplyCreate      EventType = "FORUM_REPLY_CREATE"
 	EventForumReplyDelete      EventType = "FORUM_REPLY_DELETE"
-
-	EventForumAuditResult EventType = "FORUM_PUBLISH_AUDIT_RESULT"
+	EventForumAuditResult      EventType = "FORUM_PUBLISH_AUDIT_RESULT"
+	EventInteractionCreate     EventType = "INTERACTION_CREATE"
 )
 
 // intentEventMap 不同 intent 对应的事件定义
@@ -54,6 +54,7 @@ var intentEventMap = map[Intent][]EventType{
 		EventForumThreadCreate, EventForumThreadUpdate, EventForumThreadDelete, EventForumPostCreate,
 		EventForumPostDelete, EventForumReplyCreate, EventForumReplyDelete, EventForumAuditResult,
 	},
+	IntentInteraction: {EventInteractionCreate},
 }
 
 var eventIntentMap = transposeIntentEventMap(intentEventMap)

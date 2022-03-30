@@ -47,6 +47,7 @@ var eventParseFuncMap = map[dto.OPCode]map[dto.EventType]eventParseFunc{
 		dto.EventForumReplyCreate:  replyHandler,
 		dto.EventForumReplyDelete:  replyHandler,
 		dto.EventForumAuditResult:  forumAuditHandler,
+		dto.EventInteractionCreate: interactionHandler,
 	},
 }
 
@@ -192,6 +193,17 @@ func forumAuditHandler(event *dto.WSPayload, message []byte) error {
 	}
 	if websocket.DefaultHandlers.ForumAudit != nil {
 		return websocket.DefaultHandlers.ForumAudit(event, data)
+	}
+	return nil
+}
+
+func interactionHandler(event *dto.WSPayload, message []byte) error {
+	data := &dto.WSInteractionData{}
+	if err := parseData(message, data); err != nil {
+		return err
+	}
+	if websocket.DefaultHandlers.Interaction != nil {
+		return websocket.DefaultHandlers.Interaction(event, data)
 	}
 	return nil
 }

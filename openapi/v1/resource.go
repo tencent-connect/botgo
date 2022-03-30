@@ -61,6 +61,8 @@ const (
 	pinURI  = "/channels/{channel_id}/pins/{message_id}"
 
 	messageReactionURI uri = "/channels/{channel_id}/messages/{message_id}/reactions/{emoji_type}/{emoji_id}"
+
+	interactionsURI = "/interactions/{interaction_id}"
 )
 
 // getURL 获取接口地址，会处理沙箱环境判断

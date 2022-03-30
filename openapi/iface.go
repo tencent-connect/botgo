@@ -34,6 +34,7 @@ type OpenAPI interface {
 	APIPermissionsAPI
 	PinsAPI
 	MessageReactionAPI
+	InteractionAPI
 }
 
 // Base 基础能力接口
@@ -209,4 +210,10 @@ type MessageReactionAPI interface {
 	CreateMessageReaction(ctx context.Context, channelID, messageID string, emoji dto.Emoji) error
 	// DeleteOwnMessageReaction 删除自己的消息表情表态
 	DeleteOwnMessageReaction(ctx context.Context, channelID, messageID string, emoji dto.Emoji) error
+}
+
+// InteractionAPI 互动接口
+type InteractionAPI interface {
+	// PutInteraction 更新互动信息
+	PutInteraction(ctx context.Context, interactionID string, body []byte) error
 }
