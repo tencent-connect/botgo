@@ -1,4 +1,4 @@
-package websocket
+package event
 
 import (
 	"fmt"
@@ -19,11 +19,13 @@ func TestRegisterHandlers(t *testing.T) {
 		return nil
 	}
 
-	t.Run("test intent", func(t *testing.T) {
-		i := RegisterHandlers(guild, message, audio)
-		fmt.Println(i)
-		assert.Equal(t, dto.IntentGuildMessages, i&dto.IntentGuildMessages)
-		assert.Equal(t, dto.IntentGuilds, i&dto.IntentGuilds)
-		assert.Equal(t, dto.IntentAudio, i&dto.IntentAudio)
-	})
+	t.Run(
+		"test intent", func(t *testing.T) {
+			i := RegisterHandlers(guild, message, audio)
+			fmt.Println(i)
+			assert.Equal(t, dto.IntentGuildMessages, i&dto.IntentGuildMessages)
+			assert.Equal(t, dto.IntentGuilds, i&dto.IntentGuilds)
+			assert.Equal(t, dto.IntentAudio, i&dto.IntentAudio)
+		},
+	)
 }

@@ -15,7 +15,7 @@
 # vendor/
 .idea
 # 用于存储demo中使用的 token，不提交到仓库
-examples/apitest/config.yaml
+examples/apitest/config.yaml.demo
 config.yaml
 demo
 

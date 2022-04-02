@@ -1,5 +1,5 @@
-// Package interaction 用于处理平台和机器人开发者之间的互动请求（如内联搜索等）。
-package interaction
+// Package signature 用于处理平台和机器人开发者之间的互动请求中的签名验证
+package signature
 
 import (
 	"bytes"
@@ -25,9 +25,9 @@ type ed25519Key struct {
 	PrivateKey ed25519.PrivateKey
 }
 
-// VerifySignature 验证签名，需要传入 http 头，httpBody
+// Verify 验证签名，需要传入 http 头，httpBody
 // 请在方法外部从 http request 上读取了 body 之后再交给签名验证方法进行验证，避免重复读取
-func VerifySignature(secret string, header http.Header, httpBody []byte) (bool, error) {
+func Verify(secret string, header http.Header, httpBody []byte) (bool, error) {
 	// 生成密钥
 	key, err := genKey(secret)
 	if err != nil {
@@ -46,8 +46,8 @@ func VerifySignature(secret string, header http.Header, httpBody []byte) (bool, 
 	return ed25519.Verify(key.PublicKey, content, sigBuffer), nil
 }
 
-// GenSignature 生成签名，sdk 中的改方法，主要用于与验证签名方法配合进行验证
-func GenSignature(secret string, header http.Header, httpBody []byte) (string, error) {
+// Generate 生成签名，sdk 中的改方法，主要用于与验证签名方法配合进行验证
+func Generate(secret string, header http.Header, httpBody []byte) (string, error) {
 	key, err := genKey(secret)
 	if err != nil {
 		log.Errorf("genPrivateKey error, %v", err)
@@ -64,7 +64,7 @@ func genOriginalContent(timestamp string, body []byte) ([]byte, error) {
 	if timestamp == "" {
 		return nil, errors.New("timestamp is nil")
 	}
-	// 按照 timstamp+Body 顺序组成签名体
+	// 按照 timestamp+Body 顺序组成签名体
 	var msg bytes.Buffer
 	msg.WriteString(timestamp)
 	msg.Write(body)

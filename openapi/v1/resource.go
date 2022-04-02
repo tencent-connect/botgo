@@ -63,6 +63,9 @@ const (
 	messageReactionURI uri = "/channels/{channel_id}/messages/{message_id}/reactions/{emoji_type}/{emoji_id}"
 
 	interactionsURI = "/interactions/{interaction_id}"
+
+	httpSessionsURI uri = "/gateway/webhook/sessions"
+	httpSessionURI  uri = "/gateway/webhook/sessions/{session_id}"
 )
 
 // getURL 获取接口地址，会处理沙箱环境判断

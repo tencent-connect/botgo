@@ -1,4 +1,4 @@
-package websocket
+package event
 
 import (
 	"github.com/tencent-connect/botgo/dto"
@@ -10,20 +10,24 @@ var DefaultHandlers struct {
 	ErrorNotify ErrorNotifyHandler
 	Plain       PlainEventHandler
 
-	Guild           GuildEventHandler
-	GuildMember     GuildMemberEventHandler
-	Channel         ChannelEventHandler
+	Guild       GuildEventHandler
+	GuildMember GuildMemberEventHandler
+	Channel     ChannelEventHandler
+
 	Message         MessageEventHandler
 	MessageReaction MessageReactionEventHandler
 	ATMessage       ATMessageEventHandler
 	DirectMessage   DirectMessageEventHandler
-	Audio           AudioEventHandler
 	MessageAudit    MessageAuditEventHandler
-	Thread          ThreadEventHandler
-	Post            PostEventHandler
-	Reply           ReplyEventHandler
-	ForumAudit      ForumAuditEventHandler
-	Interaction     InteractionEventHandler
+
+	Audio AudioEventHandler
+
+	Thread     ThreadEventHandler
+	Post       PostEventHandler
+	Reply      ReplyEventHandler
+	ForumAudit ForumAuditEventHandler
+
+	Interaction InteractionEventHandler
 }
 
 // ReadyHandler 可以处理 ws 的 ready 事件
@@ -95,15 +99,6 @@ func RegisterHandlers(handlers ...interface{}) dto.Intent {
 				dto.EventAudioStart, dto.EventAudioFinish,
 				dto.EventAudioOnMic, dto.EventAudioOffMic,
 			)
-		case ThreadEventHandler:
-			i = i | dto.EventToIntent(
-				dto.EventForumThreadCreate, dto.EventForumThreadUpdate, dto.EventForumThreadDelete)
-		case PostEventHandler:
-			i = i | dto.EventToIntent(dto.EventForumPostCreate, dto.EventForumPostDelete)
-		case ReplyEventHandler:
-			i = i | dto.EventToIntent(dto.EventForumReplyCreate, dto.EventForumReplyDelete)
-		case ForumAuditEventHandler:
-			i = i | dto.EventToIntent(dto.EventForumAuditResult)
 		case InteractionEventHandler:
 			DefaultHandlers.Interaction = handle
 			i = i | dto.EventToIntent(dto.EventInteractionCreate)
@@ -112,7 +107,31 @@ func RegisterHandlers(handlers ...interface{}) dto.Intent {
 	}
 	i = i | registerRelationHandlers(i, handlers...)
 	i = i | registerMessageHandlers(i, handlers...)
+	i = i | registerForumHandlers(i, handlers...)
 
+	return i
+}
+
+func registerForumHandlers(i dto.Intent, handlers ...interface{}) dto.Intent {
+	for _, h := range handlers {
+		switch handle := h.(type) {
+		case ThreadEventHandler:
+			DefaultHandlers.Thread = handle
+			i = i | dto.EventToIntent(
+				dto.EventForumThreadCreate, dto.EventForumThreadUpdate, dto.EventForumThreadDelete,
+			)
+		case PostEventHandler:
+			DefaultHandlers.Post = handle
+			i = i | dto.EventToIntent(dto.EventForumPostCreate, dto.EventForumPostDelete)
+		case ReplyEventHandler:
+			DefaultHandlers.Reply = handle
+			i = i | dto.EventToIntent(dto.EventForumReplyCreate, dto.EventForumReplyDelete)
+		case ForumAuditEventHandler:
+			DefaultHandlers.ForumAudit = handle
+			i = i | dto.EventToIntent(dto.EventForumAuditResult)
+		default:
+		}
+	}
 	return i
 }
 

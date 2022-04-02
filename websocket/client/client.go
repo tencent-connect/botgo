@@ -12,6 +12,7 @@ import (
 	wss "github.com/gorilla/websocket" // 是一个流行的 websocket 客户端，服务端实现
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/errs"
+	"github.com/tencent-connect/botgo/event"
 	"github.com/tencent-connect/botgo/log"
 	"github.com/tencent-connect/botgo/websocket"
 )
@@ -98,9 +99,9 @@ func (c *Client) Listening() error {
 			if wss.IsUnexpectedCloseError(err, 4009) {
 				err = errs.New(errs.CodeConnCloseCantResume, err.Error())
 			}
-			if websocket.DefaultHandlers.ErrorNotify != nil {
+			if event.DefaultHandlers.ErrorNotify != nil {
 				// 通知到使用方错误
-				websocket.DefaultHandlers.ErrorNotify(err)
+				event.DefaultHandlers.ErrorNotify(err)
 			}
 			return err
 		case <-c.heartBeatTicker.C:
@@ -131,15 +132,15 @@ func (c *Client) Write(message *dto.WSPayload) error {
 
 // Resume 重连
 func (c *Client) Resume() error {
-	event := &dto.WSPayload{
+	payload := &dto.WSPayload{
 		Data: &dto.WSResumeData{
 			Token:     c.session.Token.GetString(),
 			SessionID: c.session.ID,
 			Seq:       c.session.LastSeq,
 		},
 	}
-	event.OPCode = dto.WSResume // 内嵌结构体字段，单独赋值
-	return c.Write(event)
+	payload.OPCode = dto.WSResume // 内嵌结构体字段，单独赋值
+	return c.Write(payload)
 }
 
 // Identify 对一个连接进行鉴权，并声明监听的 shard 信息
@@ -148,7 +149,7 @@ func (c *Client) Identify() error {
 	if c.session.Intent == 0 {
 		c.session.Intent = dto.IntentGuilds
 	}
-	event := &dto.WSPayload{
+	payload := &dto.WSPayload{
 		Data: &dto.WSIdentityData{
 			Token:   c.session.Token.GetString(),
 			Intents: c.session.Intent,
@@ -158,8 +159,8 @@ func (c *Client) Identify() error {
 			},
 		},
 	}
-	event.OPCode = dto.WSIdentity
-	return c.Write(event)
+	payload.OPCode = dto.WSIdentity
+	return c.Write(payload)
 }
 
 // Close 关闭连接
@@ -184,18 +185,18 @@ func (c *Client) readMessageToQueue() {
 			c.closeChan <- err
 			return
 		}
-		event := &dto.WSPayload{}
-		if err := json.Unmarshal(message, event); err != nil {
+		payload := &dto.WSPayload{}
+		if err := json.Unmarshal(message, payload); err != nil {
 			log.Errorf("%s json failed, %v", c.session, err)
 			continue
 		}
-		event.RawMessage = message
-		log.Infof("%s receive %s message, %s", c.session, dto.OPMeans(event.OPCode), string(message))
+		payload.RawMessage = message
+		log.Infof("%s receive %s message, %s", c.session, dto.OPMeans(payload.OPCode), string(message))
 		// 处理内置的一些事件，如果处理成功，则这个事件不再投递给业务
-		if c.isHandleBuildIn(event) {
+		if c.isHandleBuildIn(payload) {
 			continue
 		}
-		c.messageQueue <- event
+		c.messageQueue <- payload
 	}
 }
 
@@ -208,15 +209,15 @@ func (c *Client) listenMessageAndHandle() {
 			c.closeChan <- fmt.Errorf("panic: %v", err)
 		}
 	}()
-	for event := range c.messageQueue {
-		c.saveSeq(event.Seq)
+	for payload := range c.messageQueue {
+		c.saveSeq(payload.Seq)
 		// ready 事件需要特殊处理
-		if event.Type == "READY" {
-			c.readyHandler(event)
+		if payload.Type == "READY" {
+			c.readyHandler(payload)
 			continue
 		}
 		// 解析具体事件，并投递给业务注册的 handler
-		if err := parseAndHandle(event); err != nil {
+		if err := event.ParseAndHandle(payload); err != nil {
 			log.Errorf("%s parseAndHandle failed, %v", c.session, err)
 		}
 	}
@@ -231,10 +232,10 @@ func (c *Client) saveSeq(seq uint32) {
 
 // isHandleBuildIn 内置的事件处理，处理那些不需要业务方处理的事件
 // return true 的时候说明事件已经被处理了
-func (c *Client) isHandleBuildIn(event *dto.WSPayload) bool {
-	switch event.OPCode {
+func (c *Client) isHandleBuildIn(payload *dto.WSPayload) bool {
+	switch payload.OPCode {
 	case dto.WSHello: // 接收到 hello 后需要开始发心跳
-		c.startHeartBeatTicker(event.RawMessage)
+		c.startHeartBeatTicker(payload.RawMessage)
 	case dto.WSHeartbeatAck: // 心跳 ack 不需要业务处理
 	case dto.WSReconnect: // 达到连接时长，需要重新连接，此时可以通过 resume 续传原连接上的事件
 		c.closeChan <- errs.ErrNeedReConnect
@@ -249,7 +250,7 @@ func (c *Client) isHandleBuildIn(event *dto.WSPayload) bool {
 // startHeartBeatTicker 启动定时心跳
 func (c *Client) startHeartBeatTicker(message []byte) {
 	helloData := &dto.WSHelloData{}
-	if err := parseData(message, helloData); err != nil {
+	if err := event.ParseData(message, helloData); err != nil {
 		log.Errorf("%s hello data parse failed, %v, message %v", c.session, err, message)
 	}
 	// 根据 hello 的回包，重新设置心跳的定时器时间
@@ -257,10 +258,10 @@ func (c *Client) startHeartBeatTicker(message []byte) {
 }
 
 // readyHandler 针对ready返回的处理，需要记录 sessionID 等相关信息
-func (c *Client) readyHandler(event *dto.WSPayload) {
+func (c *Client) readyHandler(payload *dto.WSPayload) {
 	readyData := &dto.WSReadyData{}
-	if err := parseData(event.RawMessage, readyData); err != nil {
-		log.Errorf("%s parseReadyData failed, %v, message %v", c.session, err, event.RawMessage)
+	if err := event.ParseData(payload.RawMessage, readyData); err != nil {
+		log.Errorf("%s parseReadyData failed, %v, message %v", c.session, err, payload.RawMessage)
 	}
 	c.version = readyData.Version
 	// 基于 ready 事件，更新 session 信息
@@ -273,7 +274,7 @@ func (c *Client) readyHandler(event *dto.WSPayload) {
 		Bot:      readyData.User.Bot,
 	}
 	// 调用自定义的 ready 回调
-	if websocket.DefaultHandlers.Ready != nil {
-		websocket.DefaultHandlers.Ready(event, readyData)
+	if event.DefaultHandlers.Ready != nil {
+		event.DefaultHandlers.Ready(payload, readyData)
 	}
 }

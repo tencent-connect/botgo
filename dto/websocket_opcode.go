@@ -17,6 +17,7 @@ const (
 	WSInvalidSession
 	WSHello
 	WSHeartbeatAck
+	HTTPCallbackAck
 )
 
 // opMeans op 对应的含义字符串标识

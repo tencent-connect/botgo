@@ -1,4 +1,4 @@
-package interaction
+package search
 
 import (
 	"bytes"
@@ -10,13 +10,14 @@ import (
 	"time"
 
 	"github.com/tencent-connect/botgo/dto"
+	"github.com/tencent-connect/botgo/interaction/signature"
 	"github.com/tencent-connect/botgo/log"
 )
 
 const maxRespBuffer = 65535
 
-// SearchConfig 搜索请求配置
-type SearchConfig struct {
+// Config 搜索请求配置
+type Config struct {
 	AppID    uint64
 	EndPoint string // 回调url地址
 	Secret   string
@@ -24,7 +25,7 @@ type SearchConfig struct {
 
 // SimulateSearch 模拟内联搜索请求
 // 开发者可以使用本方法请求自己的服务器进行平台内联搜索的模拟，避免在平台上触发搜索请求。提升联调效率。
-func SimulateSearch(config *SearchConfig, keyword string) (*dto.SearchRsp, error) {
+func SimulateSearch(config *Config, keyword string) (*dto.SearchRsp, error) {
 	interactionData := &dto.InteractionData{
 		Name: "search",
 		Type: dto.InteractionDataTypeChatSearch,
@@ -41,8 +42,8 @@ func SimulateSearch(config *SearchConfig, keyword string) (*dto.SearchRsp, error
 
 	// calc sig
 	header := http.Header{}
-	header.Set(HeaderTimestamp, timestamp)
-	sig, err := GenSignature(config.Secret, header, jsonStr)
+	header.Set(signature.HeaderTimestamp, timestamp)
+	sig, err := signature.Generate(config.Secret, header, jsonStr)
 	if err != nil {
 		return nil, err
 	}
@@ -52,8 +53,8 @@ func SimulateSearch(config *SearchConfig, keyword string) (*dto.SearchRsp, error
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set(HeaderTimestamp, timestamp)
-	req.Header.Set(HeaderSig, sig)
+	req.Header.Set(signature.HeaderTimestamp, timestamp)
+	req.Header.Set(signature.HeaderSig, sig)
 	log.Info(req)
 
 	// parse resp

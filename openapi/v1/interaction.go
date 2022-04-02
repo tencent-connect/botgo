@@ -6,7 +6,7 @@ import (
 
 // PutInteraction 更新 interaction
 func (o *openAPI) PutInteraction(ctx context.Context,
-	interactionID string, body []byte) error {
+	interactionID string, body string) error {
 	_, err := o.request(ctx).
 		SetPathParam("interaction_id", interactionID).
 		SetBody(body).

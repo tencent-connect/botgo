@@ -8,8 +8,8 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/tencent-connect/botgo"
 	"github.com/tencent-connect/botgo/dto"
+	"github.com/tencent-connect/botgo/event"
 	"github.com/tencent-connect/botgo/sessions/remote"
-	"github.com/tencent-connect/botgo/websocket"
 )
 
 func Test_redisSessionManager(t *testing.T) {
@@ -29,11 +29,11 @@ func Test_redisSessionManager(t *testing.T) {
 
 	t.Run(
 		"at message", func(t *testing.T) {
-			var message websocket.ATMessageEventHandler = func(event *dto.WSPayload, data *dto.WSATMessageData) error {
+			var message event.ATMessageEventHandler = func(event *dto.WSPayload, data *dto.WSATMessageData) error {
 				log.Println(event, data)
 				return nil
 			}
-			intent := websocket.RegisterHandlers(message)
+			intent := event.RegisterHandlers(message)
 			ws.Shards = 2
 			botgo.NewSessionManager().Start(ws, botToken, &intent)
 		},

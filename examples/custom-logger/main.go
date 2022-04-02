@@ -9,9 +9,9 @@ import (
 	"github.com/tencent-connect/botgo"
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/dto/message"
+	"github.com/tencent-connect/botgo/event"
 	"github.com/tencent-connect/botgo/openapi"
 	"github.com/tencent-connect/botgo/token"
-	"github.com/tencent-connect/botgo/websocket"
 )
 
 func main() {
@@ -38,14 +38,14 @@ func main() {
 		log.Fatalln(err)
 	}
 	// 根据不同的回调，生成 intents
-	intent := websocket.RegisterHandlers(ATMessageEventHandler(api))
+	intent := event.RegisterHandlers(ATMessageEventHandler(api))
 	if err = botgo.NewSessionManager().Start(wsInfo, botToken, &intent); err != nil {
 		log.Fatalln(err)
 	}
 }
 
 // ATMessageEventHandler 实现处理 at 消息的回调
-func ATMessageEventHandler(api openapi.OpenAPI) websocket.ATMessageEventHandler {
+func ATMessageEventHandler(api openapi.OpenAPI) event.ATMessageEventHandler {
 	return func(event *dto.WSPayload, data *dto.WSATMessageData) error {
 		log.Printf("[%s] %s", event.Type, data.Content)
 		input := strings.ToLower(message.ETLInput(data.Content))

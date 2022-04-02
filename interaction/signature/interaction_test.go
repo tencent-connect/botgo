@@ -1,4 +1,4 @@
-package interaction
+package signature
 
 import (
 	"net/http"
@@ -10,14 +10,14 @@ func TestSignature(t *testing.T) {
 	header := http.Header{}
 	header.Set(HeaderTimestamp, "1234567890")
 	httpBody := "text body"
-	sig, err := GenSignature(secret, header, []byte(httpBody))
+	sig, err := Generate(secret, header, []byte(httpBody))
 	if err != nil {
 		t.Error(err)
 	}
 	t.Log(sig)
 
 	header.Set(HeaderSig, sig)
-	flag, err := VerifySignature(secret, header, []byte(httpBody))
+	flag, err := Verify(secret, header, []byte(httpBody))
 	if err != nil {
 		t.Error(err)
 	}

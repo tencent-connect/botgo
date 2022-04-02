@@ -34,6 +34,7 @@ type OpenAPI interface {
 	APIPermissionsAPI
 	PinsAPI
 	MessageReactionAPI
+	WebhookAPI
 	InteractionAPI
 }
 
@@ -215,5 +216,13 @@ type MessageReactionAPI interface {
 // InteractionAPI 互动接口
 type InteractionAPI interface {
 	// PutInteraction 更新互动信息
-	PutInteraction(ctx context.Context, interactionID string, body []byte) error
+	PutInteraction(ctx context.Context, interactionID string, body string) error
+}
+
+// WebhookAPI http 事件网关相关接口
+type WebhookAPI interface {
+	CreateSession(ctx context.Context, identity dto.HTTPIdentity) (*dto.HTTPReady, error)
+	CheckSessions(ctx context.Context) ([]*dto.HTTPSession, error)
+	GetActiveSessionList(ctx context.Context) ([]*dto.HTTPSession, error)
+	RemoveSession(ctx context.Context, sessionID string) error
 }

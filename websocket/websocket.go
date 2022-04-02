@@ -6,6 +6,7 @@ import (
 	"syscall"
 
 	"github.com/tencent-connect/botgo/dto"
+	"github.com/tencent-connect/botgo/event"
 	"github.com/tencent-connect/botgo/log"
 )
 
@@ -34,4 +35,9 @@ func PanicHandler(e interface{}, session *dto.Session) {
 	buf := make([]byte, PanicBufLen)
 	buf = buf[:runtime.Stack(buf, false)]
 	log.Errorf("[PANIC]%s\n%v\n%s\n", session, e, buf)
+}
+
+// RegisterHandlers 兼容老版本的注册方式
+func RegisterHandlers(handlers ...interface{}) dto.Intent {
+	return event.RegisterHandlers(handlers...)
 }

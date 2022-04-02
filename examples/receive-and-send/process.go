@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"time"
@@ -55,6 +56,43 @@ func (p Processor) ProcessMessage(input string, data *dto.WSATMessageData) error
 	default:
 	}
 
+	return nil
+}
+
+func (p Processor) ProcessInlineSearch(interaction *dto.WSInteractionData) error {
+	if interaction.Data.Type != dto.InteractionDataTypeChatSearch {
+		return fmt.Errorf("interaction data type not chat search")
+	}
+	search := &dto.SearchInputResolved{}
+	if err := json.Unmarshal(interaction.Data.Resolved, search); err != nil {
+		log.Println(err)
+		return err
+	}
+	if search.Keyword != "test" {
+		return fmt.Errorf("resolved search key not allowed")
+	}
+	searchRsp := &dto.SearchRsp{
+		Layouts: []dto.SearchLayout{
+			{
+				LayoutType: 0,
+				ActionType: 0,
+				Title:      "内联搜索",
+				Records: []dto.SearchRecord{
+					{
+						Cover: "https://pub.idqqimg.com/pc/misc/files/20211208/311cfc87ce394c62b7c9f0508658cf25.png",
+						Title: "内联搜索标题",
+						Tips:  "内联搜索 tips",
+						URL:   "https://www.qq.com",
+					},
+				},
+			},
+		},
+	}
+	body, _ := json.Marshal(searchRsp)
+	if err := p.api.PutInteraction(context.Background(), interaction.ID, string(body)); err != nil {
+		log.Println("api call putInteractionInlineSearch  error: ", err)
+		return err
+	}
 	return nil
 }
 

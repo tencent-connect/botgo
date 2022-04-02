@@ -6,7 +6,7 @@ import (
 
 	"github.com/tencent-connect/botgo"
 	"github.com/tencent-connect/botgo/dto"
-	"github.com/tencent-connect/botgo/websocket"
+	"github.com/tencent-connect/botgo/event"
 )
 
 func Test_websocket(t *testing.T) {
@@ -15,96 +15,96 @@ func Test_websocket(t *testing.T) {
 
 	t.Run(
 		"at message", func(t *testing.T) {
-			var message websocket.ATMessageEventHandler = func(event *dto.WSPayload, data *dto.WSATMessageData) error {
+			var message event.ATMessageEventHandler = func(event *dto.WSPayload, data *dto.WSATMessageData) error {
 				log.Println(event, data)
 				return nil
 			}
-			intent := websocket.RegisterHandlers(message)
+			intent := event.RegisterHandlers(message)
 			botgo.NewSessionManager().Start(ws, botToken, &intent)
 		},
 	)
 	t.Run(
 		"at message assign shard to 2", func(t *testing.T) {
-			var message websocket.ATMessageEventHandler = func(event *dto.WSPayload, data *dto.WSATMessageData) error {
+			var message event.ATMessageEventHandler = func(event *dto.WSPayload, data *dto.WSATMessageData) error {
 				log.Println(event, data)
 				return nil
 			}
 			ws.Shards = 2
-			intent := websocket.RegisterHandlers(message)
+			intent := event.RegisterHandlers(message)
 			botgo.NewSessionManager().Start(ws, botToken, &intent)
 		},
 	)
 	t.Run(
 		"at message and guild event", func(t *testing.T) {
-			var message websocket.ATMessageEventHandler = func(event *dto.WSPayload, data *dto.WSATMessageData) error {
+			var message event.ATMessageEventHandler = func(event *dto.WSPayload, data *dto.WSATMessageData) error {
 				log.Println(event, data)
 				return nil
 			}
-			var guildEvent websocket.GuildEventHandler = func(event *dto.WSPayload, data *dto.WSGuildData) error {
+			var guildEvent event.GuildEventHandler = func(event *dto.WSPayload, data *dto.WSGuildData) error {
 				log.Println(event, data)
 				return nil
 			}
-			intent := websocket.RegisterHandlers(message, guildEvent)
+			intent := event.RegisterHandlers(message, guildEvent)
 			botgo.NewSessionManager().Start(ws, botToken, &intent)
 		},
 	)
 	t.Run(
 		"message reaction", func(t *testing.T) {
-			var message websocket.MessageReactionEventHandler = func(
+			var message event.MessageReactionEventHandler = func(
 				event *dto.WSPayload, data *dto.WSMessageReactionData,
 			) error {
 				log.Println(event, data)
 				return nil
 			}
-			intent := websocket.RegisterHandlers(message)
+			intent := event.RegisterHandlers(message)
 			botgo.NewSessionManager().Start(ws, botToken, &intent)
 		},
 	)
 	t.Run(
 		"thread event", func(t *testing.T) {
-			var message websocket.ThreadEventHandler = func(
+			var message event.ThreadEventHandler = func(
 				event *dto.WSPayload, data *dto.WSThreadData,
 			) error {
 				log.Println(event, data)
 				return nil
 			}
-			intent := websocket.RegisterHandlers(message)
+			intent := event.RegisterHandlers(message)
 			botgo.NewSessionManager().Start(ws, botToken, &intent)
 		},
 	)
 	t.Run(
 		"post event", func(t *testing.T) {
-			var message websocket.PostEventHandler = func(
+			var message event.PostEventHandler = func(
 				event *dto.WSPayload, data *dto.WSPostData,
 			) error {
 				log.Println(event, data)
 				return nil
 			}
-			intent := websocket.RegisterHandlers(message)
+			intent := event.RegisterHandlers(message)
 			botgo.NewSessionManager().Start(ws, botToken, &intent)
 		},
 	)
 	t.Run(
 		"Reply event", func(t *testing.T) {
-			var message websocket.ReplyEventHandler = func(
+			var message event.ReplyEventHandler = func(
 				event *dto.WSPayload, data *dto.WSReplyData,
 			) error {
 				log.Println(event, data)
 				return nil
 			}
-			intent := websocket.RegisterHandlers(message)
+			intent := event.RegisterHandlers(message)
 			botgo.NewSessionManager().Start(ws, botToken, &intent)
 		},
 	)
 	t.Run(
 		"Forum audit event", func(t *testing.T) {
-			var message websocket.ForumAuditEventHandler = func(
+			var message event.ForumAuditEventHandler = func(
 				event *dto.WSPayload, data *dto.WSForumAuditData,
 			) error {
 				log.Println(event, data)
 				return nil
 			}
-			intent := websocket.RegisterHandlers(message)
+			intent := event.RegisterHandlers(message)
 			botgo.NewSessionManager().Start(ws, botToken, &intent)
 		},
 	)
