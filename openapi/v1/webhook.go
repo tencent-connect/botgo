@@ -38,7 +38,7 @@ func (o *openAPI) CheckSessions(ctx context.Context) ([]*dto.HTTPSession, error)
 }
 
 // GetActiveSessionList 拉取活跃的 http session 列表
-func (o *openAPI) GetActiveSessionList(ctx context.Context) ([]*dto.HTTPSession, error) {
+func (o *openAPI) SessionList(ctx context.Context) ([]*dto.HTTPSession, error) {
 	resp, err := o.request(ctx).
 		Get(o.getURL(httpSessionsURI))
 	if err != nil {

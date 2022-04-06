@@ -223,6 +223,6 @@ type InteractionAPI interface {
 type WebhookAPI interface {
 	CreateSession(ctx context.Context, identity dto.HTTPIdentity) (*dto.HTTPReady, error)
 	CheckSessions(ctx context.Context) ([]*dto.HTTPSession, error)
-	GetActiveSessionList(ctx context.Context) ([]*dto.HTTPSession, error)
+	SessionList(ctx context.Context) ([]*dto.HTTPSession, error)
 	RemoveSession(ctx context.Context, sessionID string) error
 }

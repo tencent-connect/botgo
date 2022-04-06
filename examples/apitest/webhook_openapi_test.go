@@ -25,7 +25,7 @@ func TestWebhook(t *testing.T) {
 	)
 	t.Run(
 		"拉取会话", func(t *testing.T) {
-			rsp, err := api.GetActiveSessionList(ctx)
+			rsp, err := api.SessionList(ctx)
 			if err != nil {
 				t.Error(err)
 			}
