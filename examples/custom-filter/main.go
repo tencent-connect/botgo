@@ -32,11 +32,13 @@ func main() {
 	log.Println(wsInfo.URL)
 }
 
+// ReqFilter 自定义请求过滤器
 func ReqFilter(req *http.Request, _ *http.Response) error {
 	req.Header.Set("X-Custom-TraceID", uuid.NewString())
 	return nil
 }
 
+// RespFilter 自定义响应过滤器
 func RespFilter(req *http.Request, resp *http.Response) error {
 	log.Println("trace id added by req filter", req.Header.Get("X-Custom-TraceID"))
 	log.Println("trace id return by openapi", resp.Header.Get(openapi.TraceIDKey))

@@ -118,6 +118,7 @@ func (c *Client) Listening() error {
 	}
 }
 
+// Write 往 ws 写入数据
 func (c *Client) Write(message *dto.WSPayload) error {
 	m, _ := json.Marshal(message)
 	log.Infof("%s write %s message, %v", c.session, dto.OPMeans(message.OPCode), string(m))

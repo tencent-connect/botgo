@@ -48,6 +48,35 @@ func Test_role(t *testing.T) {
 		},
 	)
 	t.Run(
+		"修改身份组", func(t *testing.T) {
+			patchRoleResult, err := api.PatchRole(
+				ctx, testGuildID, roleID, &dto.Role{
+					Name: patchRoleModifyName,
+				},
+			)
+			if err != nil {
+				t.Error(err)
+			}
+			reflect.DeepEqual(patchRoleModifyName, patchRoleResult.Role.Name)
+			t.Logf("patchRoleResult: %+v", patchRoleResult)
+		},
+	)
+	t.Run(
+		"删除身份组", func(t *testing.T) {
+			err = api.DeleteRole(ctx, testGuildID, roleID)
+			if err != nil {
+				t.Error(err)
+			}
+			t.Logf("role id : %v, is deleted", roleID)
+		},
+	)
+}
+
+func Test_roleWithMember(t *testing.T) {
+	var roleID dto.RoleID
+	var err error
+
+	t.Run(
 		"添加人到身份组", func(t *testing.T) {
 			members, err := api.GuildMembers(
 				ctx, testGuildID, &dto.GuildMembersPager{
@@ -73,20 +102,6 @@ func Test_role(t *testing.T) {
 			if !roleFound {
 				t.Error("not found role id been add")
 			}
-		},
-	)
-	t.Run(
-		"修改身份组", func(t *testing.T) {
-			patchRoleResult, err := api.PatchRole(
-				ctx, testGuildID, roleID, &dto.Role{
-					Name: patchRoleModifyName,
-				},
-			)
-			if err != nil {
-				t.Error(err)
-			}
-			reflect.DeepEqual(patchRoleModifyName, patchRoleResult.Role.Name)
-			t.Logf("patchRoleResult: %+v", patchRoleResult)
 		},
 	)
 	t.Run(
@@ -174,15 +189,6 @@ func Test_role(t *testing.T) {
 			if channelPermissionsUint&manageChannelPermission == 2 {
 				t.Error("not found channel permissions been add")
 			}
-		},
-	)
-	t.Run(
-		"删除身份组", func(t *testing.T) {
-			err = api.DeleteRole(ctx, testGuildID, roleID)
-			if err != nil {
-				t.Error(err)
-			}
-			t.Logf("role id : %v, is deleted", roleID)
 		},
 	)
 }

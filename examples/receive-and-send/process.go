@@ -12,10 +12,12 @@ import (
 	"github.com/tencent-connect/botgo/openapi"
 )
 
+// Processor is a struct to process message
 type Processor struct {
 	api openapi.OpenAPI
 }
 
+// ProcessMessage is a function to process message
 func (p Processor) ProcessMessage(input string, data *dto.WSATMessageData) error {
 	ctx := context.Background()
 	cmd := message.ParseCommand(input)
@@ -59,6 +61,7 @@ func (p Processor) ProcessMessage(input string, data *dto.WSATMessageData) error
 	return nil
 }
 
+// ProcessInlineSearch is a function to process inline search
 func (p Processor) ProcessInlineSearch(interaction *dto.WSInteractionData) error {
 	if interaction.Data.Type != dto.InteractionDataTypeChatSearch {
 		return fmt.Errorf("interaction data type not chat search")

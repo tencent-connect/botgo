@@ -67,6 +67,7 @@ func Error(err error) *Err {
 	}
 }
 
+// Error 输出错误信息
 func (e Err) Error() string {
 	return fmt.Sprintf("code:%v, text:%v, traceID:%s", e.code, e.text, e.trace)
 }
