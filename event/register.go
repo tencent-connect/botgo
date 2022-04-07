@@ -14,11 +14,14 @@ var DefaultHandlers struct {
 	GuildMember GuildMemberEventHandler
 	Channel     ChannelEventHandler
 
-	Message         MessageEventHandler
-	MessageReaction MessageReactionEventHandler
-	ATMessage       ATMessageEventHandler
-	DirectMessage   DirectMessageEventHandler
-	MessageAudit    MessageAuditEventHandler
+	Message             MessageEventHandler
+	MessageReaction     MessageReactionEventHandler
+	ATMessage           ATMessageEventHandler
+	DirectMessage       DirectMessageEventHandler
+	MessageAudit        MessageAuditEventHandler
+	MessageDelete       MessageDeleteEventHandler
+	PublicMessageDelete PublicMessageDeleteEventHandler
+	DirectMessageDelete DirectMessageDeleteEventHandler
 
 	Audio AudioEventHandler
 
@@ -51,6 +54,15 @@ type ChannelEventHandler func(event *dto.WSPayload, data *dto.WSChannelData) err
 
 // MessageEventHandler 消息事件 handler
 type MessageEventHandler func(event *dto.WSPayload, data *dto.WSMessageData) error
+
+// MessageDeleteEventHandler 消息事件 handler
+type MessageDeleteEventHandler func(event *dto.WSPayload, data *dto.WSMessageDeleteData) error
+
+// PublicMessageDeleteEventHandler 消息事件 handler
+type PublicMessageDeleteEventHandler func(event *dto.WSPayload, data *dto.WSPublicMessageDeleteData) error
+
+// DirectMessageDeleteEventHandler 消息事件 handler
+type DirectMessageDeleteEventHandler func(event *dto.WSPayload, data *dto.WSDirectMessageDeleteData) error
 
 // MessageReactionEventHandler 表情表态事件 handler
 type MessageReactionEventHandler func(event *dto.WSPayload, data *dto.WSMessageReactionData) error
@@ -167,6 +179,15 @@ func registerMessageHandlers(i dto.Intent, handlers ...interface{}) dto.Intent {
 		case DirectMessageEventHandler:
 			DefaultHandlers.DirectMessage = handle
 			i = i | dto.EventToIntent(dto.EventDirectMessageCreate)
+		case MessageDeleteEventHandler:
+			DefaultHandlers.MessageDelete = handle
+			i = i | dto.EventToIntent(dto.EventMessageDelete)
+		case PublicMessageDeleteEventHandler:
+			DefaultHandlers.PublicMessageDelete = handle
+			i = i | dto.EventToIntent(dto.EventPublicMessageDelete)
+		case DirectMessageDeleteEventHandler:
+			DefaultHandlers.DirectMessageDelete = handle
+			i = i | dto.EventToIntent(dto.EventDirectMessageDelete)
 		case MessageReactionEventHandler:
 			DefaultHandlers.MessageReaction = handle
 			i = i | dto.EventToIntent(dto.EventMessageReactionAdd, dto.EventMessageReactionRemove)

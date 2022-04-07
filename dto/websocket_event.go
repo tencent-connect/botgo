@@ -19,13 +19,16 @@ const (
 	EventMessageReactionAdd    EventType = "MESSAGE_REACTION_ADD"
 	EventMessageReactionRemove EventType = "MESSAGE_REACTION_REMOVE"
 	EventAtMessageCreate       EventType = "AT_MESSAGE_CREATE"
+	EventPublicMessageDelete   EventType = "PUBLIC_MESSAGE_DELETE"
 	EventDirectMessageCreate   EventType = "DIRECT_MESSAGE_CREATE"
+	EventDirectMessageDelete   EventType = "DIRECT_MESSAGE_DELETE"
 	EventAudioStart            EventType = "AUDIO_START"
 	EventAudioFinish           EventType = "AUDIO_FINISH"
 	EventAudioOnMic            EventType = "AUDIO_ON_MIC"
 	EventAudioOffMic           EventType = "AUDIO_OFF_MIC"
 	EventMessageAuditPass      EventType = "MESSAGE_AUDIT_PASS"
 	EventMessageAuditReject    EventType = "MESSAGE_AUDIT_REJECT"
+	EventMessageDelete         EventType = "MESSAGE_DELETE"
 	EventForumThreadCreate     EventType = "FORUM_THREAD_CREATE"
 	EventForumThreadUpdate     EventType = "FORUM_THREAD_UPDATE"
 	EventForumThreadDelete     EventType = "FORUM_THREAD_DELETE"
@@ -44,10 +47,10 @@ var intentEventMap = map[Intent][]EventType{
 		EventChannelCreate, EventChannelUpdate, EventChannelDelete,
 	},
 	IntentGuildMembers:          {EventGuildMemberAdd, EventGuildMemberUpdate, EventGuildMemberRemove},
-	IntentGuildMessages:         {EventMessageCreate},
+	IntentGuildMessages:         {EventMessageCreate, EventMessageDelete},
 	IntentGuildMessageReactions: {EventMessageReactionAdd, EventMessageReactionRemove},
-	IntentGuildAtMessage:        {EventAtMessageCreate},
-	IntentDirectMessages:        {EventDirectMessageCreate},
+	IntentGuildAtMessage:        {EventAtMessageCreate, EventPublicMessageDelete},
+	IntentDirectMessages:        {EventDirectMessageCreate, EventDirectMessageDelete},
 	IntentAudio:                 {EventAudioStart, EventAudioFinish, EventAudioOnMic, EventAudioOffMic},
 	IntentAudit:                 {EventMessageAuditPass, EventMessageAuditReject},
 	IntentForum: {

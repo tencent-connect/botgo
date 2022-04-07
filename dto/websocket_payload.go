@@ -75,6 +75,15 @@ type WSATMessageData Message
 // WSDirectMessageData 私信消息 payload
 type WSDirectMessageData Message
 
+// WSMessageDeleteData 消息 payload
+type WSMessageDeleteData MessageDelete
+
+// WSPublicMessageDeleteData 公域机器人的消息删除 payload
+type WSPublicMessageDeleteData MessageDelete
+
+// WSDirectMessageDeleteData 私信消息 payload
+type WSDirectMessageDeleteData MessageDelete
+
 // WSAudioData 音频机器人的音频流事件
 type WSAudioData AudioAction
 
