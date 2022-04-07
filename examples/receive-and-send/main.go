@@ -64,7 +64,6 @@ func main() {
 		InteractionHandler(),
 	)
 	// 指定需要启动的分片数为 2 的话可以手动修改 wsInfo
-	wsInfo.Shards = 1
 	if err = botgo.NewSessionManager().Start(wsInfo, botToken, &intent); err != nil {
 		log.Fatalln(err)
 	}

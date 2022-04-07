@@ -17,7 +17,7 @@ func TestInteractions(t *testing.T) {
 					Resolved: json.RawMessage("test"),
 				},
 			)
-			err := api.PutInteraction(ctx, testInteractionD, body)
+			err := api.PutInteraction(ctx, testInteractionD, string(body))
 			if err != nil {
 				t.Error(err)
 			}
