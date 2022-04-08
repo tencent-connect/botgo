@@ -1,6 +1,7 @@
 package apitest
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/tencent-connect/botgo/dto"
@@ -80,6 +81,9 @@ func TestMessage(t *testing.T) {
 				}
 				t.Log(message.ID, message.Author.Username, message.Timestamp)
 			}
+
+			message, err := api.Message(ctx, testChannelID, index[0])
+			fmt.Println(message)
 		},
 	)
 }
@@ -100,13 +104,15 @@ func TestRetractMessage(t *testing.T) {
 func TestMessageReference(t *testing.T) {
 	t.Run(
 		"引用消息", func(t *testing.T) {
-			message, err := api.PostMessage(ctx, testChannelID, &dto.MessageToCreate{
-				Content: "文本引用消息",
-				MessageReference: &dto.MessageReference{
-					MessageID:             testMessageID,
-					IgnoreGetMessageError: false,
+			message, err := api.PostMessage(
+				ctx, testChannelID, &dto.MessageToCreate{
+					Content: "文本引用消息",
+					MessageReference: &dto.MessageReference{
+						MessageID:             testMessageID,
+						IgnoreGetMessageError: false,
+					},
 				},
-			})
+			)
 			if err != nil {
 				t.Error(err)
 			}
@@ -118,33 +124,35 @@ func TestMessageReference(t *testing.T) {
 func TestMarkdownMessage(t *testing.T) {
 	t.Run(
 		"markdown 消息", func(t *testing.T) {
-			message, err := api.PostMessage(ctx, testChannelID, &dto.MessageToCreate{
-				Markdown: &dto.Markdown{
-					TemplateID: testMarkdownTemplateID,
-					Params: []*dto.MarkdownParams{
-						{
-							Key:    "title",
-							Values: []string{"标题"},
-						},
-						{
-							Key:    "slice",
-							Values: []string{"1", "频道名称<#1146349>", "3"},
-						},
-						{
-							Key:    "image",
-							Values: []string{"https://pub.idqqimg.com/pc/misc/files/20191015/32ed5b691a1138ac452a59e42f3f83b5.png"},
-						},
-						{
-							Key:    "link",
-							Values: []string{"[🔗我的收藏夹](qq.com)"},
-						},
-						{
-							Key:    "desc",
-							Values: []string{"简介"},
+			message, err := api.PostMessage(
+				ctx, testChannelID, &dto.MessageToCreate{
+					Markdown: &dto.Markdown{
+						TemplateID: testMarkdownTemplateID,
+						Params: []*dto.MarkdownParams{
+							{
+								Key:    "title",
+								Values: []string{"标题"},
+							},
+							{
+								Key:    "slice",
+								Values: []string{"1", "频道名称<#1146349>", "3"},
+							},
+							{
+								Key:    "image",
+								Values: []string{"https://pub.idqqimg.com/pc/misc/files/20191015/32ed5b691a1138ac452a59e42f3f83b5.png"},
+							},
+							{
+								Key:    "link",
+								Values: []string{"[🔗我的收藏夹](qq.com)"},
+							},
+							{
+								Key:    "desc",
+								Values: []string{"简介"},
+							},
 						},
 					},
 				},
-			})
+			)
 			if err != nil {
 				t.Error(err)
 			}
@@ -156,9 +164,11 @@ func TestMarkdownMessage(t *testing.T) {
 func TestContentMessage(t *testing.T) {
 	t.Run(
 		"content 消息", func(t *testing.T) {
-			message, err := api.PostMessage(ctx, testChannelID, &dto.MessageToCreate{
-				Content: "文本消息",
-			})
+			message, err := api.PostMessage(
+				ctx, testChannelID, &dto.MessageToCreate{
+					Content: "文本消息",
+				},
+			)
 			if err != nil {
 				t.Error(err)
 			}
@@ -170,24 +180,26 @@ func TestContentMessage(t *testing.T) {
 func TestPatchMessage(t *testing.T) {
 	t.Run(
 		"修改消息", func(t *testing.T) {
-			message, err := api.PatchMessage(ctx, testChannelID, testMessageID, &dto.MessageToCreate{
-				Keyboard: &dto.Keyboard{
-					ID: "62",
-				},
-				Markdown: &dto.Markdown{
-					TemplateID: 65,
-					Params: []*dto.MarkdownParams{
-						{
-							Key:    "title",
-							Values: []string{"标题"},
-						},
-						{
-							Key:    "content",
-							Values: []string{"内容"},
+			message, err := api.PatchMessage(
+				ctx, testChannelID, testMessageID, &dto.MessageToCreate{
+					Keyboard: &dto.Keyboard{
+						ID: "62",
+					},
+					Markdown: &dto.Markdown{
+						TemplateID: 65,
+						Params: []*dto.MarkdownParams{
+							{
+								Key:    "title",
+								Values: []string{"标题"},
+							},
+							{
+								Key:    "content",
+								Values: []string{"内容"},
+							},
 						},
 					},
 				},
-			})
+			)
 			if err != nil {
 				t.Error(err)
 			}

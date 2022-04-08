@@ -23,7 +23,7 @@ var api openapi.OpenAPI
 
 var (
 	testGuildID   = "3326534247441079828" // replace your guild id
-	testChannelID = "1513270"             // replace your channel id
+	testChannelID = "1595028"             // replace your channel id
 	testMessageID = `08e092eeb983afef9e0110f9bb5d1a1231343431313532313836373838333234303420801e
 28003091c4bb02380c400c48d8a7928d06`  // replace your channel id
 	testRolesID            = `10054557`                             // replace your roles id

@@ -74,7 +74,6 @@ func Test_role(t *testing.T) {
 
 func Test_roleWithMember(t *testing.T) {
 	var roleID dto.RoleID
-	var err error
 
 	t.Run(
 		"添加人到身份组", func(t *testing.T) {

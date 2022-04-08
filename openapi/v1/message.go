@@ -7,6 +7,7 @@ import (
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/errs"
 	"github.com/tencent-connect/botgo/openapi"
+	"github.com/tidwall/gjson"
 )
 
 // Message 拉取单条消息
@@ -20,7 +21,15 @@ func (o *openAPI) Message(ctx context.Context, channelID string, messageID strin
 		return nil, err
 	}
 
-	return resp.Result().(*dto.Message), nil
+	// 兼容处理
+	result := resp.Result().(*dto.Message)
+	if result.ID == "" {
+		body := gjson.Get(resp.String(), "message")
+		if err := json.Unmarshal([]byte(body.String()), result); err != nil {
+			return nil, err
+		}
+	}
+	return result, nil
 }
 
 // Messages 拉取消息列表
