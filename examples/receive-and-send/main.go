@@ -62,6 +62,8 @@ func main() {
 		CreateMessageHandler(),
 		// 互动事件
 		InteractionHandler(),
+		// 发帖事件
+		ThreadEventHandler(),
 	)
 	// 指定需要启动的分片数为 2 的话可以手动修改 wsInfo
 	if err = botgo.NewSessionManager().Start(wsInfo, botToken, &intent); err != nil {
