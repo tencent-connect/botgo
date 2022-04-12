@@ -62,3 +62,10 @@ type EmbedField struct {
 type MessageAttachment struct {
 	URL string `json:"url"`
 }
+
+// MessageReactionUsers 消息表情表态用户列表
+type MessageReactionUsers struct {
+	Users  []*User `json:"users,omitempty"`
+	Cookie string  `json:"cookie,omitempty"`
+	IsEnd  bool    `json:"is_end,omitempty"`
+}

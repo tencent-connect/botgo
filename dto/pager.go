@@ -66,6 +66,24 @@ func (m *MessagesPager) QueryParams() map[string]string {
 	return query
 }
 
+// MessageReactionPager 分页器
+type MessageReactionPager struct {
+	Cookie string `json:"cookie"` // 分页游标
+	Limit  string `json:"limit"`  // 分页大小，1-1000，默认是20
+}
+
+// QueryParams 转换为 query 参数
+func (g *MessageReactionPager) QueryParams() map[string]string {
+	query := make(map[string]string)
+	if g.Limit != "" {
+		query["limit"] = g.Limit
+	}
+	if g.Cookie != "" {
+		query["cookie"] = g.Cookie
+	}
+	return query
+}
+
 // MessagePagerType 消息翻页拉取方式
 type MessagePagerType string
 

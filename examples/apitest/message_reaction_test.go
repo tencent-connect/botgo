@@ -25,4 +25,26 @@ func TestMessageReaction(t *testing.T) {
 			t.Logf("err:%+v", err)
 		},
 	)
+	t.Run(
+		"Get Reaction Users", func(t *testing.T) {
+			users, err := api.GetMessageReactions(ctx, testChannelID, testMessageID, dto.Emoji{Type: 1, ID: "43"},
+				&dto.MessageReactionPager{
+					Limit: "20",
+				})
+			if err != nil {
+				t.Error(err)
+			}
+			t.Logf("err:%+v", err)
+
+			_, err = api.GetMessageReactions(ctx, testChannelID, testMessageID, dto.Emoji{Type: 1, ID: "43"},
+				&dto.MessageReactionPager{
+					Cookie: users.Cookie,
+					Limit:  "20",
+				})
+			if err != nil {
+				t.Error(err)
+			}
+			t.Logf("err:%+v", err)
+		},
+	)
 }
