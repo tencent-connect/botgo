@@ -81,7 +81,7 @@ func (o *openAPI) DeleteChannel(ctx context.Context, channelID string) error {
 func (o *openAPI) CreatePrivateChannel(ctx context.Context, guildID string, value *dto.ChannelValueObject,
 	userIds []string) (*dto.Channel, error) {
 	value.PrivateType = dto.ChannelPrivateTypeAdminAndMember
-	if len(userIds) == 0 {
+	if len(userIds) != 0 {
 		value.PrivateUserIDs = userIds
 		value.PrivateType = dto.ChannelPrivateTypeOnlyAdmin
 	}

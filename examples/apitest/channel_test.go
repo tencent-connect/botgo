@@ -28,7 +28,7 @@ func TestChannel(t *testing.T) {
 					Type:     dto.ChannelTypeText,
 					Position: 0,
 					ParentID: "0", // 父ID，正常应该找到一个分组ID，如果传0，就不归属在任何一个分组中
-				}, nil,
+				}, []string{testMemberID},
 			)
 			if err != nil {
 				t.Error(err)
