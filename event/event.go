@@ -22,12 +22,16 @@ var eventParseFuncMap = map[dto.OPCode]map[dto.EventType]eventParseFunc{
 		dto.EventGuildMemberRemove: guildMemberHandler,
 
 		dto.EventMessageCreate: messageHandler,
+		dto.EventMessageDelete: messageDeleteHandler,
 
 		dto.EventMessageReactionAdd:    messageReactionHandler,
 		dto.EventMessageReactionRemove: messageReactionHandler,
 
 		dto.EventAtMessageCreate:     atMessageHandler,
+		dto.EventPublicMessageDelete: publicMessageDeleteHandler,
+
 		dto.EventDirectMessageCreate: directMessageHandler,
+		dto.EventDirectMessageDelete: directMessageDeleteHandler,
 
 		dto.EventAudioStart:  audioHandler,
 		dto.EventAudioFinish: audioHandler,
@@ -115,6 +119,17 @@ func messageHandler(payload *dto.WSPayload, message []byte) error {
 	return nil
 }
 
+func messageDeleteHandler(payload *dto.WSPayload, message []byte) error {
+	data := &dto.WSMessageDeleteData{}
+	if err := ParseData(message, data); err != nil {
+		return err
+	}
+	if DefaultHandlers.MessageDelete != nil {
+		return DefaultHandlers.MessageDelete(payload, data)
+	}
+	return nil
+}
+
 func messageReactionHandler(payload *dto.WSPayload, message []byte) error {
 	data := &dto.WSMessageReactionData{}
 	if err := ParseData(message, data); err != nil {
@@ -137,6 +152,17 @@ func atMessageHandler(payload *dto.WSPayload, message []byte) error {
 	return nil
 }
 
+func publicMessageDeleteHandler(payload *dto.WSPayload, message []byte) error {
+	data := &dto.WSPublicMessageDeleteData{}
+	if err := ParseData(message, data); err != nil {
+		return err
+	}
+	if DefaultHandlers.PublicMessageDelete != nil {
+		return DefaultHandlers.PublicMessageDelete(payload, data)
+	}
+	return nil
+}
+
 func directMessageHandler(payload *dto.WSPayload, message []byte) error {
 	data := &dto.WSDirectMessageData{}
 	if err := ParseData(message, data); err != nil {
@@ -144,6 +170,17 @@ func directMessageHandler(payload *dto.WSPayload, message []byte) error {
 	}
 	if DefaultHandlers.DirectMessage != nil {
 		return DefaultHandlers.DirectMessage(payload, data)
+	}
+	return nil
+}
+
+func directMessageDeleteHandler(payload *dto.WSPayload, message []byte) error {
+	data := &dto.WSDirectMessageDeleteData{}
+	if err := ParseData(message, data); err != nil {
+		return err
+	}
+	if DefaultHandlers.DirectMessageDelete != nil {
+		return DefaultHandlers.DirectMessageDelete(payload, data)
 	}
 	return nil
 }
