@@ -18,7 +18,7 @@ const maxRespBuffer = 65535
 
 // Config 搜索请求配置
 type Config struct {
-	AppID    uint64
+	AppID    string
 	EndPoint string // 回调url地址
 	Secret   string
 }

@@ -1,6 +1,9 @@
 package keyboard
 
+// ActionType 按钮操作类型
 type ActionType uint32
+
+// PermissionType 按钮的权限类型
 type PermissionType uint32
 
 const (

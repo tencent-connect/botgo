@@ -9,7 +9,7 @@ import (
 func TestSimulateSearch(t *testing.T) {
 	got, err := SimulateSearch(
 		&Config{
-			AppID:    1,
+			AppID:    "1",
 			EndPoint: "https://www.qq.com",
 			Secret:   "a",
 		}, "hello",
