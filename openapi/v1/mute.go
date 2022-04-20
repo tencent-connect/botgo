@@ -2,6 +2,9 @@ package v1
 
 import (
 	"context"
+	"errors"
+
+	"github.com/tencent-connect/botgo/log"
 
 	"github.com/tencent-connect/botgo/dto"
 )
@@ -30,4 +33,21 @@ func (o *openAPI) MemberMute(ctx context.Context, guildID, userID string,
 		return err
 	}
 	return nil
+}
+
+//MultiMemberMute 频道批量成员禁言
+func (o *openAPI) MultiMemberMute(ctx context.Context, guildID string,
+	mute *dto.UpdateGuildMute) (*dto.UpdateGuildMuteResponse, error) {
+	if len(mute.UserIDs) == 0 {
+		return nil, errors.New("no user id param")
+	}
+	rsp, err := o.request(ctx).
+		SetPathParam("guild_id", guildID).
+		SetBody(mute).
+		Patch(o.getURL(guildMuteURI))
+	if err != nil {
+		return nil, err
+	}
+	log.Infof("MultiMemberMute rsp: %#v", rsp)
+	return rsp.Result().(*dto.UpdateGuildMuteResponse), nil
 }

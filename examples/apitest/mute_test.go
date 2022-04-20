@@ -38,4 +38,17 @@ func Test_mute(t *testing.T) {
 			t.Logf("Testing_Succ")
 		},
 	)
+	t.Run(
+		"频道指定批量成员禁言", func(t *testing.T) {
+			mute := &dto.UpdateGuildMute{
+				MuteEndTimestamp: strconv.FormatInt(time.Now().Unix()+600, 10),
+				UserIDs:          []string{testMuteUserID},
+			}
+			_, err := api.MultiMemberMute(ctx, testGuildID, mute)
+			if err != nil {
+				t.Error(err)
+			}
+			t.Logf("Testing_Succ")
+		},
+	)
 }

@@ -134,8 +134,11 @@ type MemberAPI interface {
 		ctx context.Context,
 		guildID string, roleID dto.RoleID, userID string, value *dto.MemberAddRoleBody,
 	) error
-	// 频道指定成员禁言
+	//MemberMute 频道指定单个成员禁言
 	MemberMute(ctx context.Context, guildID, userID string, mute *dto.UpdateGuildMute) error
+	//MultiMemberMute 频道指定批量成员禁言
+	MultiMemberMute(ctx context.Context, guildID string,
+		mute *dto.UpdateGuildMute) (*dto.UpdateGuildMuteResponse, error)
 }
 
 // DirectMessageAPI 信息相关接口
