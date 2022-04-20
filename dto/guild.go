@@ -27,4 +27,6 @@ type Guild struct {
 	UnionWorldID string `json:"union_world_id"`
 	// 游戏绑定公会/战队ID
 	UnionOrgID string `json:"union_org_id"`
+	// 操作人
+	OpUserID string `json:"op_user_id,omitempty"`
 }

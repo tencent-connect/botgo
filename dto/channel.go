@@ -81,4 +81,6 @@ type ChannelValueObject struct {
 	// 机器人在此频道上拥有的权限, 定义请参考
 	// [文档](https://bot.q.qq.com/wiki/develop/api/openapi/channel_permissions/model.html#permissions)
 	Permissions string `json:"permissions,omitempty"`
+	// 操作人
+	OpUserID string `json:"op_user_id,omitempty"`
 }
