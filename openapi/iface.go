@@ -36,6 +36,7 @@ type OpenAPI interface {
 	MessageReactionAPI
 	WebhookAPI
 	InteractionAPI
+	MessageSettingAPI
 }
 
 // Base 基础能力接口
@@ -228,4 +229,9 @@ type WebhookAPI interface {
 	CheckSessions(ctx context.Context) ([]*dto.HTTPSession, error)
 	SessionList(ctx context.Context) ([]*dto.HTTPSession, error)
 	RemoveSession(ctx context.Context, sessionID string) error
+}
+
+// MessageSettingAPI 频道消息设置接口
+type MessageSettingAPI interface {
+	GetMessageSetting(ctx context.Context, guildID string) (*dto.MessageSetting, error)
 }

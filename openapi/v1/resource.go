@@ -66,6 +66,8 @@ const (
 
 	httpSessionsURI uri = "/gateway/webhook/sessions"
 	httpSessionURI  uri = "/gateway/webhook/sessions/{session_id}"
+
+	messageSettingURI uri = "/guilds/{guild_id}/message/setting"
 )
 
 // getURL 获取接口地址，会处理沙箱环境判断

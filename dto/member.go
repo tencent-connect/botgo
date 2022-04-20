@@ -7,7 +7,7 @@ type Member struct {
 	Nick     string    `json:"nick"`
 	User     *User     `json:"user"`
 	Roles    []string  `json:"roles"`
-	OpUserID string    `json:"op_user_id,omitempty"` // 操作人
+	OpUserID string    `json:"op_user_id,omitempty"`
 }
 
 // DeleteHistoryMsgDay 消息撤回天数
