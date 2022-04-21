@@ -35,7 +35,7 @@ func (o *openAPI) MemberMute(ctx context.Context, guildID, userID string,
 	return nil
 }
 
-//MultiMemberMute 频道批量成员禁言
+// MultiMemberMute 频道批量成员禁言
 func (o *openAPI) MultiMemberMute(ctx context.Context, guildID string,
 	mute *dto.UpdateGuildMute) (*dto.UpdateGuildMuteResponse, error) {
 	if len(mute.UserIDs) == 0 {
@@ -44,10 +44,11 @@ func (o *openAPI) MultiMemberMute(ctx context.Context, guildID string,
 	rsp, err := o.request(ctx).
 		SetPathParam("guild_id", guildID).
 		SetBody(mute).
+		SetResult(dto.UpdateGuildMuteResponse{}).
 		Patch(o.getURL(guildMuteURI))
 	if err != nil {
 		return nil, err
 	}
-	log.Infof("MultiMemberMute rsp: %#v", rsp)
+	log.Infof("MultiMemberMute rsp result: %#v", rsp.Result())
 	return rsp.Result().(*dto.UpdateGuildMuteResponse), nil
 }
