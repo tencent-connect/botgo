@@ -87,3 +87,18 @@ func (o *openAPI) CreatePrivateChannel(ctx context.Context, guildID string, valu
 	}
 	return o.PostChannel(ctx, guildID, value)
 }
+
+// ListVoiceChannelMembers 查询语音子频道成员列表
+func (o *openAPI) ListVoiceChannelMembers(ctx context.Context, channelID string) ([]*dto.Member, error) {
+	resp, err := o.request(ctx).
+		SetPathParam("channel_id", channelID).
+		Get(o.getURL(voiceChannelMembersURI))
+	if err != nil {
+		return nil, err
+	}
+	members := make([]*dto.Member, 0)
+	if err := json.Unmarshal(resp.Body(), &members); err != nil {
+		return nil, err
+	}
+	return members, nil
+}

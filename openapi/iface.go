@@ -97,6 +97,7 @@ type ChannelAPI interface {
 	// CreatePrivateChannel 创建私密子频道
 	CreatePrivateChannel(ctx context.Context,
 		guildID string, value *dto.ChannelValueObject, userIds []string) (*dto.Channel, error)
+	ListVoiceChannelMembers(ctx context.Context, channelID string) ([]*dto.Member, error)
 }
 
 // ChannelPermissionsAPI 子频道权限相关接口

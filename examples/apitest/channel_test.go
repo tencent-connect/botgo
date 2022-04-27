@@ -53,4 +53,17 @@ func TestChannel(t *testing.T) {
 			}
 		},
 	)
+	t.Run(
+		"get voice channel member list test", func(t *testing.T) {
+			testChannelID := "1572139"
+			members, err := api.ListVoiceChannelMembers(ctx, testChannelID)
+			if err != nil {
+				t.Error(err)
+			}
+			for _, member := range members {
+				t.Logf("member%v", member)
+			}
+
+		},
+	)
 }
