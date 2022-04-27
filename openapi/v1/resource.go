@@ -36,6 +36,7 @@ const (
 	gatewayBotURI uri = "/gateway/bot"
 
 	audioControlURI uri = "/channels/{channel_id}/audio"
+	micURI          uri = "/channels/{channel_id}/mic"
 
 	rolesURI uri = "/guilds/{guild_id}/roles"
 	roleURI  uri = "/guilds/{guild_id}/roles/{role_id}"

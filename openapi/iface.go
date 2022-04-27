@@ -118,6 +118,10 @@ type ChannelPermissionsAPI interface {
 type AudioAPI interface {
 	// PostAudio 执行音频播放，暂停等操作
 	PostAudio(ctx context.Context, channelID string, value *dto.AudioControl) (*dto.AudioControl, error)
+	// PutMic 机器人上麦
+	PutMic(ctx context.Context, channelID string) error
+	// DeleteMic 机器人下麦
+	DeleteMic(ctx context.Context, channelID string) error
 }
 
 // RoleAPI 用户组相关接口
