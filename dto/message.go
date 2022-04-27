@@ -34,6 +34,8 @@ type Message struct {
 	SeqInChannel string `json:"seq_in_channel"`
 	// 引用的消息
 	MessageReference *MessageReference `json:"message_reference,omitempty"`
+	// 私信场景下，该字段用来标识从哪个频道发起的私信
+	SrcGuildID string `json:"src_guild_id"`
 }
 
 // Embed 结构
