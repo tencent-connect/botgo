@@ -70,6 +70,9 @@ const (
 	messageSettingURI uri = "/guilds/{guild_id}/message/setting"
 
 	voiceChannelMembersURI uri = "/channels/{channel_id}/voice/members"
+
+	settingGuideURI   uri = "/channels/{channel_id}/settingguide"
+	dmSettingGuideURI uri = "/dms/{guild_id}/settingguide"
 )
 
 // getURL 获取接口地址，会处理沙箱环境判断

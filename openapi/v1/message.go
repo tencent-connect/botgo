@@ -3,6 +3,7 @@ package v1
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/errs"
@@ -96,4 +97,25 @@ func (o *openAPI) RetractMessage(ctx context.Context,
 	}
 	_, err := request.Delete(o.getURL(messageURI))
 	return err
+}
+
+// PostSettingGuide 发送设置引导消息, atUserID为要at的用户
+func (o *openAPI) PostSettingGuide(ctx context.Context,
+	channelID string, atUserIDs []string) (*dto.Message, error) {
+	var content string
+	for _, userID := range atUserIDs {
+		content += fmt.Sprintf("<@%s>", userID)
+	}
+	msg := &dto.SettingGuideToCreate{
+		Content: content,
+	}
+	resp, err := o.request(ctx).
+		SetResult(dto.Message{}).
+		SetPathParam("channel_id", channelID).
+		SetBody(msg).
+		Post(o.getURL(settingGuideURI))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*dto.Message), nil
 }

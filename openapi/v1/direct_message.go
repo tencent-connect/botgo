@@ -47,3 +47,22 @@ func (o *openAPI) RetractDMMessage(ctx context.Context,
 	_, err := request.Delete(o.getURL(dmsMessageURI))
 	return err
 }
+
+// PostDMSettingGuide 发送私信设置引导, jumpGuildID为设置引导要跳转的频道ID
+func (o *openAPI) PostDMSettingGuide(ctx context.Context,
+	dm *dto.DirectMessage, jumpGuildID string) (*dto.Message, error) {
+	msg := &dto.SettingGuideToCreate{
+		SettingGuide: &dto.SettingGuide{
+			GuildID: jumpGuildID,
+		},
+	}
+	resp, err := o.request(ctx).
+		SetResult(dto.Message{}).
+		SetPathParam("guild_id", dm.GuildID).
+		SetBody(msg).
+		Post(o.getURL(dmSettingGuideURI))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*dto.Message), nil
+}

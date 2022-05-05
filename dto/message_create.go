@@ -35,3 +35,15 @@ type MarkdownParams struct {
 type Keyboard struct {
 	ID string `json:"id"`
 }
+
+// SettingGuideToCreate 发送引导消息的结构体
+type SettingGuideToCreate struct {
+	Content      string        `json:"content,omitempty"`       // 频道内发引导消息可以带@
+	SettingGuide *SettingGuide `json:"setting_guide,omitempty"` // 设置引导
+}
+
+// SettingGuide 设置引导
+type SettingGuide struct {
+	// 频道ID, 当通过私信发送设置引导消息时，需要指定guild_id
+	GuildID string `json:"guild_id"`
+}

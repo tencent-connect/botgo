@@ -70,6 +70,8 @@ type MessageAPI interface {
 	PatchMessage(ctx context.Context,
 		channelID string, messageID string, msg *dto.MessageToCreate) (*dto.Message, error)
 	RetractMessage(ctx context.Context, channelID, msgID string, options ...RetractMessageOption) error
+	// PostSettingGuide 发送设置引导
+	PostSettingGuide(ctx context.Context, channelID string, atUserIDs []string) (*dto.Message, error)
 }
 
 // GuildAPI guild 相关接口
@@ -151,6 +153,8 @@ type DirectMessageAPI interface {
 	PostDirectMessage(ctx context.Context, dm *dto.DirectMessage, msg *dto.MessageToCreate) (*dto.Message, error)
 	// RetractDMMessage 撤回私信频道消息
 	RetractDMMessage(ctx context.Context, guildID, msgID string, options ...RetractMessageOption) error
+	// PostDMSettingGuide 发送私信设置引导, jumpGuildID为设置引导要跳转的频道ID
+	PostDMSettingGuide(ctx context.Context, dm *dto.DirectMessage, jumpGuildID string) (*dto.Message, error)
 }
 
 // AnnouncesAPI 公告相关接口
