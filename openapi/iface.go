@@ -136,9 +136,9 @@ type MemberAPI interface {
 		ctx context.Context,
 		guildID string, roleID dto.RoleID, userID string, value *dto.MemberAddRoleBody,
 	) error
-	//MemberMute 频道指定单个成员禁言
+	// MemberMute 频道指定单个成员禁言
 	MemberMute(ctx context.Context, guildID, userID string, mute *dto.UpdateGuildMute) error
-	//MultiMemberMute 频道指定批量成员禁言
+	// MultiMemberMute 频道指定批量成员禁言
 	MultiMemberMute(ctx context.Context, guildID string,
 		mute *dto.UpdateGuildMute) (*dto.UpdateGuildMuteResponse, error)
 }
@@ -216,8 +216,8 @@ type MessageReactionAPI interface {
 	CreateMessageReaction(ctx context.Context, channelID, messageID string, emoji dto.Emoji) error
 	// DeleteOwnMessageReaction 删除自己的消息表情表态
 	DeleteOwnMessageReaction(ctx context.Context, channelID, messageID string, emoji dto.Emoji) error
-	// GetMessageReactions 获取消息表情表态用户列表
-	GetMessageReactions(ctx context.Context, channelID, messageID string, emoji dto.Emoji,
+	// GetMessageReactionUsers 获取消息表情表态用户列表
+	GetMessageReactionUsers(ctx context.Context, channelID, messageID string, emoji dto.Emoji,
 		pager *dto.MessageReactionPager) (*dto.MessageReactionUsers, error)
 }
 
