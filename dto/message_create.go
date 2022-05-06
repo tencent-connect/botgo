@@ -10,6 +10,7 @@ type MessageToCreate struct {
 	MessageReference *MessageReference `json:"message_reference,omitempty"`
 	Markdown         *Markdown         `json:"markdown,omitempty"`
 	Keyboard         *Keyboard         `json:"keyboard,omitempty"` // 内嵌键盘
+	EventID          string            `json:"event_id,omitempty"` // 要回复的事件id, 逻辑同MsgID
 }
 
 // MessageReference 引用消息
