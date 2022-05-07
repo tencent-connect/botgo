@@ -1,16 +1,18 @@
 package dto
 
+import "github.com/tencent-connect/botgo/dto/keyboard"
+
 // MessageToCreate 发送消息结构体定义
 type MessageToCreate struct {
-	Content          string            `json:"content,omitempty"`
-	Embed            *Embed            `json:"embed,omitempty"`
-	Ark              *Ark              `json:"ark,omitempty"`
-	Image            string            `json:"image,omitempty"`
-	MsgID            string            `json:"msg_id,omitempty"` // 要回复的消息id，为空是主动消息，公域机器人会异步审核，不为空是被动消息，公域机器人会校验语料
-	MessageReference *MessageReference `json:"message_reference,omitempty"`
-	Markdown         *Markdown         `json:"markdown,omitempty"`
-	Keyboard         *Keyboard         `json:"keyboard,omitempty"` // 内嵌键盘
-	EventID          string            `json:"event_id,omitempty"` // 要回复的事件id, 逻辑同MsgID
+	Content          string                    `json:"content,omitempty"`
+	Embed            *Embed                    `json:"embed,omitempty"`
+	Ark              *Ark                      `json:"ark,omitempty"`
+	Image            string                    `json:"image,omitempty"`
+	MsgID            string                    `json:"msg_id,omitempty"` // 要回复的消息id，为空是主动消息，公域机器人会异步审核，不为空是被动消息，公域机器人会校验语料
+	MessageReference *MessageReference         `json:"message_reference,omitempty"`
+	Markdown         *Markdown                 `json:"markdown,omitempty"`
+	Keyboard         *keyboard.MessageKeyboard `json:"keyboard,omitempty"` // 消息按钮组件
+	EventID          string                    `json:"event_id,omitempty"` // 要回复的事件id, 逻辑同MsgID
 }
 
 // MessageReference 引用消息
@@ -30,11 +32,6 @@ type Markdown struct {
 type MarkdownParams struct {
 	Key    string   `json:"key"`
 	Values []string `json:"values"`
-}
-
-// Keyboard 内嵌键盘
-type Keyboard struct {
-	ID string `json:"id"`
 }
 
 // SettingGuideToCreate 发送引导消息的结构体

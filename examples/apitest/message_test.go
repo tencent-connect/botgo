@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/tencent-connect/botgo/dto/keyboard"
+
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/openapi"
 )
@@ -161,6 +163,70 @@ func TestMarkdownMessage(t *testing.T) {
 	)
 }
 
+func TestKeyboardMessage(t *testing.T) {
+	t.Run(
+		"消息按钮组件消息", func(t *testing.T) {
+			message, err := api.PostMessage(
+				ctx, testChannelID, &dto.MessageToCreate{
+					Markdown: &dto.Markdown{
+						Content: "# 123 \n 今天是个好天气",
+					},
+					Keyboard: &keyboard.MessageKeyboard{
+						Content: &keyboard.CustomKeyboard{
+							Rows: []*keyboard.Row{
+								{
+									Buttons: []*keyboard.Button{
+										{
+											ID: "1",
+											RenderData: &keyboard.RenderData{
+												Label:        "指定身份组可点击",
+												VisitedLabel: "点击后按钮上文字",
+												Style:        0,
+											},
+											Action: &keyboard.Action{
+												Type: keyboard.ActionTypeAtBot,
+												Permission: &keyboard.Permission{
+													Type:           keyboard.PermissionTypAll,
+													SpecifyRoleIDs: []string{"1"},
+												},
+												ClickLimit:           10,
+												Data:                 "/搜索",
+												AtBotShowChannelList: true,
+											},
+										},
+										{
+											ID: "2",
+											RenderData: &keyboard.RenderData{
+												Label:        "指定身份组可点击",
+												VisitedLabel: "点击后按钮上文字",
+												Style:        0,
+											},
+											Action: &keyboard.Action{
+												Type: keyboard.ActionTypeAtBot,
+												Permission: &keyboard.Permission{
+													Type:           keyboard.PermissionTypeSpecifyUserIDs,
+													SpecifyUserIDs: []string{"9859283702500083161"},
+												},
+												ClickLimit:           10,
+												Data:                 "/搜索",
+												AtBotShowChannelList: true,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			)
+			if err != nil {
+				t.Error(err)
+			}
+			t.Logf("message : %v", message)
+		},
+	)
+}
+
 func TestContentMessage(t *testing.T) {
 	t.Run(
 		"content 消息", func(t *testing.T) {
@@ -182,7 +248,7 @@ func TestPatchMessage(t *testing.T) {
 		"修改消息", func(t *testing.T) {
 			message, err := api.PatchMessage(
 				ctx, testChannelID, testMessageID, &dto.MessageToCreate{
-					Keyboard: &dto.Keyboard{
+					Keyboard: &keyboard.MessageKeyboard{
 						ID: "62",
 					},
 					Markdown: &dto.Markdown{
