@@ -15,6 +15,7 @@ type WSPayloadBase struct {
 	OPCode OPCode    `json:"op"`
 	Seq    uint32    `json:"s,omitempty"`
 	Type   EventType `json:"t,omitempty"`
+	Id     string    `json:"id,omitempty"`
 }
 
 // 以下为发送到 websocket 的 data
