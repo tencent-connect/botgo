@@ -8,6 +8,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/websocket v1.4.2
 	github.com/stretchr/testify v1.7.0
+	github.com/tencent-connect/botgo v0.1.6
 	github.com/tidwall/gjson v1.9.3
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
 )
