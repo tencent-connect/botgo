@@ -24,6 +24,24 @@ func (g *GuildMembersPager) QueryParams() map[string]string {
 	return query
 }
 
+// GuildRoleMembersPager 分页器
+type GuildRoleMembersPager struct {
+	StartIndex string `json:"start_index"`
+	Limit      string `json:"limit"`
+}
+
+// QueryParams 转换为 query 参数
+func (g *GuildRoleMembersPager) QueryParams() map[string]string {
+	query := make(map[string]string)
+	if g.Limit != "" {
+		query["limit"] = g.Limit
+	}
+	if g.StartIndex != "" {
+		query["start_index"] = g.StartIndex
+	}
+	return query
+}
+
 // GuildPager 分页器
 type GuildPager struct {
 	Before string `json:"before"` // 读此id之前的数据

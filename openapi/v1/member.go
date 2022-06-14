@@ -80,6 +80,34 @@ func (o *openAPI) GuildMembers(
 	return members, nil
 }
 
+// GuildRoleMembers 分页拉取频道内身份组成员列表
+func (o *openAPI) GuildRoleMembers(
+	ctx context.Context, guildID string, roleID string, pager *dto.GuildRoleMembersPager,
+) ([]*dto.Member, string, error) {
+	if pager == nil {
+		return nil, "", errs.ErrPagerIsNil
+	}
+	resp, err := o.request(ctx).
+		SetPathParam("guild_id", guildID).
+		SetPathParam("role_id", roleID).
+		SetQueryParams(pager.QueryParams()).
+		Get(o.getURL(guildRoleMemberURI))
+	if err != nil {
+		return nil, "", err
+	}
+
+	type res struct {
+		Data []*dto.Member `json:"data"`
+		Next string        `json:"next"`
+	}
+	var roleMembersRsp res
+	if err := json.Unmarshal(resp.Body(), &roleMembersRsp); err != nil {
+		return nil, "", err
+	}
+
+	return roleMembersRsp.Data, roleMembersRsp.Next, nil
+}
+
 // DeleteGuildMember 将指定成员踢出频道
 func (o *openAPI) DeleteGuildMember(ctx context.Context, guildID, userID string, opts ...dto.MemberDeleteOption) error {
 	opt := &dto.MemberDeleteOpts{}

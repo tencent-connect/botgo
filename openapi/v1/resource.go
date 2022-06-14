@@ -16,6 +16,7 @@ const (
 	guildURI            uri = "/guilds/{guild_id}"
 	guildMembersURI     uri = "/guilds/{guild_id}/members"
 	guildMemberURI      uri = "/guilds/{guild_id}/members/{user_id}"
+	guildRoleMemberURI  uri = "/guilds/{guild_id}/roles/{role_id}/members"
 	guildMuteURI        uri = "/guilds/{guild_id}/mute"                   // 频道禁言
 	guildMembersMuteURI uri = "/guilds/{guild_id}/members/{user_id}/mute" // 频道指定成员禁言
 

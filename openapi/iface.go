@@ -79,6 +79,8 @@ type GuildAPI interface {
 	Guild(ctx context.Context, guildID string) (*dto.Guild, error)
 	GuildMember(ctx context.Context, guildID, userID string) (*dto.Member, error)
 	GuildMembers(ctx context.Context, guildID string, pager *dto.GuildMembersPager) ([]*dto.Member, error)
+	GuildRoleMembers(ctx context.Context, guildID string, roleID string, pager *dto.GuildRoleMembersPager) (
+		[]*dto.Member, string, error)
 	DeleteGuildMember(ctx context.Context, guildID, userID string, opts ...dto.MemberDeleteOption) error
 	// 频道禁言
 	GuildMute(ctx context.Context, guildID string, mute *dto.UpdateGuildMute) error
