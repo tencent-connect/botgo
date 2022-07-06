@@ -32,6 +32,7 @@ func (c *Client) New(session dto.Session) websocket.WebSocket {
 		session:         &session,
 		closeChan:       make(closeErrorChan, 10),
 		heartBeatTicker: time.NewTicker(60 * time.Second), // 先给一个默认 ticker，在收到 hello 包之后，会 reset
+		msgHandler:      event.ParseAndHandle,
 	}
 }
 
@@ -44,10 +45,15 @@ type Client struct {
 	user            *dto.WSUser
 	closeChan       closeErrorChan
 	heartBeatTicker *time.Ticker // 用于维持定时心跳
+	msgHandler      func(payload *dto.WSPayload) error
 }
 
 type messageChan chan *dto.WSPayload
 type closeErrorChan chan error
+
+func (c *Client) SetMsgHandler(handler func(payload *dto.WSPayload) error) {
+	c.msgHandler = handler
+}
 
 // Connect 连接到 websocket
 func (c *Client) Connect() error {
@@ -218,7 +224,7 @@ func (c *Client) listenMessageAndHandle() {
 			continue
 		}
 		// 解析具体事件，并投递给业务注册的 handler
-		if err := event.ParseAndHandle(payload); err != nil {
+		if err := c.msgHandler(payload); err != nil {
 			log.Errorf("%s parseAndHandle failed, %v", c.session, err)
 		}
 	}
