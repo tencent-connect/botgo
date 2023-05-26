@@ -12,6 +12,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+// FileLogger file logger
 type FileLogger struct {
 	logger *zap.Logger
 }

@@ -78,6 +78,7 @@ func ReadyHandler() event.ReadyHandler {
 	}
 }
 
+// ErrorNotifyHandler 处理当 ws 链接发送错误的事件
 func ErrorNotifyHandler() event.ErrorNotifyHandler {
 	return func(err error) {
 		log.Println("error notify receive: ", err)
