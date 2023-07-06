@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"github.com/tencent-connect/botgo"
 	"github.com/tencent-connect/botgo/openapi"
 	"github.com/tencent-connect/botgo/token"
@@ -19,6 +20,9 @@ func main() {
 	// 加载 appid 和 token
 	botToken := token.New(token.TypeBot)
 	if err := botToken.LoadFromConfig("config.yaml"); err != nil {
+		log.Fatalln(err)
+	}
+	if err := botToken.InitToken(context.Background()); err != nil {
 		log.Fatalln(err)
 	}
 	// 初始化 openapi，使用 NewSandboxOpenAPI 请求到沙箱环境

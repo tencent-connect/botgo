@@ -2,6 +2,7 @@
 package client
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -10,6 +11,7 @@ import (
 	"time"
 
 	wss "github.com/gorilla/websocket" // 是一个流行的 websocket 客户端，服务端实现
+
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/errs"
 	"github.com/tencent-connect/botgo/event"
@@ -93,6 +95,10 @@ func (c *Client) Listening() error {
 			// 不能够 identify 的错误
 			if wss.IsCloseError(err, 4914, 4915) {
 				err = errs.New(errs.CodeConnCloseCantIdentify, err.Error())
+			}
+			// accessToken过期
+			if wss.IsCloseError(err, 4004) {
+				c.session.Token.UpAccessToken(context.Background(), err)
 			}
 			// 这里用 UnexpectedCloseError，如果有需要排除在外的 close error code，可以补充在第二个参数上
 			// 4009: session time out, 发了 reconnect 之后马上关闭连接时候的错误码，这个是允许 resumeSignal 的

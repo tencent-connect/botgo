@@ -43,6 +43,10 @@ const (
 	IntentDirectMessageReactions
 	IntentDirectMessageTyping
 
+	// IntentGroupMessages 群消息事件
+	// - GROUP_AT_MESSAGE_CREATE // 群中@机器人时的消息
+	IntentGroupMessages Intent = 1 << 25 // 群消息事件
+
 	IntentInteraction Intent = 1 << 26 // 互动事件
 	IntentAudit       Intent = 1 << 27 // 审核事件
 	// IntentForum 论坛事件

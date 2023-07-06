@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/go-resty/resty/v2" // resty 是一个优秀的 rest api 客户端，可以极大的减少开发基于 rest 标准接口求请求的封装工作量
+
 	"github.com/tencent-connect/botgo/errs"
 	"github.com/tencent-connect/botgo/log"
 	"github.com/tencent-connect/botgo/openapi"
@@ -76,14 +77,20 @@ func (o *openAPI) setupClient() {
 		SetLogger(log.DefaultLogger).
 		SetDebug(o.debug).
 		SetTimeout(o.timeout).
-		SetAuthToken(o.token.GetString()).
 		SetAuthScheme(string(o.token.Type)).
 		SetHeader("User-Agent", version.String()).
+		SetHeader("X-Union-Appid", fmt.Sprint(o.token.GetAppID())).
 		SetPreRequestHook(
 			func(client *resty.Client, request *http.Request) error {
 				// 执行请求前过滤器
 				// 由于在 `OnBeforeRequest` 的时候，request 还没生成，所以 filter 不能使用，所以放到 `PreRequestHook`
 				return openapi.DoReqFilterChains(request, nil)
+			},
+		).
+		OnBeforeRequest(
+			func(c *resty.Client, r *resty.Request) error {
+				c.SetAuthToken(o.token.GetAccessToken())
+				return nil
 			},
 		).
 		// 设置请求之后的钩子，打印日志，判断状态码
@@ -123,6 +130,12 @@ func respInfo(resp *resty.Response) string {
 		string(bodyJSON),
 		string(resp.Body()),
 	)
+}
+
+// reqInfo 用于请求日志格式化
+func reqInfo(req *resty.Request) string {
+	bodyJSON, _ := json.Marshal(req)
+	return fmt.Sprintf("[OPENAPI]%v %v data:%v", req.Method, req.URL, string(bodyJSON))
 }
 
 func createTransport(localAddr net.Addr, idleConns int) *http.Transport {

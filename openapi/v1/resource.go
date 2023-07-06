@@ -26,8 +26,14 @@ const (
 	channelPermissionsURI      uri = "/channels/{channel_id}/members/{user_id}/permissions"
 	channelRolesPermissionsURI uri = "/channels/{channel_id}/roles/{role_id}/permissions"
 
-	messagesURI uri = "/channels/{channel_id}/messages"
-	messageURI  uri = "/channels/{channel_id}/messages/{message_id}"
+	messagesURI       uri = "/channels/{channel_id}/messages"
+	groupMessagesURI  uri = "/v2/groups/{group_id}/messages"
+	groupRichMediaURI uri = "/v2/groups/{group_id}/files"
+
+	c2cMessagesURI  uri = "/v2/users/{user_id}/messages"
+	c2cRichMediaURI uri = "/v2/users/{user_id}/files"
+
+	messageURI uri = "/channels/{channel_id}/messages/{message_id}"
 
 	userMeURI       uri = "/users/@me"
 	userMeGuildsURI uri = "/users/@me/guilds"

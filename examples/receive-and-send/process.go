@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/tencent-connect/botgo/dto"
@@ -131,7 +132,6 @@ func genReplyContent(data *dto.WSATMessageData) string {
 
 消息来自：%s
 `
-
 	msgTime, _ := data.Timestamp.Time()
 	return fmt.Sprintf(
 		tpl,
@@ -140,6 +140,96 @@ func genReplyContent(data *dto.WSATMessageData) string {
 		msgTime, time.Now().Format(time.RFC3339),
 		getIP(),
 	)
+}
+
+func genErrMessage(data dto.Message, err error) dto.APIMessage {
+	return &dto.MessageToCreate{
+		Timestamp: time.Now().UnixMilli(),
+		Content:   fmt.Sprintf("处理异常:%v", err),
+		MessageReference: &dto.MessageReference{
+			// 引用这条消息
+			MessageID:             data.ID,
+			IgnoreGetMessageError: true,
+		},
+		MsgID: data.ID,
+	}
+}
+
+// ProcessGroupMessage 回复群消息
+func (p Processor) ProcessGroupMessage(input string, data *dto.WSGroupATMessageData) error {
+	msg := generateDemoMessage(data.ID, data.Content, dto.Message(*data))
+	if err := p.sendGroupReply(context.Background(), data.GroupID, msg); err != nil {
+		p.sendGroupReply(context.Background(), data.GroupID, genErrMessage(dto.Message(*data), err))
+	}
+
+	return nil
+}
+
+// ProcessC2CMessage 回复C2C消息
+func (p Processor) ProcessC2CMessage(input string, data *dto.WSC2CMessageData) error {
+	userID := ""
+	if data.Author != nil && data.Author.ID != "" {
+		userID = data.Author.ID
+	}
+	msg := generateDemoMessage(data.ID, data.Content, dto.Message(*data))
+	if err := p.sendC2CReply(context.Background(), userID, msg); err != nil {
+		p.sendC2CReply(context.Background(), userID, genErrMessage(dto.Message(*data), err))
+	}
+	return nil
+}
+
+func generateDemoMessage(id string, cmd string, recvMsg dto.Message) dto.APIMessage {
+	log.Printf("收到指令:%+v", cmd)
+
+	var replyMsg dto.APIMessage
+	log.Printf("opt:[%v]->[%v] attachments:%v", cmd, strings.ToLower(strings.TrimSpace(cmd)))
+	switch strings.ToLower(strings.TrimSpace(cmd)) {
+	case "发图片":
+		replyMsg = &dto.RichMediaMessage{
+			EventID:    id,
+			FileType:   1,
+			URL:        "https://qqminiapp.cdn-go.cn/open-platform/53e29134/img/qqInterconncet.aa1a9d9c.png",
+			SrvSendMsg: true,
+		}
+	//case "发视频:":
+	//	replyMsg = &dto.RichMediaMessage{
+	//		EventID:    id,
+	//		FileType:   2,
+	//		URL:        "https://static-res.qq.com/static-res/imqq-home/video/video-large.mp4",
+	//		SrvSendMsg: true,
+	//	}
+	case "发md":
+		replyMsg = &dto.MessageToCreate{
+			Timestamp: time.Now().UnixMilli(),
+			Content:   "md",
+			MsgType:   2,
+			MsgID:     id,
+			Markdown: &dto.Markdown{
+				Params:  nil,
+				Content: "# Markdown消息标题内容",
+			},
+		}
+	default:
+		msg := ""
+		if len(recvMsg.Content) > 0 {
+			msg += "收到:" + recvMsg.Content
+		}
+		for _, _v := range recvMsg.Attachments {
+			msg += ",收到文件类型:" + _v.ContentType
+		}
+		replyMsg = &dto.MessageToCreate{
+			Timestamp: time.Now().UnixMilli(),
+			Content:   msg,
+			MessageReference: &dto.MessageReference{
+				// 引用这条消息
+				MessageID:             id,
+				IgnoreGetMessageError: true,
+			},
+			MsgID: id,
+		}
+	}
+
+	return replyMsg
 }
 
 func genReplyArk(data *dto.WSATMessageData) *dto.Ark {

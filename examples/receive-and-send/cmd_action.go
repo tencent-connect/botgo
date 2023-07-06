@@ -40,3 +40,21 @@ func (p Processor) sendReply(ctx context.Context, channelID string, toCreate *dt
 		log.Println(err)
 	}
 }
+
+func (p Processor) sendGroupReply(ctx context.Context, groupID string, toCreate dto.APIMessage) error {
+	log.Printf("EVENT ID:%v", toCreate.GetEventID())
+	if _, err := p.api.PostGroupMessage(ctx, groupID, toCreate); err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
+}
+
+func (p Processor) sendC2CReply(ctx context.Context, userID string, toCreate dto.APIMessage) error {
+	log.Printf("EVENT ID:%v", toCreate.GetEventID())
+	if _, err := p.api.PostC2CMessage(ctx, userID, toCreate); err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
+}

@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/tidwall/gjson"
+
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/errs"
 	"github.com/tencent-connect/botgo/openapi"
-	"github.com/tidwall/gjson"
 )
 
 // Message 拉取单条消息
@@ -114,6 +115,51 @@ func (o *openAPI) PostSettingGuide(ctx context.Context,
 		SetPathParam("channel_id", channelID).
 		SetBody(msg).
 		Post(o.getURL(settingGuideURI))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*dto.Message), nil
+}
+
+func getGroupURLBySendType(msgType dto.SendType) uri {
+	switch msgType {
+	case dto.RichMedia:
+		return groupRichMediaURI
+	default:
+		return groupMessagesURI
+	}
+}
+
+// PostGroupMessage 回复群消息
+func (o *openAPI) PostGroupMessage(ctx context.Context, groupID string, msg dto.APIMessage) (*dto.Message, error) {
+
+	resp, err := o.request(ctx).
+		SetResult(dto.Message{}).
+		SetPathParam("group_id", groupID).
+		SetBody(msg).
+		Post(o.getURL(getGroupURLBySendType(msg.GetSendType())))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*dto.Message), nil
+}
+
+func getC2CURLBySendType(msgType dto.SendType) uri {
+	switch msgType {
+	case dto.RichMedia:
+		return c2cRichMediaURI
+	default:
+		return c2cMessagesURI
+	}
+}
+
+// PostC2CMessage 回复C2C消息
+func (o *openAPI) PostC2CMessage(ctx context.Context, userID string, msg dto.APIMessage) (*dto.Message, error) {
+	resp, err := o.request(ctx).
+		SetResult(dto.Message{}).
+		SetPathParam("user_id", userID).
+		SetBody(msg).
+		Post(o.getURL(getC2CURLBySendType(msg.GetSendType())))
 	if err != nil {
 		return nil, err
 	}

@@ -23,11 +23,14 @@ var processor Processor
 func main() {
 	ctx := context.Background()
 	// 加载 appid 和 token
-	botToken := token.New(token.TypeBot)
+	botToken := token.New(token.TypeQQBot)
 	if err := botToken.LoadFromConfig(getConfigPath("config.yaml")); err != nil {
 		log.Fatalln(err)
 	}
 
+	if err := botToken.InitToken(ctx); err != nil {
+		log.Fatalln(err)
+	}
 	// 初始化 openapi，正式环境
 	api := botgo.NewOpenAPI(botToken).WithTimeout(3 * time.Second)
 	// 沙箱环境
@@ -44,12 +47,15 @@ func main() {
 	// websocket.RegisterResumeSignal(syscall.SIGUSR1)
 	// 根据不同的回调，生成 intents
 	intent := websocket.RegisterHandlers(
-		// at 机器人事件，目前是在这个事件处理中有逻辑，会回消息，其他的回调处理都只把数据打印出来，不做任何处理
-		ATMessageEventHandler(),
+		// ***********公用事件消息***********
 		// 如果想要捕获到连接成功的事件，可以实现这个回调
 		ReadyHandler(),
 		// 连接关闭回调
 		ErrorNotifyHandler(),
+
+		//***********频道事件消息***********
+		// at 机器人事件，目前是在这个事件处理中有逻辑，会回消息，其他的回调处理都只把数据打印出来，不做任何处理
+		ATMessageEventHandler(),
 		// 频道事件
 		GuildEventHandler(),
 		// 成员事件
@@ -64,6 +70,12 @@ func main() {
 		InteractionHandler(),
 		// 发帖事件
 		ThreadEventHandler(),
+
+		// ***********群事件及C2C消息***********
+		// 群@事件
+		GroupATMessageEventHandler(),
+		// C2C消息事件
+		C2CMessageEventHandler(),
 	)
 	// 指定需要启动的分片数为 2 的话可以手动修改 wsInfo
 	if err = botgo.NewSessionManager().Start(wsInfo, botToken, &intent); err != nil {
@@ -138,6 +150,21 @@ func InteractionHandler() event.InteractionEventHandler {
 	return func(event *dto.WSPayload, data *dto.WSInteractionData) error {
 		fmt.Println(data)
 		return processor.ProcessInlineSearch(data)
+	}
+}
+
+// GroupATMessageEventHandler 实现处理 at 消息的回调
+func GroupATMessageEventHandler() event.GroupATMessageEventHandler {
+	return func(event *dto.WSPayload, data *dto.WSGroupATMessageData) error {
+		input := strings.ToLower(message.ETLInput(data.Content))
+		return processor.ProcessGroupMessage(input, data)
+	}
+}
+
+// C2CMessageEventHandler 实现处理 at 消息的回调
+func C2CMessageEventHandler() event.C2CMessageEventHandler {
+	return func(event *dto.WSPayload, data *dto.WSC2CMessageData) error {
+		return processor.ProcessC2CMessage(string(event.RawMessage), data)
 	}
 }
 

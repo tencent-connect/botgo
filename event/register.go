@@ -31,6 +31,9 @@ var DefaultHandlers struct {
 	ForumAudit ForumAuditEventHandler
 
 	Interaction InteractionEventHandler
+
+	GroupATMessage GroupATMessageEventHandler
+	C2CMessage     C2CMessageEventHandler
 }
 
 // ReadyHandler 可以处理 ws 的 ready 事件
@@ -93,6 +96,16 @@ type ForumAuditEventHandler func(event *dto.WSPayload, data *dto.WSForumAuditDat
 
 // InteractionEventHandler 互动事件 handler
 type InteractionEventHandler func(event *dto.WSPayload, data *dto.WSInteractionData) error
+
+// ***************** 群消息/C2C消息  *****************
+
+// GroupATMessageEventHandler 群中at机器人消息事件 handler
+type GroupATMessageEventHandler func(event *dto.WSPayload, data *dto.WSGroupATMessageData) error
+
+// C2CMessageEventHandler 机器人消息事件 handler
+type C2CMessageEventHandler func(event *dto.WSPayload, data *dto.WSC2CMessageData) error
+
+// ************************************************
 
 // RegisterHandlers 注册事件回调，并返回 intent 用于 websocket 的鉴权
 func RegisterHandlers(handlers ...interface{}) dto.Intent {
@@ -194,6 +207,12 @@ func registerMessageHandlers(i dto.Intent, handlers ...interface{}) dto.Intent {
 		case MessageAuditEventHandler:
 			DefaultHandlers.MessageAudit = handle
 			i = i | dto.EventToIntent(dto.EventMessageAuditPass, dto.EventMessageAuditReject)
+		case GroupATMessageEventHandler:
+			DefaultHandlers.GroupATMessage = handle
+			i = i | dto.EventToIntent(dto.EventGroupAtMessageCreate)
+		case C2CMessageEventHandler:
+			DefaultHandlers.C2CMessage = handle
+			i = i | dto.EventToIntent(dto.EventC2CMessageCreate)
 		default:
 		}
 	}

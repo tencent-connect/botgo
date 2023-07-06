@@ -72,6 +72,11 @@ type MessageAPI interface {
 	RetractMessage(ctx context.Context, channelID, msgID string, options ...RetractMessageOption) error
 	// PostSettingGuide 发送设置引导
 	PostSettingGuide(ctx context.Context, channelID string, atUserIDs []string) (*dto.Message, error)
+
+	// PostGroupMessage 发送群消息
+	PostGroupMessage(ctx context.Context, groupID string, msg dto.APIMessage) (*dto.Message, error)
+	// PostC2CMessage 发送C2C消息
+	PostC2CMessage(ctx context.Context, userID string, msg dto.APIMessage) (*dto.Message, error)
 }
 
 // GuildAPI guild 相关接口

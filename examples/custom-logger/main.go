@@ -30,6 +30,9 @@ func main() {
 	if err := botToken.LoadFromConfig("config.yaml"); err != nil {
 		log.Fatalln(err)
 	}
+	if err := botToken.InitToken(context.Background()); err != nil {
+		log.Fatalln(err)
+	}
 	// 初始化 openapi
 	api := botgo.NewOpenAPI(botToken).WithTimeout(3 * time.Second)
 	// 获取 websocket 信息

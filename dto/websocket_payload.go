@@ -107,3 +107,13 @@ type WSForumAuditData ForumAuditResult
 
 // WSInteractionData 互动事件
 type WSInteractionData Interaction
+
+// ***************** 群消息/C2C消息  *****************
+
+// WSGroupATMessageData 群@机器人的事件
+type WSGroupATMessageData Message
+
+// WSC2CMessageData  c2c消息事件
+type WSC2CMessageData Message
+
+// ************************************************

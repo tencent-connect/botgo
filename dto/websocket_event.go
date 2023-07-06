@@ -38,6 +38,8 @@ const (
 	EventForumReplyDelete      EventType = "FORUM_REPLY_DELETE"
 	EventForumAuditResult      EventType = "FORUM_PUBLISH_AUDIT_RESULT"
 	EventInteractionCreate     EventType = "INTERACTION_CREATE"
+	EventGroupAtMessageCreate  EventType = "GROUP_AT_MESSAGE_CREATE"
+	EventC2CMessageCreate      EventType = "C2C_MESSAGE_CREATE"
 )
 
 // intentEventMap 不同 intent 对应的事件定义
@@ -46,8 +48,10 @@ var intentEventMap = map[Intent][]EventType{
 		EventGuildCreate, EventGuildUpdate, EventGuildDelete,
 		EventChannelCreate, EventChannelUpdate, EventChannelDelete,
 	},
-	IntentGuildMembers:          {EventGuildMemberAdd, EventGuildMemberUpdate, EventGuildMemberRemove},
-	IntentGuildMessages:         {EventMessageCreate, EventMessageDelete},
+	IntentGuildMembers:  {EventGuildMemberAdd, EventGuildMemberUpdate, EventGuildMemberRemove},
+	IntentGuildMessages: {EventMessageCreate, EventMessageDelete},
+	IntentGroupMessages: {EventGroupAtMessageCreate, EventC2CMessageCreate},
+
 	IntentGuildMessageReactions: {EventMessageReactionAdd, EventMessageReactionRemove},
 	IntentGuildAtMessage:        {EventAtMessageCreate, EventPublicMessageDelete},
 	IntentDirectMessages:        {EventDirectMessageCreate, EventDirectMessageDelete},

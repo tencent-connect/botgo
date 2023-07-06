@@ -8,6 +8,9 @@ type Message struct {
 	ChannelID string `json:"channel_id"`
 	// 频道ID
 	GuildID string `json:"guild_id"`
+	// 群ID
+	GroupID string `json:"group_id"`
+
 	// 内容
 	Content string `json:"content"`
 	// 发送时间
@@ -60,7 +63,12 @@ type EmbedField struct {
 
 // MessageAttachment 附件定义
 type MessageAttachment struct {
-	URL string `json:"url"`
+	URL         string `json:"url,omitempty"`
+	FileName    string `json:"filename,omitempty"`
+	Height      int    `json:"height,omitempty"`
+	Size        int    `json:"size,omitempty"`
+	Width       int    `json:"width,omitempty"`
+	ContentType string `json:"content_type,omitempty"` // voice:语音, image/xxx: 图片 video/xxx: 视频
 }
 
 // MessageReactionUsers 消息表情表态用户列表

@@ -8,10 +8,11 @@ import (
 	"testing"
 	"time"
 
+	"gopkg.in/yaml.v2"
+
 	"github.com/tencent-connect/botgo"
 	"github.com/tencent-connect/botgo/openapi"
 	"github.com/tencent-connect/botgo/token"
-	"gopkg.in/yaml.v2"
 )
 
 var conf struct {
@@ -25,7 +26,7 @@ var (
 	testGuildID   = "3326534247441079828" // replace your guild id
 	testChannelID = "1595028"             // replace your channel id
 	testMessageID = `08e092eeb983afef9e0110f9bb5d1a1231343431313532313836373838333234303420801e
-28003091c4bb02380c400c48d8a7928d06`  // replace your channel id
+28003091c4bb02380c400c48d8a7928d06` // replace your channel id
 	testRolesID            = `10054557`                             // replace your roles id
 	testMemberID           = `1201318637970874066`                  // replace your member id
 	testMarkdownTemplateID = 1231231231231231                       // replace your markdown template id
@@ -48,6 +49,8 @@ func TestMain(m *testing.M) {
 
 	botToken = token.BotToken(conf.AppID, conf.Token)
 	api = botgo.NewOpenAPI(botToken).WithTimeout(3 * time.Second)
-
+	if err := botToken.InitToken(context.Background()); err != nil {
+		log.Fatalln(err)
+	}
 	os.Exit(m.Run())
 }

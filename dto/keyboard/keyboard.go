@@ -56,7 +56,7 @@ type RenderData struct {
 // Action 按纽点击操作
 type Action struct {
 	Type                 ActionType  `json:"type,omitempty"`                     // 操作类型
-	Permission           *Permission `son:"permission,omitempty"`                // 可操作
+	Permission           *Permission `json:"permission,omitempty"`               // 可操作
 	ClickLimit           uint32      `json:"click_limit,omitempty"`              // 可点击的次数, 默认不限
 	Data                 string      `json:"data,omitempty"`                     // 操作相关数据
 	AtBotShowChannelList bool        `json:"at_bot_show_channel_list,omitempty"` // false:当前 true:弹出展示子频道选择器

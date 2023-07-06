@@ -3,8 +3,9 @@ package event
 import (
 	"encoding/json"
 
-	"github.com/tencent-connect/botgo/dto"
 	"github.com/tidwall/gjson" // 由于回包的 d 类型不确定，gjson 用于从回包json中提取 d 并进行针对性的解析
+
+	"github.com/tencent-connect/botgo/dto"
 )
 
 var eventParseFuncMap = map[dto.OPCode]map[dto.EventType]eventParseFunc{
@@ -50,7 +51,9 @@ var eventParseFuncMap = map[dto.OPCode]map[dto.EventType]eventParseFunc{
 		dto.EventForumReplyDelete:  replyHandler,
 		dto.EventForumAuditResult:  forumAuditHandler,
 
-		dto.EventInteractionCreate: interactionHandler,
+		dto.EventInteractionCreate:    interactionHandler,
+		dto.EventGroupAtMessageCreate: groupAtMessageHandler,
+		dto.EventC2CMessageCreate:     c2cMessageHandler,
 	},
 }
 
@@ -148,6 +151,28 @@ func atMessageHandler(payload *dto.WSPayload, message []byte) error {
 	}
 	if DefaultHandlers.ATMessage != nil {
 		return DefaultHandlers.ATMessage(payload, data)
+	}
+	return nil
+}
+
+func groupAtMessageHandler(payload *dto.WSPayload, message []byte) error {
+	data := &dto.WSGroupATMessageData{}
+	if err := ParseData(message, data); err != nil {
+		return err
+	}
+	if DefaultHandlers.GroupATMessage != nil {
+		return DefaultHandlers.GroupATMessage(payload, data)
+	}
+	return nil
+}
+
+func c2cMessageHandler(payload *dto.WSPayload, message []byte) error {
+	data := &dto.WSC2CMessageData{}
+	if err := ParseData(message, data); err != nil {
+		return err
+	}
+	if DefaultHandlers.C2CMessage != nil {
+		return DefaultHandlers.C2CMessage(payload, data)
 	}
 	return nil
 }
