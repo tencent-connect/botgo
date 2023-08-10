@@ -98,7 +98,10 @@ func (c *Client) Listening() error {
 			}
 			// accessToken过期
 			if wss.IsCloseError(err, 4004) {
-				c.session.Token.UpAccessToken(context.Background(), err)
+				err = c.session.Token.UpAccessToken(context.Background(), err)
+				if err != nil {
+					log.Errorf("update access token failed: %v", err)
+				}
 			}
 			// 这里用 UnexpectedCloseError，如果有需要排除在外的 close error code，可以补充在第二个参数上
 			// 4009: session time out, 发了 reconnect 之后马上关闭连接时候的错误码，这个是允许 resumeSignal 的
@@ -198,6 +201,7 @@ func (c *Client) readMessageToQueue() {
 			continue
 		}
 		payload.RawMessage = message
+		payload.Session = c.session
 		log.Infof("%s receive %s message, %s", c.session, dto.OPMeans(payload.OPCode), string(message))
 		// 处理内置的一些事件，如果处理成功，则这个事件不再投递给业务
 		if c.isHandleBuildIn(payload) {
