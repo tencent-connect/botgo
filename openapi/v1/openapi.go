@@ -105,6 +105,7 @@ func (o *openAPI) setupClient() {
 				o.lastTraceID = traceID
 				// 非成功含义的状态码，需要返回 error 供调用方识别
 				if !openapi.IsSuccessStatus(resp.StatusCode()) {
+					o.handleError(resp)
 					return errs.New(resp.StatusCode(), string(resp.Body()), traceID)
 				}
 				return nil
@@ -115,6 +116,26 @@ func (o *openAPI) setupClient() {
 // request 每个请求，都需要创建一个 request
 func (o *openAPI) request(ctx context.Context) *resty.Request {
 	return o.restyClient.R().SetContext(ctx)
+}
+
+// errBody 请求出错情况下的body结构
+type errBody struct {
+	Code    int    `json:"code"`    // 错误码
+	Message string `json:"message"` // 错误信息
+}
+
+// handleError 处理openapi调用失败的情况
+func (o *openAPI) handleError(resp *resty.Response) {
+	var b errBody
+	err := json.Unmarshal(resp.Body(), &b)
+	if err != nil {
+		log.Errorf("parse errBody fail, err:%v, body:%s", err, string(resp.Body()))
+		return
+	}
+	if b.Code == errs.APICodeTokenExpireOrNotExist {
+		log.Errorf("token expire or not exist, update token")
+		_ = o.token.UpAccessToken(context.Background(), "openapi token expire")
+	}
 }
 
 // respInfo 用于输出日志的时候格式化数据

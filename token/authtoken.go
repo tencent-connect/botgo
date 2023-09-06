@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"sync"
@@ -13,6 +14,15 @@ import (
 
 	"github.com/tencent-connect/botgo/log"
 )
+
+var (
+	r *rand.Rand
+)
+
+func init() {
+	src := rand.NewSource(time.Now().Unix())
+	r = rand.New(src)
+}
 
 // getAccessTokenURL 取得AccessToken的地址
 var getAccessTokenURL = "https://bots.qq.com/app/getAppAccessToken"
@@ -61,13 +71,12 @@ func (atoken *AuthTokenInfo) StartRefreshAccessToken(ctx context.Context, tokenU
 	atoken.once.Do(func() {
 		go func() {
 			for {
-				if tokenTTL <= 0 {
-					tokenTTL = 1
-				}
+				tokenTTL = getTokenTTL(tokenTTL)
+				log.Infof("tokenTTL:%d", tokenTTL)
 				select {
 				case <-time.NewTimer(time.Duration(tokenTTL) * time.Second).C:
-				case upToken := <-atoken.forceUpToken:
-					log.Warnf("recv uptoken info:%v", upToken)
+				case reason := <-atoken.forceUpToken:
+					log.Warnf("forceUpToken, reason:%v", reason)
 				case <-ctx.Done():
 					log.Warnf("recv ctx:%v exit refreshAccessToken", ctx.Err())
 					return
@@ -83,6 +92,24 @@ func (atoken *AuthTokenInfo) StartRefreshAccessToken(ctx context.Context, tokenU
 		}()
 	})
 	return
+}
+
+const (
+	preserveTokenTTL = 30 // token预留时长，用于控制提前刷新token
+	minTimer         = 2  // 定时器的最少时长
+	randTime         = 10 // 随机时间区间
+)
+
+func getTokenTTL(tokenTTL int64) int64 {
+	tokenTTL = tokenTTL - preserveTokenTTL
+	if tokenTTL <= minTimer {
+		tokenTTL = minTimer // 为了避免有bug导致不断触发timer，这里需要预留一点时间
+	}
+	// 随机化，避免所有机器人都同时获取access_token
+	if tokenTTL > randTime {
+		tokenTTL = tokenTTL - r.Int63n(randTime)
+	}
+	return tokenTTL
 }
 
 func (atoken *AuthTokenInfo) getAuthToken() AccessTokenInfo {
@@ -129,7 +156,7 @@ func queryAccessToken(ctx context.Context, tokenURL, appID, clientSecrent string
 		return AccessTokenInfo{}, err
 	}
 	payload := bytes.NewReader(data)
-	log.Infof("reqdata:%v", string(data))
+	log.Infof("queryAccessToken reqData:%v", string(data))
 	client := &http.Client{
 		Timeout: 10 * time.Second,
 	}
@@ -151,7 +178,7 @@ func queryAccessToken(ctx context.Context, tokenURL, appID, clientSecrent string
 		log.Errorf("ReadAll do err:%v", err)
 		return AccessTokenInfo{}, err
 	}
-	log.Infof("accesstoken:%v", string(body))
+	log.Infof("access_token:%v", string(body))
 	queryRsp := queryTokenRsp{}
 	if err = json.Unmarshal(body, &queryRsp); err != nil {
 		log.Errorf("Unmarshal err:%v", err)

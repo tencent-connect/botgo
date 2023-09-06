@@ -23,6 +23,7 @@ type RichMediaMessage struct {
 	URL        string `json:"url,omitempty"`
 	SrvSendMsg bool   `json:"srv_send_msg,omitempty"`
 	Content    string `json:"content,omitempty"`
+	MsgSeq     int64  `json:"msg_seq,omitempty"` // 机器人对于回复一个msg_id或者event_id的消息序号，指定后根据这个字段和msg_id或者event_id进行去重
 }
 
 // GetEventID 事件ID
@@ -49,6 +50,7 @@ type MessageToCreate struct {
 	Keyboard         *keyboard.MessageKeyboard `json:"keyboard,omitempty"`  // 消息按钮组件
 	EventID          string                    `json:"event_id,omitempty"`  // 要回复的事件id, 逻辑同MsgID
 	Timestamp        int64                     `json:"timestamp,omitempty"` //TODO delete this
+	MsgSeq           int64                     `json:"msg_seq,omitempty"`   // 机器人对于回复一个msg_id或者event_id的消息序号，指定后根据这个字段和msg_id或者event_id进行去重
 }
 
 // GetEventID 事件ID
