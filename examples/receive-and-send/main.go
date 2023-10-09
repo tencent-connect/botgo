@@ -54,7 +54,7 @@ func main() {
 		ErrorNotifyHandler(),
 
 		//***********频道事件消息***********
-		// at 机器人事件，目前是在这个事件处理中有逻辑，会回消息，其他的回调处理都只把数据打印出来，不做任何处理
+		// 频道 at 机器人事件，目前是在这个事件处理中有逻辑，会回消息，其他的回调处理都只把数据打印出来，不做任何处理
 		ATMessageEventHandler(),
 		// 频道事件
 		GuildEventHandler(),
@@ -63,14 +63,9 @@ func main() {
 		// 子频道事件
 		ChannelEventHandler(),
 		// 私信，目前只有私域才能够收到这个，如果你的机器人不是私域机器人，会导致连接报错，那么启动 example 就需要注释掉这个回调
-		DirectMessageHandler(),
-		// 频道消息，只有私域才能够收到这个，如果你的机器人不是私域机器人，会导致连接报错，那么启动 example 就需要注释掉这个回调
-		CreateMessageHandler(),
+		// DirectMessageHandler(),
 		// 互动事件
 		InteractionHandler(),
-		// 发帖事件
-		ThreadEventHandler(),
-
 		// ***********群事件及C2C消息***********
 		// 群@事件
 		GroupATMessageEventHandler(),

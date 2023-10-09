@@ -6,8 +6,22 @@ QQ频道机器人，官方 GOLANG SDK。
 [![Go Reference](https://pkg.go.dev/badge/github.com/tencent-connect/botgo.svg)](https://pkg.go.dev/github.com/tencent-connect/botgo)
 [![Examples](https://img.shields.io/badge/BotGo-examples-yellowgreen)](https://github.com/tencent-connect/botgo/tree/master/examples)
 
+## 一、quick start
+### 1.打开 examples/receive-and-send
+### 2.复制 config.yaml.demo -> config.yaml
+![img.png](doc/img/copy-config-yaml.png)
+### 3.登录[开发者管理端](https://q.qq.com)，将BotAppID和机器人秘钥分别填入config.yaml中的appid和secret字段
+![find-app-acc.png](doc/img/find-app-acc.png)
+![type-in-app-info.png](doc/img/type-in-app-info.png)
+### 4.运行 main.go，即可收到消息并回复。
+![robot-start-console.png](doc/img/robot-start-console.png)
+### 5.根据机器人QQ号查找、添加机器人为好友
+![add-robot.png](doc/img/add-robot.png)
 
-## 一、如何使用
+### 6.发送消息，即可收到回复。
+![robot-reply.png](doc/img/robot-reply.png)
+
+## 二、如何使用
 
 ### 1.请求 openapi 接口，操作资源
 
@@ -48,7 +62,7 @@ func main() {
 }
 ```
 
-## 二、什么是 SessionManager
+## 三、什么是 SessionManager
 
 SessionManager，用于管理 websocket 连接的启动，重连等。接口定义在：`session_manager.go`。开发者也可以自己实现自己的 SessionManager。
 
@@ -59,7 +73,7 @@ sdk 中实现了两个 SessionManager
 
 另外，也有其他同事基于 etcd 实现了 shard 集群的管理，在 [botgo-plugns](https://github.com/tencent-connect/botgo-plugins) 中。
 
-## 三、生产环境中的一些建议
+## 四、生产环境中的一些建议
 
 得益于 websocket 的机制，我们可以在本地就启动一个机器人，实现相关逻辑，但是在生产环境中需要考虑扩容，容灾等情况，所以建
 议从以下几方面考虑生产环境的部署：
@@ -90,11 +104,11 @@ sdk 中实现了两个 SessionManager
 
 提前规划好 kafka 的分片，然后从容的针对逻辑层做水平扩容。或者使用 pulsar（腾讯云上叫 tdmq） 来替代 kafka 避免 rebalance 问题。
 
-## 四、SDK 开发说明
+## 五、SDK 开发说明
 
 请查看：[开发说明](./DEVELOP.md)
 
-## 五、加入官方社区
+## 六、加入官方社区
 
 欢迎扫码加入 **QQ 频道开发者社区**。
 
