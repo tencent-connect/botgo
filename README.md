@@ -13,7 +13,7 @@ QQ频道机器人，官方 GOLANG SDK。
 ### 3.登录[开发者管理端](https://q.qq.com)，将BotAppID和机器人秘钥分别填入config.yaml中的appid和secret字段
 ![find-app-acc.png](doc/img/find-app-acc.png)
 ![type-in-app-info.png](doc/img/type-in-app-info.png)
-### 4.运行 main.go，即可收到消息并回复。
+### 4.执行go build，然后执行./receive-and-send, 即可收到消息并回复。
 ![robot-start-console.png](doc/img/robot-start-console.png)
 ### 5.根据机器人QQ号查找、添加机器人为好友
 ![add-robot.png](doc/img/add-robot.png)
