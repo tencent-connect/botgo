@@ -47,10 +47,11 @@ type MessageToCreate struct {
 	MsgID            string                    `json:"msg_id,omitempty"`
 	MessageReference *MessageReference         `json:"message_reference,omitempty"`
 	Markdown         *Markdown                 `json:"markdown,omitempty"`
-	Keyboard         *keyboard.MessageKeyboard `json:"keyboard,omitempty"`  // 消息按钮组件
-	EventID          string                    `json:"event_id,omitempty"`  // 要回复的事件id, 逻辑同MsgID
-	Timestamp        int64                     `json:"timestamp,omitempty"` //TODO delete this
-	MsgSeq           int64                     `json:"msg_seq,omitempty"`   // 机器人对于回复一个msg_id或者event_id的消息序号，指定后根据这个字段和msg_id或者event_id进行去重
+	Keyboard         *keyboard.MessageKeyboard `json:"keyboard,omitempty"`     // 消息按钮组件
+	EventID          string                    `json:"event_id,omitempty"`     // 要回复的事件id, 逻辑同MsgID
+	Timestamp        int64                     `json:"timestamp,omitempty"`    //TODO delete this
+	MsgSeq           int64                     `json:"msg_seq,omitempty"`      // 机器人对于回复一个msg_id或者event_id的消息序号，指定后根据这个字段和msg_id或者event_id进行去重
+	SubscribeId      string                    `json:"subscribe_id,omitempty"` // 订阅id，发送订阅消息时使用
 }
 
 // GetEventID 事件ID
@@ -81,9 +82,10 @@ func (msg MessageReference) GetSendType() SendType {
 
 // Markdown markdown 消息
 type Markdown struct {
-	TemplateID int               `json:"template_id"` // 模版 id
-	Params     []*MarkdownParams `json:"params"`      // 模版参数
-	Content    string            `json:"content"`     // 原生 markdown
+	TemplateID       int               `json:"template_id"`        // 模版 id
+	CustomTemplateID string            `json:"custom_template_id"` // 自定义模板id
+	Params           []*MarkdownParams `json:"params"`             // 模版参数
+	Content          string            `json:"content"`            // 原生 markdown
 }
 
 // MarkdownParams markdown 模版参数 键值对

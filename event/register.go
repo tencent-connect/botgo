@@ -32,8 +32,9 @@ var DefaultHandlers struct {
 
 	Interaction InteractionEventHandler
 
-	GroupATMessage GroupATMessageEventHandler
-	C2CMessage     C2CMessageEventHandler
+	GroupATMessage     GroupATMessageEventHandler
+	C2CMessage         C2CMessageEventHandler
+	SubscribeMsgStatus SubscribeMsgStatusEventHandler
 }
 
 // ReadyHandler 可以处理 ws 的 ready 事件
@@ -107,6 +108,9 @@ type C2CMessageEventHandler func(event *dto.WSPayload, data *dto.WSC2CMessageDat
 
 // ************************************************
 
+// SubscribeMsgStatusEventHandler 订阅消息模板授权状态变更事件 handler
+type SubscribeMsgStatusEventHandler func(event *dto.WSPayload, data *dto.WSSubscribeMsgStatus) error
+
 // RegisterHandlers 注册事件回调，并返回 intent 用于 websocket 的鉴权
 func RegisterHandlers(handlers ...interface{}) dto.Intent {
 	var i dto.Intent
@@ -127,6 +131,9 @@ func RegisterHandlers(handlers ...interface{}) dto.Intent {
 		case InteractionEventHandler:
 			DefaultHandlers.Interaction = handle
 			i = i | dto.EventToIntent(dto.EventInteractionCreate)
+		case SubscribeMsgStatusEventHandler:
+			DefaultHandlers.SubscribeMsgStatus = handle
+			i = i | dto.EventToIntent(dto.EventSubscribeMsgStatus)
 		default:
 		}
 	}

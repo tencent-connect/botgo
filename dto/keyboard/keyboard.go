@@ -13,6 +13,11 @@ const (
 	ActionTypeCallback ActionType = 1
 	// ActionTypeAtBot at机器人, 根据 at_bot_show_channel_list 决定在当前频道或用户选择频道,自动在输入框 @bot data
 	ActionTypeAtBot ActionType = 2
+	// ActionTypeMQQAPI 客户端native跳转链接
+	ActionTypeMQQAPI ActionType = 3
+	// ActionTypeSubscribe 订阅按钮
+	ActionTypeSubscribe ActionType = 4
+
 	// PermissionTypeSpecifyUserIDs 仅指定这条消息的人可操作
 	PermissionTypeSpecifyUserIDs PermissionType = 0
 	// PermissionTypManager  仅频道管理者可操作
@@ -55,11 +60,12 @@ type RenderData struct {
 
 // Action 按纽点击操作
 type Action struct {
-	Type                 ActionType  `json:"type,omitempty"`                     // 操作类型
-	Permission           *Permission `json:"permission,omitempty"`               // 可操作
-	ClickLimit           uint32      `json:"click_limit,omitempty"`              // 可点击的次数, 默认不限
-	Data                 string      `json:"data,omitempty"`                     // 操作相关数据
-	AtBotShowChannelList bool        `json:"at_bot_show_channel_list,omitempty"` // false:当前 true:弹出展示子频道选择器
+	Type                 ActionType    `json:"type,omitempty"`                     // 操作类型
+	Permission           *Permission   `json:"permission,omitempty"`               // 可操作
+	ClickLimit           uint32        `json:"click_limit,omitempty"`              // 可点击的次数, 默认不限
+	Data                 string        `json:"data,omitempty"`                     // 操作相关数据
+	AtBotShowChannelList bool          `json:"at_bot_show_channel_list,omitempty"` // false:当前 true:弹出展示子频道选择器
+	SubscribeData        SubscribeData `json:"subscribe_data"`                     // 订阅按钮数据，type=ActionTypeSubscribe时使用
 }
 
 // Permission 按纽操作权限
@@ -70,4 +76,16 @@ type Permission struct {
 	SpecifyRoleIDs []string `json:"specify_role_ids,omitempty"`
 	// SpecifyUserIDs 指定 UserID
 	SpecifyUserIDs []string `json:"specify_user_ids,omitempty"`
+}
+
+// TemplateID 对模板id的封装，兼容官方模板和自定义模板
+type TemplateID struct {
+	// 这两个字段互斥，只填入一个
+	TemplateId       uint32 `json:"template_id,omitempty"`        // 官方提供的模板id
+	CustomTemplateId string `json:"custom_template_id,omitempty"` // 自定义模板
+}
+
+// SubscribeData 订阅按钮数据
+type SubscribeData struct {
+	TemplateIds []*TemplateID `json:"template_ids,omitempty"` // 订阅按钮对应的模板id列表
 }

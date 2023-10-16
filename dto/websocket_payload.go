@@ -118,3 +118,6 @@ type WSGroupATMessageData Message
 type WSC2CMessageData Message
 
 // ************************************************
+
+// WSSubscribeMsgStatus 订阅消息模板授权状态变更事件
+type WSSubscribeMsgStatus SubscribeMessageStatusData
