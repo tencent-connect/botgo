@@ -3,6 +3,7 @@ package token
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 
@@ -28,6 +29,37 @@ type Token struct {
 	tokenURL     string
 	Type         Type
 	authToken    *AuthTokenInfo
+}
+
+type tokenData struct {
+	AppID        uint64
+	ClientSecret string
+	TokenURL     string
+	Type         Type
+}
+
+func (t *Token) UnmarshalJSON(data []byte) error {
+	token := &tokenData{}
+	err := json.Unmarshal(data, token)
+	if err != nil {
+		return err
+	}
+
+	t.appID = token.AppID
+	t.clientSecret = token.ClientSecret
+	t.tokenURL = token.TokenURL
+	t.Type = token.Type
+	t.authToken = NewAuthTokenInfo()
+	return nil
+}
+
+func (t Token) MarshalJSON() ([]byte, error) {
+	return json.Marshal(tokenData{
+		AppID:        t.appID,
+		ClientSecret: t.clientSecret,
+		TokenURL:     t.tokenURL,
+		Type:         t.Type,
+	})
 }
 
 // SetTokenURL 设置获取accessToken的调用地址

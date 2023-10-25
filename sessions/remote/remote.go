@@ -139,6 +139,12 @@ func (r *RedisManager) newConnect(session dto.Session) {
 	}
 	go shardLock.StartRenew(ctx, shardLockExpireTime)
 
+	// token初始化失败，重新放回去
+	if err := session.Token.InitToken(ctx); err != nil {
+		r.sessionProduceChan <- session
+		return
+	}
+
 	wsClient := websocket.ClientImpl.New(session)
 	if err := wsClient.Connect(); err != nil {
 		log.Error(err)

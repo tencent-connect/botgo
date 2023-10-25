@@ -42,12 +42,17 @@ type AccessTokenInfo struct {
 	UpTime    time.Time
 }
 
-// NewAuthTokenInfo 初始化动态鉴权Token
+var authTokenInstance *AuthTokenInfo
+var once sync.Once
+
 func NewAuthTokenInfo() *AuthTokenInfo {
-	return &AuthTokenInfo{
-		lock:         &sync.RWMutex{},
-		forceUpToken: make(chan interface{}, 10),
-	}
+	once.Do(func() {
+		authTokenInstance = &AuthTokenInfo{
+			lock:         &sync.RWMutex{},
+			forceUpToken: make(chan interface{}, 10),
+		}
+	})
+	return authTokenInstance
 }
 
 // ForceUpToken 强制刷新Token
@@ -61,7 +66,8 @@ func (atoken *AuthTokenInfo) ForceUpToken(ctx context.Context, reason string) er
 }
 
 // StartRefreshAccessToken 启动获取AccessToken的后台刷新
-func (atoken *AuthTokenInfo) StartRefreshAccessToken(ctx context.Context, tokenURL, appID, clientSecrent string) (err error) {
+func (atoken *AuthTokenInfo) StartRefreshAccessToken(ctx context.Context,
+	tokenURL, appID, clientSecrent string) (err error) {
 	tokenInfo, err := queryAccessToken(ctx, tokenURL, appID, clientSecrent)
 	if err != nil {
 		return err
