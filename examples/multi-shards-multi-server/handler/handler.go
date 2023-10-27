@@ -1,3 +1,4 @@
+// Package handler 事件处理回调
 package handler
 
 import (
@@ -7,6 +8,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
+
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/dto/message"
 	"github.com/tencent-connect/botgo/event"

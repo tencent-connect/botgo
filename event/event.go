@@ -1,3 +1,4 @@
+// Package event 事件处理注册
 package event
 
 import (

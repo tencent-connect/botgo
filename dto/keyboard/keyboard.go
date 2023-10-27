@@ -1,3 +1,4 @@
+// Package keyboard 消息按钮
 package keyboard
 
 // ActionType 按钮操作类型

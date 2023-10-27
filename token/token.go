@@ -63,6 +63,7 @@ func UserToken(appID uint64, clientSecret string) *Token {
 	}
 }
 
+// InitToken 启动机器人Token自动刷新
 func (t *Token) InitToken(ctx context.Context) (err error) {
 	if err = t.authToken.StartRefreshAccessToken(ctx, t.tokenURL, fmt.Sprint(t.appID), t.clientSecret); err != nil {
 		return err
