@@ -232,6 +232,34 @@ func generateDemoMessage(id string, cmd string, recvMsg dto.Message) dto.APIMess
 	return replyMsg
 }
 
+func (p Processor) ProcessFriend(wsEventType string, data *dto.WSC2CFriendData) error {
+	// 请注意，这里是主动推送添加好友事件，后续改为 event id 被动消息
+	replyMsg := dto.MessageToCreate{
+		Timestamp: time.Now().UnixMilli(),
+		Content:   "",
+	}
+	var content string
+	switch strings.ToLower(wsEventType) {
+	case strings.ToLower(string(dto.EventC2CFriendAdd)):
+		log.Println("添加好友")
+		content = fmt.Sprintf("ID为 %s 的用户添加好友", data.OpenId)
+	default:
+		log.Println("添加好友")
+		return nil
+	}
+	replyMsg.Content = content
+	_, err := p.api.PostC2CMessage(
+		context.Background(),
+		data.OpenId,
+		replyMsg,
+	)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
+}
+
 func genReplyArk(data *dto.WSATMessageData) *dto.Ark {
 	return &dto.Ark{
 		TemplateID: 23,

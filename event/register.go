@@ -35,6 +35,7 @@ var DefaultHandlers struct {
 	GroupATMessage     GroupATMessageEventHandler
 	C2CMessage         C2CMessageEventHandler
 	SubscribeMsgStatus SubscribeMsgStatusEventHandler
+	C2CFriend          C2CFriendEventHandler
 }
 
 // ReadyHandler 可以处理 ws 的 ready 事件
@@ -106,6 +107,11 @@ type GroupATMessageEventHandler func(event *dto.WSPayload, data *dto.WSGroupATMe
 // C2CMessageEventHandler 机器人消息事件 handler
 type C2CMessageEventHandler func(event *dto.WSPayload, data *dto.WSC2CMessageData) error
 
+// ***************** C2C 添加/删除好友 *******************************
+
+// C2CFriendEventHandler C2C 好友事件 handler
+type C2CFriendEventHandler func(event *dto.WSPayload, data *dto.WSC2CFriendData) error
+
 // ************************************************
 
 // SubscribeMsgStatusEventHandler 订阅消息模板授权状态变更事件 handler
@@ -134,6 +140,9 @@ func RegisterHandlers(handlers ...interface{}) dto.Intent {
 		case SubscribeMsgStatusEventHandler:
 			DefaultHandlers.SubscribeMsgStatus = handle
 			i = i | dto.EventToIntent(dto.EventSubscribeMsgStatus)
+		case C2CFriendEventHandler:
+			DefaultHandlers.C2CFriend = handle
+			i = i | dto.EventToIntent(dto.EventC2CFriendAdd)
 		default:
 		}
 	}

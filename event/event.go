@@ -56,6 +56,8 @@ var eventParseFuncMap = map[dto.OPCode]map[dto.EventType]eventParseFunc{
 		dto.EventGroupAtMessageCreate: groupAtMessageHandler,
 		dto.EventC2CMessageCreate:     c2cMessageHandler,
 		dto.EventSubscribeMsgStatus:   subscribeStatusHandler,
+		dto.EventC2CFriendAdd:         c2cFriendAddHandler,
+		dto.EventC2CFriendDel:         c2cFriendDelHandler,
 	},
 }
 
@@ -186,6 +188,28 @@ func subscribeStatusHandler(payload *dto.WSPayload, message []byte) error {
 	}
 	if DefaultHandlers.SubscribeMsgStatus != nil {
 		return DefaultHandlers.SubscribeMsgStatus(payload, data)
+	}
+	return nil
+}
+
+func c2cFriendDelHandler(payload *dto.WSPayload, message []byte) error {
+	data := &dto.WSC2CFriendData{}
+	if err := ParseData(message, data); err != nil {
+		return err
+	}
+	if DefaultHandlers.C2CFriend != nil {
+		return DefaultHandlers.C2CFriend(payload, data)
+	}
+	return nil
+}
+
+func c2cFriendAddHandler(payload *dto.WSPayload, message []byte) error {
+	data := &dto.WSC2CFriendData{}
+	if err := ParseData(message, data); err != nil {
+		return err
+	}
+	if DefaultHandlers.C2CFriend != nil {
+		return DefaultHandlers.C2CFriend(payload, data)
 	}
 	return nil
 }

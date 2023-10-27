@@ -119,5 +119,10 @@ type WSC2CMessageData Message
 
 // ************************************************
 
+// WSC2CFriendData C2C 好友事件
+type WSC2CFriendData C2CFriendData
+
+// ************************************************
+
 // WSSubscribeMsgStatus 订阅消息模板授权状态变更事件
 type WSSubscribeMsgStatus SubscribeMessageStatusData

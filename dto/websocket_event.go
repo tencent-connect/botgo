@@ -41,6 +41,8 @@ const (
 	EventGroupAtMessageCreate  EventType = "GROUP_AT_MESSAGE_CREATE"
 	EventC2CMessageCreate      EventType = "C2C_MESSAGE_CREATE"
 	EventSubscribeMsgStatus    EventType = "SUBSCRIBE_MESSAGE_STATUS"
+	EventC2CFriendAdd          EventType = "FRIEND_ADD"
+	EventC2CFriendDel          EventType = "FRIEND_DEL"
 )
 
 // intentEventMap 不同 intent 对应的事件定义
@@ -51,7 +53,8 @@ var intentEventMap = map[Intent][]EventType{
 	},
 	IntentGuildMembers:  {EventGuildMemberAdd, EventGuildMemberUpdate, EventGuildMemberRemove},
 	IntentGuildMessages: {EventMessageCreate, EventMessageDelete},
-	IntentGroupMessages: {EventGroupAtMessageCreate, EventC2CMessageCreate, EventSubscribeMsgStatus},
+	IntentGroupMessages: {EventGroupAtMessageCreate, EventC2CMessageCreate, EventSubscribeMsgStatus,
+		EventC2CFriendAdd, EventC2CFriendDel},
 
 	IntentGuildMessageReactions: {EventMessageReactionAdd, EventMessageReactionRemove},
 	IntentGuildAtMessage:        {EventAtMessageCreate, EventPublicMessageDelete},

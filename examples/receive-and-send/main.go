@@ -43,7 +43,6 @@ func main() {
 	}
 
 	processor = Processor{api: api}
-
 	// websocket.RegisterResumeSignal(syscall.SIGUSR1)
 	// 根据不同的回调，生成 intents
 	intent := websocket.RegisterHandlers(
@@ -71,6 +70,8 @@ func main() {
 		GroupATMessageEventHandler(),
 		// C2C消息事件
 		C2CMessageEventHandler(),
+		// C2C好友变更事件
+		C2CFriendEventHandler(),
 	)
 	// 指定需要启动的分片数为 2 的话可以手动修改 wsInfo
 	if err = botgo.NewSessionManager().Start(wsInfo, botToken, &intent); err != nil {
@@ -160,6 +161,14 @@ func GroupATMessageEventHandler() event.GroupATMessageEventHandler {
 func C2CMessageEventHandler() event.C2CMessageEventHandler {
 	return func(event *dto.WSPayload, data *dto.WSC2CMessageData) error {
 		return processor.ProcessC2CMessage(string(event.RawMessage), data)
+	}
+}
+
+// C2CFriendEventHandler 实现处理好友关系变更的回调
+func C2CFriendEventHandler() event.C2CFriendEventHandler {
+	return func(event *dto.WSPayload, data *dto.WSC2CFriendData) error {
+		fmt.Println(data)
+		return processor.ProcessFriend(string(event.Type), data)
 	}
 }
 
