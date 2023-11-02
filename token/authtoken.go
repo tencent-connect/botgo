@@ -42,17 +42,11 @@ type AccessTokenInfo struct {
 	UpTime    time.Time
 }
 
-var authTokenInstance *AuthTokenInfo
-var once sync.Once
-
 func NewAuthTokenInfo() *AuthTokenInfo {
-	once.Do(func() {
-		authTokenInstance = &AuthTokenInfo{
-			lock:         &sync.RWMutex{},
-			forceUpToken: make(chan interface{}, 10),
-		}
-	})
-	return authTokenInstance
+	return &AuthTokenInfo{
+		lock:         &sync.RWMutex{},
+		forceUpToken: make(chan interface{}, 10),
+	}
 }
 
 // ForceUpToken 强制刷新Token

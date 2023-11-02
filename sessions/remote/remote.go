@@ -129,7 +129,9 @@ func (r *RedisManager) getShardLockKey(session dto.Session) string {
 // 如果不能，则清理掉 sessionID，将 session 放入 sessionChan 中
 // session 的启动，交给 start 中的 for 循环执行，session 不自己递归进行重连，避免递归深度过深
 func (r *RedisManager) newConnect(session dto.Session) {
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	// 锁 shard，避免针对相同 shard 消费重复了
 	shardLock := lock.New(r.getShardLockKey(session), uuid.NewString(), r.client)
 	if err := shardLock.Lock(ctx, shardLockExpireTime); err != nil {
