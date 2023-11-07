@@ -1,14 +1,17 @@
 package v1
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
+
+	"github.com/tidwall/gjson"
 
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/errs"
 	"github.com/tencent-connect/botgo/openapi"
-	"github.com/tidwall/gjson"
 )
 
 // Message 拉取单条消息
@@ -60,6 +63,21 @@ func (o *openAPI) PostMessage(ctx context.Context, channelID string, msg *dto.Me
 		SetResult(dto.Message{}).
 		SetPathParam("channel_id", channelID).
 		SetBody(msg).
+		Post(o.getURL(messagesURI))
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.Result().(*dto.Message), nil
+}
+
+// PostMessageByFormData 发图片消息
+func (o *openAPI) PostMessageByFormData(ctx context.Context, channelID string, imgData []byte, msg map[string]string) (*dto.Message, error) {
+	resp, err := o.request(ctx).
+		SetResult(dto.Message{}).
+		SetPathParam("channel_id", channelID).
+		SetFileReader("file_image", time.Now().String(), bytes.NewReader(imgData)).
+		SetFormData(msg).
 		Post(o.getURL(messagesURI))
 	if err != nil {
 		return nil, err

@@ -1,7 +1,9 @@
 package v1
 
 import (
+	"bytes"
 	"context"
+	"time"
 
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/openapi"
@@ -26,6 +28,21 @@ func (o *openAPI) PostDirectMessage(ctx context.Context,
 		SetResult(dto.Message{}).
 		SetPathParam("guild_id", dm.GuildID).
 		SetBody(msg).
+		Post(o.getURL(dmsURI))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*dto.Message), nil
+}
+
+// PostDirectMessage 在私信频道内发图片消息
+func (o *openAPI) PostDirectMessageByFormData(ctx context.Context,
+	dm *dto.DirectMessage, imgData []byte, msg map[string]string) (*dto.Message, error) {
+	resp, err := o.request(ctx).
+		SetResult(dto.Message{}).
+		SetPathParam("guild_id", dm.GuildID).
+		SetFileReader("file_image", time.Now().String(), bytes.NewReader(imgData)).
+		SetFormData(msg).
 		Post(o.getURL(dmsURI))
 	if err != nil {
 		return nil, err
