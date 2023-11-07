@@ -67,6 +67,7 @@ type MessageAPI interface {
 	Message(ctx context.Context, channelID string, messageID string) (*dto.Message, error)
 	Messages(ctx context.Context, channelID string, pager *dto.MessagesPager) ([]*dto.Message, error)
 	PostMessage(ctx context.Context, channelID string, msg *dto.MessageToCreate) (*dto.Message, error)
+	PostMessageByFormData(ctx context.Context, channelID string, imgData []byte, msg map[string]string) (*dto.Message, error)
 	PatchMessage(ctx context.Context,
 		channelID string, messageID string, msg *dto.MessageToCreate) (*dto.Message, error)
 	RetractMessage(ctx context.Context, channelID, msgID string, options ...RetractMessageOption) error
@@ -157,6 +158,8 @@ type DirectMessageAPI interface {
 	CreateDirectMessage(ctx context.Context, dm *dto.DirectMessageToCreate) (*dto.DirectMessage, error)
 	// PostDirectMessage 在私信频道内发消息
 	PostDirectMessage(ctx context.Context, dm *dto.DirectMessage, msg *dto.MessageToCreate) (*dto.Message, error)
+	// PostDirectMessageByFormData 在私信频道内发图片消息
+	PostDirectMessageByFormData(ctx context.Context, dm *dto.DirectMessage, imgData []byte, msg map[string]string) (*dto.Message, error)
 	// RetractDMMessage 撤回私信频道消息
 	RetractDMMessage(ctx context.Context, guildID, msgID string, options ...RetractMessageOption) error
 	// PostDMSettingGuide 发送私信设置引导, jumpGuildID为设置引导要跳转的频道ID
