@@ -1,0 +1,14 @@
+- appid: xxx
+  appkey: xxxx
+  redis:
+     addr: xxxxxxxx
+     net_work: 
+     pass_word: 
+  cluster_key: xxxxxxxxxx
+- appid: xxxx
+  appkey: xxxx
+  redis:
+     addr: xxxxxxxx
+     net_work: 
+     pass_word: 
+  cluster_key: xxxxxxxxxxx
