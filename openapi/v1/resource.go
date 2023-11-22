@@ -6,6 +6,7 @@ import (
 
 const domain = "api.sgroup.qq.com"
 const sandBoxDomain = "sandbox.api.sgroup.qq.com"
+const getAppAccessTokenDomain = "https://bots.qq.com"
 
 const scheme = "https"
 
@@ -13,10 +14,16 @@ type uri string
 
 // 目前提供的接口的 uri
 const (
+	getAppAccessTokenUri uri = "/app/getAppAccessToken"
+
+	privateMessageUri          uri = "/v2/users/{openid}/messages"
+	groupMessageUri            uri = "/v2/groups/{group_openid}/messages"
+	privateRichMediaMessageUri uri = "/v2/users/{openid}/files"
+	groupRichMediaMessageUri   uri = "/v2/groups/{group_openid}/files"
+
 	guildURI            uri = "/guilds/{guild_id}"
 	guildMembersURI     uri = "/guilds/{guild_id}/members"
 	guildMemberURI      uri = "/guilds/{guild_id}/members/{user_id}"
-	guildRoleMemberURI  uri = "/guilds/{guild_id}/roles/{role_id}/members"
 	guildMuteURI        uri = "/guilds/{guild_id}/mute"                   // 频道禁言
 	guildMembersMuteURI uri = "/guilds/{guild_id}/members/{user_id}/mute" // 频道指定成员禁言
 
@@ -37,7 +44,6 @@ const (
 	gatewayBotURI uri = "/gateway/bot"
 
 	audioControlURI uri = "/channels/{channel_id}/audio"
-	micURI          uri = "/channels/{channel_id}/mic"
 
 	rolesURI uri = "/guilds/{guild_id}/roles"
 	roleURI  uri = "/guilds/{guild_id}/roles/{role_id}"
@@ -83,5 +89,10 @@ func (o *openAPI) getURL(endpoint uri) string {
 	if o.sandbox {
 		d = sandBoxDomain
 	}
+	return fmt.Sprintf("%s://%s%s", scheme, d, endpoint)
+}
+
+func (o *openAPI) getQQURL(endpoint uri) string {
+	d := getAppAccessTokenDomain
 	return fmt.Sprintf("%s://%s%s", scheme, d, endpoint)
 }

@@ -31,6 +31,9 @@ var DefaultHandlers struct {
 	ForumAudit ForumAuditEventHandler
 
 	Interaction InteractionEventHandler
+
+	GroupAtMessage GroupAtMessageEventHandler
+	GroupMessage   GroupMessageEventHandler
 }
 
 // ReadyHandler 可以处理 ws 的 ready 事件
@@ -93,6 +96,10 @@ type ForumAuditEventHandler func(event *dto.WSPayload, data *dto.WSForumAuditDat
 
 // InteractionEventHandler 互动事件 handler
 type InteractionEventHandler func(event *dto.WSPayload, data *dto.WSInteractionData) error
+
+type GroupAtMessageEventHandler func(event *dto.WSPayload, data *dto.WSGroupATMessageData) error
+
+type GroupMessageEventHandler func(event *dto.WSPayload, data *dto.WSGroupMessageData) error
 
 // RegisterHandlers 注册事件回调，并返回 intent 用于 websocket 的鉴权
 func RegisterHandlers(handlers ...interface{}) dto.Intent {
@@ -194,6 +201,12 @@ func registerMessageHandlers(i dto.Intent, handlers ...interface{}) dto.Intent {
 		case MessageAuditEventHandler:
 			DefaultHandlers.MessageAudit = handle
 			i = i | dto.EventToIntent(dto.EventMessageAuditPass, dto.EventMessageAuditReject)
+		case GroupAtMessageEventHandler:
+			DefaultHandlers.GroupAtMessage = handle
+			i = i | dto.EventToIntent(dto.EventGroupATMessageCreate)
+		case GroupMessageEventHandler:
+			DefaultHandlers.GroupMessage = handle
+			i = i | dto.EventToIntent(dto.EventGroupMessageCreate)
 		default:
 		}
 	}

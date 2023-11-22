@@ -72,6 +72,10 @@ type WSMessageData Message
 // WSATMessageData only at 机器人的消息 payload
 type WSATMessageData Message
 
+type WSGroupATMessageData GroupMessage
+
+type WSGroupMessageData GroupMessage
+
 // WSDirectMessageData 私信消息 payload
 type WSDirectMessageData Message
 

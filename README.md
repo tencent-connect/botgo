@@ -38,11 +38,63 @@ func main() {
     }
 
     // 监听哪类事件就需要实现哪类的 handler，定义：websocket/event_handler.go
-    var atMessage websocket.ATMessageEventHandler = func(event *dto.WSPayload, data *dto.WSATMessageData) error {
-        fmt.Println(event, data)
-        return nil
-    }
+    var atMessage event.ATMessageEventHandler = func(event *dto.WSPayload, data *dto.WSATMessageData) error {
+		fmt.Println(event, data)
+		return nil
+	}
+    
     intent := websocket.RegisterHandlers(atMessage)
+    // 启动 session manager 进行 ws 连接的管理，如果接口返回需要启动多个 shard 的连接，这里也会自动启动多个
+    botgo.NewSessionManager().Start(ws, token, &intent)
+}
+```
+
+### 3.群聊示例
+
+```golang
+func main() {
+    token := token.BotToken(conf.AppID, conf.Token)
+    api := botgo.NewOpenAPI(token).WithTimeout(3 * time.Second)
+    ctx := context.Background()
+    ws, err := api.WS(ctx, nil, "")
+    if err != nil {
+        log.Printf("%+v, err:%v", ws, err)
+    }
+
+    // 监听哪类事件就需要实现哪类的 handler，定义：websocket/event_handler.go
+    var atMessage event.ATMessageEventHandler = func(event *dto.WSPayload, data *dto.WSATMessageData) error {
+		fmt.Println(event, data)
+		return nil
+	}
+
+	var groupMessage event.GroupAtMessageEventHandler = func(event *dto.WSPayload, data *dto.WSGroupATMessageData) error {
+		groupId := data.GroupId
+		//userId := data.Author.UserId
+		content := strings.TrimSpace(data.Content)
+		msgId := data.MsgId
+
+		resp, err := api.PostGroupRichMediaMessage(ctx, groupId, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: "图片Url", SrvSendMsg: false})
+		if err != nil {
+            newMsg := &dto.GroupMessageToCreate{
+				Content: "图片上传失败",
+				MsgID:   msgId,
+				MsgType: 0,
+			}
+		    api.PostGroupMessage(ctx, groupId, newMsg)
+			return nil
+		}
+
+		newMsg := &dto.GroupMessageToCreate{
+			Content: content,
+			Media:   &dto.FileInfo{FileInfo: resp.FileInfo},
+			MsgID:   msgId,
+			MsgType: 7,
+		}
+		api.PostGroupMessage(ctx, groupId, newMsg)
+		return nil
+	}
+
+    intent := websocket.RegisterHandlers(atMessage, groupMessage)
     // 启动 session manager 进行 ws 连接的管理，如果接口返回需要启动多个 shard 的连接，这里也会自动启动多个
     botgo.NewSessionManager().Start(ws, token, &intent)
 }

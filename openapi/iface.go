@@ -67,6 +67,8 @@ type MessageAPI interface {
 	Message(ctx context.Context, channelID string, messageID string) (*dto.Message, error)
 	Messages(ctx context.Context, channelID string, pager *dto.MessagesPager) ([]*dto.Message, error)
 	PostMessage(ctx context.Context, channelID string, msg *dto.MessageToCreate) (*dto.Message, error)
+	PostGroupMessage(ctx context.Context, groupId string, msg *dto.GroupMessageToCreate) (*dto.GroupMsgResp, error)
+	PostGroupRichMediaMessage(ctx context.Context, groupId string, msg *dto.GroupRichMediaMessageToCreate) (*dto.RichMediaMsgResp, error)
 	PatchMessage(ctx context.Context,
 		channelID string, messageID string, msg *dto.MessageToCreate) (*dto.Message, error)
 	RetractMessage(ctx context.Context, channelID, msgID string, options ...RetractMessageOption) error
@@ -79,8 +81,6 @@ type GuildAPI interface {
 	Guild(ctx context.Context, guildID string) (*dto.Guild, error)
 	GuildMember(ctx context.Context, guildID, userID string) (*dto.Member, error)
 	GuildMembers(ctx context.Context, guildID string, pager *dto.GuildMembersPager) ([]*dto.Member, error)
-	GuildRoleMembers(ctx context.Context, guildID string, roleID string, pager *dto.GuildRoleMembersPager) (
-		[]*dto.Member, string, error)
 	DeleteGuildMember(ctx context.Context, guildID, userID string, opts ...dto.MemberDeleteOption) error
 	// 频道禁言
 	GuildMute(ctx context.Context, guildID string, mute *dto.UpdateGuildMute) error
@@ -120,10 +120,6 @@ type ChannelPermissionsAPI interface {
 type AudioAPI interface {
 	// PostAudio 执行音频播放，暂停等操作
 	PostAudio(ctx context.Context, channelID string, value *dto.AudioControl) (*dto.AudioControl, error)
-	// PutMic 机器人上麦
-	PutMic(ctx context.Context, channelID string) error
-	// DeleteMic 机器人下麦
-	DeleteMic(ctx context.Context, channelID string) error
 }
 
 // RoleAPI 用户组相关接口

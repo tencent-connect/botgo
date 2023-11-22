@@ -68,6 +68,32 @@ func (o *openAPI) PostMessage(ctx context.Context, channelID string, msg *dto.Me
 	return resp.Result().(*dto.Message), nil
 }
 
+func (o *openAPI) PostGroupMessage(ctx context.Context, groupID string, msg *dto.GroupMessageToCreate) (*dto.GroupMsgResp, error) {
+	resp, err := o.request(ctx).
+		SetResult(dto.GroupMsgResp{}).
+		SetPathParam("group_openid", groupID).
+		SetBody(msg).
+		Post(o.getURL(groupMessageUri))
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.Result().(*dto.GroupMsgResp), nil
+}
+
+func (o *openAPI) PostGroupRichMediaMessage(ctx context.Context, groupID string, msg *dto.GroupRichMediaMessageToCreate) (*dto.RichMediaMsgResp, error) {
+	resp, err := o.request(ctx).
+		SetResult(dto.RichMediaMsgResp{}).
+		SetPathParam("group_openid", groupID).
+		SetBody(msg).
+		Post(o.getURL(groupRichMediaMessageUri))
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.Result().(*dto.RichMediaMsgResp), nil
+}
+
 // PatchMessage 编辑消息
 func (o *openAPI) PatchMessage(ctx context.Context,
 	channelID string, messageID string, msg *dto.MessageToCreate) (*dto.Message, error) {
