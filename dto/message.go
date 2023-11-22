@@ -38,6 +38,20 @@ type Message struct {
 	SrcGuildID string `json:"src_guild_id"`
 }
 
+type GroupMessage struct {
+	GroupId     string    `json:"group_id"`
+	GroupOpenId string    `json:"group_openid"`
+	Content     string    `json:"content"`
+	MsgId       string    `json:"id"`
+	Author      Author    `json:"author"`
+	Timestamp   Timestamp `json:"timestamp"`
+}
+
+type Author struct {
+	UserId     string `json:"id"`
+	UserOpenId string `json:"member_openid"`
+}
+
 // Embed 结构
 type Embed struct {
 	Title       string                `json:"title,omitempty"`
