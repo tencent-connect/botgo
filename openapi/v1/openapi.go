@@ -22,8 +22,8 @@ import (
 const MaxIdleConns = 3000
 
 type openAPI struct {
-	token   *token.Token
-	timeout time.Duration
+	tokenManager *token.Manager
+	timeout      time.Duration
 
 	sandbox     bool   // 请求沙箱环境
 	debug       bool   // debug 模式，调试sdk时候使用
@@ -48,11 +48,11 @@ func (o *openAPI) TraceID() string {
 }
 
 // Setup 生成一个实例
-func (o *openAPI) Setup(token *token.Token, inSandbox bool) openapi.OpenAPI {
+func (o *openAPI) Setup(token *token.Manager, inSandbox bool) openapi.OpenAPI {
 	api := &openAPI{
-		token:   token,
-		timeout: 3 * time.Second,
-		sandbox: inSandbox,
+		tokenManager: token,
+		timeout:      3 * time.Second,
+		sandbox:      inSandbox,
 	}
 	api.setupClient() // 初始化可复用的 client
 	return api
@@ -77,9 +77,9 @@ func (o *openAPI) setupClient() {
 		SetLogger(log.DefaultLogger).
 		SetDebug(o.debug).
 		SetTimeout(o.timeout).
-		SetAuthScheme(string(o.token.Type)).
+		SetAuthScheme(string(o.tokenManager.Type)).
 		SetHeader("User-Agent", version.String()).
-		SetHeader("X-Union-Appid", fmt.Sprint(o.token.GetAppID())).
+		SetHeader("X-Union-Appid", fmt.Sprint(o.tokenManager.GetAppID())).
 		SetPreRequestHook(
 			func(client *resty.Client, request *http.Request) error {
 				// 执行请求前过滤器
@@ -89,7 +89,7 @@ func (o *openAPI) setupClient() {
 		).
 		OnBeforeRequest(
 			func(c *resty.Client, r *resty.Request) error {
-				c.SetAuthToken(o.token.GetAccessToken())
+				c.SetAuthToken(o.tokenManager.GetAccessToken().GetToken())
 				return nil
 			},
 		).
@@ -134,7 +134,7 @@ func (o *openAPI) handleError(resp *resty.Response) {
 	}
 	if b.Code == errs.APICodeTokenExpireOrNotExist {
 		log.Errorf("token expire or not exist, update token")
-		_ = o.token.UpAccessToken(context.Background(), "openapi token expire")
+		o.tokenManager.GetRefreshSigCh() <- errs.New(errs.APICodeTokenExpireOrNotExist, "openapi token expire")
 	}
 }
 
@@ -152,13 +152,6 @@ func respInfo(resp *resty.Response) string {
 		string(resp.Body()),
 	)
 }
-
-// reqInfo 用于请求日志格式化
-func reqInfo(req *resty.Request) string {
-	bodyJSON, _ := json.Marshal(req)
-	return fmt.Sprintf("[OPENAPI]%v %v data:%v", req.Method, req.URL, string(bodyJSON))
-}
-
 func createTransport(localAddr net.Addr, idleConns int) *http.Transport {
 	dialer := &net.Dialer{
 		Timeout:   60 * time.Second,

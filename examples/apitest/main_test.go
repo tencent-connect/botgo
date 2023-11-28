@@ -19,7 +19,7 @@ var conf struct {
 	AppID uint64 `yaml:"appid"`
 	Token string `yaml:"token"`
 }
-var botToken *token.Token
+var botToken *token.Manager
 var api openapi.OpenAPI
 
 var (
@@ -47,9 +47,9 @@ func TestMain(m *testing.M) {
 	}
 	log.Println(conf)
 
-	botToken = token.BotToken(conf.AppID, conf.Token)
+	manager := token.NewBotTokenManager(conf.AppID, conf.Token)
 	api = botgo.NewOpenAPI(botToken).WithTimeout(3 * time.Second)
-	if err := botToken.InitToken(context.Background()); err != nil {
+	if err := manager.Init(context.Background()); err != nil {
 		log.Fatalln(err)
 	}
 	os.Exit(m.Run())

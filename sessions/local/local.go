@@ -23,7 +23,7 @@ type ChanManager struct {
 }
 
 // Start 启动本地 session manager
-func (l *ChanManager) Start(apInfo *dto.WebsocketAP, token *token.Token, intents *dto.Intent) error {
+func (l *ChanManager) Start(apInfo *dto.WebsocketAP, tokenManager *token.Manager, intents *dto.Intent) error {
 	defer log.Sync()
 	if err := manager.CheckSessionLimit(apInfo); err != nil {
 		log.Errorf("[ws/session/local] session limited apInfo: %+v", apInfo)
@@ -37,10 +37,10 @@ func (l *ChanManager) Start(apInfo *dto.WebsocketAP, token *token.Token, intents
 	l.sessionChan = make(chan dto.Session, apInfo.Shards)
 	for i := uint32(0); i < apInfo.Shards; i++ {
 		session := dto.Session{
-			URL:     apInfo.URL,
-			Token:   *token,
-			Intent:  *intents,
-			LastSeq: 0,
+			URL:          apInfo.URL,
+			TokenManager: tokenManager,
+			Intent:       *intents,
+			LastSeq:      0,
 			Shards: dto.ShardConfig{
 				ShardID:    i,
 				ShardCount: apInfo.Shards,

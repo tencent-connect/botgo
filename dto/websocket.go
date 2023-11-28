@@ -29,12 +29,12 @@ type ShardConfig struct {
 
 // Session 连接的 session 结构，包括链接的所有必要字段
 type Session struct {
-	ID      string
-	URL     string
-	Token   token.Token
-	Intent  Intent
-	LastSeq uint32
-	Shards  ShardConfig
+	ID           string
+	URL          string
+	TokenManager *token.Manager
+	Intent       Intent
+	LastSeq      uint32
+	Shards       ShardConfig
 }
 
 // String 输出session字符串

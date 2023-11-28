@@ -52,7 +52,7 @@ func New(client *redis.Client, opts ...Option) *RedisManager {
 }
 
 // Start 启动 redis 的 session 管理器
-func (r *RedisManager) Start(apInfo *dto.WebsocketAP, token *token.Token, intents *dto.Intent) error {
+func (r *RedisManager) Start(apInfo *dto.WebsocketAP, token *token.Manager, intents *dto.Intent) error {
 	defer log.Sync()
 	if err := manager.CheckSessionLimit(apInfo); err != nil {
 		log.Errorf("[ws/session/redis] session limited apInfo: %+v", apInfo)
@@ -140,13 +140,11 @@ func (r *RedisManager) newConnect(session dto.Session) {
 		return
 	}
 	go shardLock.StartRenew(ctx, shardLockExpireTime)
-
 	// token初始化失败，重新放回去
-	if err := session.Token.InitToken(ctx); err != nil {
+	if err := session.TokenManager.Init(ctx); err != nil {
 		r.sessionProduceChan <- session
 		return
 	}
-
 	wsClient := websocket.ClientImpl.New(session)
 	if err := wsClient.Connect(); err != nil {
 		log.Error(err)

@@ -23,16 +23,18 @@ var processor Processor
 func main() {
 	ctx := context.Background()
 	// 加载 appid 和 token
-	botToken := token.New(token.TypeQQBot)
-	if err := botToken.LoadFromConfig(getConfigPath("config.yaml")); err != nil {
+	tokenManager := token.NewManager(token.TypeQQBot)
+
+	filePath := getConfigPath("config.yaml")
+	if err := tokenManager.LoadAppAccFromYAML(filePath); err != nil {
 		log.Fatalln(err)
 	}
 
-	if err := botToken.InitToken(ctx); err != nil {
+	if err := tokenManager.Init(ctx); err != nil {
 		log.Fatalln(err)
 	}
 	// 初始化 openapi，正式环境
-	api := botgo.NewOpenAPI(botToken).WithTimeout(3 * time.Second)
+	api := botgo.NewOpenAPI(tokenManager).WithTimeout(3 * time.Second)
 	// 沙箱环境
 	// api := botgo.NewSandboxOpenAPI(botToken).WithTimeout(3 * time.Second)
 
@@ -74,7 +76,7 @@ func main() {
 		C2CFriendEventHandler(),
 	)
 	// 指定需要启动的分片数为 2 的话可以手动修改 wsInfo
-	if err = botgo.NewSessionManager().Start(wsInfo, botToken, &intent); err != nil {
+	if err = botgo.NewSessionManager().Start(wsInfo, tokenManager, &intent); err != nil {
 		log.Fatalln(err)
 	}
 }

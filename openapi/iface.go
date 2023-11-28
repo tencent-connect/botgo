@@ -42,7 +42,7 @@ type OpenAPI interface {
 // Base 基础能力接口
 type Base interface {
 	Version() APIVersion
-	Setup(token *token.Token, inSandbox bool) OpenAPI
+	Setup(token *token.Manager, inSandbox bool) OpenAPI
 	// WithTimeout 设置请求接口超时时间
 	WithTimeout(duration time.Duration) OpenAPI
 	// Transport 透传请求，如果 sdk 没有及时跟进新的接口的变更，可以使用该方法进行透传，openapi 实现时可以按需选择是否实现该接口

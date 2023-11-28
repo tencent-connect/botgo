@@ -11,17 +11,18 @@ import (
 )
 
 // distributeSession 根据 shards 生产初始化的 session，这里需要抢一个分布式锁，抢到锁的服务器，负责把session都生产到 redis 中
-func (r *RedisManager) distributeSession(apInfo *dto.WebsocketAP, token *token.Token, intents *dto.Intent) error {
+func (r *RedisManager) distributeSession(
+	apInfo *dto.WebsocketAP, tokenManager *token.Manager, intents *dto.Intent) error {
 	// clear，报错也不影响
 	if err := r.client.Del(context.Background(), r.sessionQueueKey); err != nil {
 		log.Errorf("[ws/session/redis] clear session list failed: %v", err)
 	}
 	for i := uint32(0); i < apInfo.Shards; i++ {
 		session := dto.Session{
-			URL:     apInfo.URL,
-			Token:   *token,
-			Intent:  *intents,
-			LastSeq: 0,
+			URL:          apInfo.URL,
+			TokenManager: *tokenManager,
+			Intent:       *intents,
+			LastSeq:      0,
 			Shards: dto.ShardConfig{
 				ShardID:    i,
 				ShardCount: apInfo.Shards,

@@ -26,11 +26,11 @@ func main() {
 	)
 
 	// 加载 appid 和 token
-	botToken := token.New(token.TypeBot)
-	if err := botToken.LoadFromConfig("config.yaml"); err != nil {
+	botToken := token.NewManager(token.TypeQQBot)
+	if err := botToken.LoadAppAccFromYAML("config.yaml"); err != nil {
 		log.Fatalln(err)
 	}
-	if err := botToken.InitToken(context.Background()); err != nil {
+	if err := botToken.Init(context.Background()); err != nil {
 		log.Fatalln(err)
 	}
 	// 初始化 openapi

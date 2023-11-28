@@ -32,11 +32,11 @@ func SelectOpenAPIVersion(version openapi.APIVersion) error {
 
 // NewOpenAPI 创建新的 openapi 实例，会返回当前的 openapi 实现的实例
 // 如果需要使用其他版本的实现，需要在调用这个方法之前调用 SelectOpenAPIVersion 方法
-func NewOpenAPI(token *token.Token) openapi.OpenAPI {
+func NewOpenAPI(token *token.Manager) openapi.OpenAPI {
 	return openapi.DefaultImpl.Setup(token, false)
 }
 
 // NewSandboxOpenAPI 创建测试环境的 openapi 实例
-func NewSandboxOpenAPI(token *token.Token) openapi.OpenAPI {
+func NewSandboxOpenAPI(token *token.Manager) openapi.OpenAPI {
 	return openapi.DefaultImpl.Setup(token, true)
 }

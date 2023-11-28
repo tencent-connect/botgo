@@ -2,7 +2,6 @@
 package client
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -98,10 +97,7 @@ func (c *Client) Listening() error {
 			}
 			// accessToken过期
 			if wss.IsCloseError(err, errs.WSCodeBackendAuthenticationFail) {
-				err = c.session.Token.UpAccessToken(context.Background(), err)
-				if err != nil {
-					log.Errorf("update access token failed: %v", err)
-				}
+				c.session.TokenManager.GetRefreshSigCh() <- err
 			}
 			// 这里用 UnexpectedCloseError，如果有需要排除在外的 close error code，可以补充在第二个参数上
 			// 4009: session time out, 发了 reconnect 之后马上关闭连接时候的错误码，这个是允许 resumeSignal 的
@@ -144,7 +140,7 @@ func (c *Client) Write(message *dto.WSPayload) error {
 func (c *Client) Resume() error {
 	payload := &dto.WSPayload{
 		Data: &dto.WSResumeData{
-			Token:     c.session.Token.GetString(),
+			Token:     c.session.TokenManager.GetTokenValue(),
 			SessionID: c.session.ID,
 			Seq:       c.session.LastSeq,
 		},
@@ -161,7 +157,7 @@ func (c *Client) Identify() error {
 	}
 	payload := &dto.WSPayload{
 		Data: &dto.WSIdentityData{
-			Token:   c.session.Token.GetString(),
+			Token:   c.session.TokenManager.GetTokenValue(),
 			Intents: c.session.Intent,
 			Shard: []uint32{
 				c.session.Shards.ShardID,
@@ -194,10 +190,7 @@ func (c *Client) readMessageToQueue() {
 			close(c.messageQueue)
 			// accessToken过期
 			if wss.IsCloseError(err, 4004) {
-				err = c.session.Token.UpAccessToken(context.Background(), err)
-				if err != nil {
-					log.Errorf("update access token failed: %v", err)
-				}
+				c.session.TokenManager.GetRefreshSigCh() <- err
 			}
 			c.closeChan <- err
 			return
