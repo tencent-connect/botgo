@@ -38,6 +38,7 @@ type tokenData struct {
 	Type         Type
 }
 
+// UnmarshalJSON 反序列化 json
 func (t *Token) UnmarshalJSON(data []byte) error {
 	token := &tokenData{}
 	err := json.Unmarshal(data, token)
@@ -53,6 +54,7 @@ func (t *Token) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// MarshalJSON 序列化 json
 func (t Token) MarshalJSON() ([]byte, error) {
 	return json.Marshal(tokenData{
 		AppID:        t.appID,

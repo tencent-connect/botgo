@@ -232,6 +232,7 @@ func generateDemoMessage(id string, cmd string, recvMsg dto.Message) dto.APIMess
 	return replyMsg
 }
 
+// ProcessFriend 处理 c2c 好友事件
 func (p Processor) ProcessFriend(wsEventType string, data *dto.WSC2CFriendData) error {
 	// 请注意，这里是主动推送添加好友事件，后续改为 event id 被动消息
 	replyMsg := dto.MessageToCreate{

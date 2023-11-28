@@ -1,3 +1,4 @@
+// Package processor 事件处理
 package processor
 
 import (

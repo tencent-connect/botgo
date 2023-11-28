@@ -42,6 +42,7 @@ type AccessTokenInfo struct {
 	UpTime    time.Time
 }
 
+// NewAuthTokenInfo 创建 authToken 信息
 func NewAuthTokenInfo() *AuthTokenInfo {
 	return &AuthTokenInfo{
 		lock:         &sync.RWMutex{},
