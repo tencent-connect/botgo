@@ -11,6 +11,7 @@ import (
 
 	"github.com/go-resty/resty/v2" // resty 是一个优秀的 rest api 客户端，可以极大的减少开发基于 rest 标准接口求请求的封装工作量
 
+	"github.com/tencent-connect/botgo/constant"
 	"github.com/tencent-connect/botgo/errs"
 	"github.com/tencent-connect/botgo/log"
 	"github.com/tencent-connect/botgo/openapi"
@@ -101,7 +102,7 @@ func (o *openAPI) setupClient() {
 				if err := openapi.DoRespFilterChains(resp.Request.RawRequest, resp.RawResponse); err != nil {
 					return err
 				}
-				traceID := resp.Header().Get(openapi.TraceIDKey)
+				traceID := resp.Header().Get(constant.TraceIDKey)
 				o.lastTraceID = traceID
 				// 非成功含义的状态码，需要返回 error 供调用方识别
 				if !openapi.IsSuccessStatus(resp.StatusCode()) {
@@ -120,8 +121,10 @@ func (o *openAPI) request(ctx context.Context) *resty.Request {
 
 // errBody 请求出错情况下的body结构
 type errBody struct {
-	Code    int    `json:"code"`    // 错误码
-	Message string `json:"message"` // 错误信息
+	Message string `json:"message"`  // 错误原因
+	Code    int    `json:"code"`     // 错误码，后续废弃
+	ErrCode int    `json:"err_code"` // 错误码
+	TraceID string `json:"trace_id"` // 服务端traceID, 用于问题排查
 }
 
 // handleError 处理openapi调用失败的情况
@@ -132,7 +135,7 @@ func (o *openAPI) handleError(resp *resty.Response) {
 		log.Errorf("parse errBody fail, err:%v, body:%s", err, string(resp.Body()))
 		return
 	}
-	if b.Code == errs.APICodeTokenExpireOrNotExist {
+	if b.ErrCode == errs.APICodeTokenExpireOrNotExist || b.Code == errs.APICodeTokenExpireOrNotExist {
 		log.Errorf("token expire or not exist, update token")
 		o.tokenManager.GetRefreshSigCh() <- errs.New(errs.APICodeTokenExpireOrNotExist, "openapi token expire")
 	}
@@ -145,7 +148,7 @@ func respInfo(resp *resty.Response) string {
 		"[OPENAPI]%v %v, traceID:%v, status:%v, elapsed:%v req: %v, resp: %v",
 		resp.Request.Method,
 		resp.Request.URL,
-		resp.Header().Get(openapi.TraceIDKey),
+		resp.Header().Get(constant.TraceIDKey),
 		resp.Status(),
 		resp.Time(),
 		string(bodyJSON),

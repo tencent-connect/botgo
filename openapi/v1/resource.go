@@ -2,12 +2,9 @@ package v1
 
 import (
 	"fmt"
+
+	"github.com/tencent-connect/botgo/constant"
 )
-
-const domain = "api.sgroup.qq.com"
-const sandBoxDomain = "sandbox.api.sgroup.qq.com"
-
-const scheme = "https"
 
 type uri string
 
@@ -85,9 +82,9 @@ const (
 
 // getURL 获取接口地址，会处理沙箱环境判断
 func (o *openAPI) getURL(endpoint uri) string {
-	d := domain
+	d := constant.APIDomain
 	if o.sandbox {
-		d = sandBoxDomain
+		d = constant.SandBoxAPIDomain
 	}
-	return fmt.Sprintf("%s://%s%s", scheme, d, endpoint)
+	return fmt.Sprintf("%s%s", d, endpoint)
 }

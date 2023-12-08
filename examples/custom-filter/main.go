@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/tencent-connect/botgo"
+	"github.com/tencent-connect/botgo/constant"
 	"github.com/tencent-connect/botgo/openapi"
 	"github.com/tencent-connect/botgo/token"
 )
@@ -45,6 +46,6 @@ func ReqFilter(req *http.Request, _ *http.Response) error {
 // RespFilter 自定义响应过滤器
 func RespFilter(req *http.Request, resp *http.Response) error {
 	log.Println("trace id added by req filter", req.Header.Get("X-Custom-TraceID"))
-	log.Println("trace id return by openapi", resp.Header.Get(openapi.TraceIDKey))
+	log.Println("trace id return by openapi", resp.Header.Get(constant.TraceIDKey))
 	return nil
 }

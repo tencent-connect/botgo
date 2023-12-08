@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/tencent-connect/botgo/constant"
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/event"
 	"github.com/tencent-connect/botgo/interaction/signature"
 	"github.com/tencent-connect/botgo/log"
-	"github.com/tencent-connect/botgo/openapi"
 )
 
 type ack struct {
@@ -54,25 +54,26 @@ func HTTPHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Debugf("http callback body: %v", string(body))
 
+	traceID := r.Header.Get(constant.TraceIDKey)
 	// 签名验证
 	if pass, err := signature.Verify(DefaultGetSecretFunc(), r.Header, body); err != nil || !pass {
-		log.Errorf("signature verify failed, err: %v, traceID: %s", err, r.Header.Get(openapi.TraceIDKey))
+		log.Errorf("signature verify failed, err: %v, traceID: %s", err, traceID)
 		return
 	}
 
 	// 解析 payload
 	payload := &dto.WSPayload{}
 	if err := json.Unmarshal(body, payload); err != nil {
-		log.Errorf("unmarshal http callback body error: %s, traceID: %s", err, r.Header.Get(openapi.TraceIDKey))
+		log.Errorf("unmarshal http callback body error: %s, traceID: %s", err, traceID)
 		return
 	}
 	// 原始数据放入，parse 的时候需要从里面提取 d
 	payload.RawMessage = body
 
-	result := parsePayload(payload, r.Header.Get(openapi.TraceIDKey))
+	result := parsePayload(payload, traceID)
 	if result != "" {
 		if _, err := w.Write([]byte(result)); err != nil {
-			log.Errorf("write http callback response error: %s, traceID: %s", err, r.Header.Get(openapi.TraceIDKey))
+			log.Errorf("write http callback response error: %s, traceID: %s", err, traceID)
 			return
 		}
 	}

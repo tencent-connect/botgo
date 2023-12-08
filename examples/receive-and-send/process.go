@@ -182,7 +182,8 @@ func generateDemoMessage(id string, cmd string, recvMsg dto.Message) dto.APIMess
 	log.Printf("收到指令:%+v", cmd)
 
 	var replyMsg dto.APIMessage
-	log.Printf("opt:[%v]->[%v] attachments:%v", cmd, strings.ToLower(strings.TrimSpace(cmd)))
+	log.Printf("opt:[%v]->[%v] attachments:%v", cmd, strings.ToLower(strings.TrimSpace(cmd)),
+		recvMsg.Attachments)
 	switch strings.ToLower(strings.TrimSpace(cmd)) {
 	case "发图片":
 		replyMsg = &dto.RichMediaMessage{

@@ -2,14 +2,17 @@ package token
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"strconv"
 	"time"
 
 	"encoding/json"
-	"github.com/tencent-connect/botgo/log"
 	"math/rand"
 	"net/http"
+
+	"github.com/tencent-connect/botgo/constant"
+	"github.com/tencent-connect/botgo/log"
 )
 
 var (
@@ -17,10 +20,12 @@ var (
 )
 
 const (
-	preserveTokenTTL   float64 = 30                                          // token预留时长，用于控制提前刷新token Sec
-	minTimeGap         float64 = 2                                           // 定时器的最少时长Sec
-	randTimeUpperLimit         = 10                                          // 随机时间区间Sec
-	tokenURL                   = "https://bots.qq.com/app/getAppAccessToken" // tokenURL 取得AccessToken的地址
+	preserveTokenTTL   float64 = 30 // token预留时长，用于控制提前刷新token Sec
+	minTimeGap         float64 = 2  // 定时器的最少时长Sec
+	randTimeUpperLimit         = 10 // 随机时间区间Sec
+
+	tokenURL = "/app/getAppAccessToken" // tokenURL 取得AccessToken的地址
+
 )
 
 func init() {
@@ -48,8 +53,14 @@ type retrieveTokenReq struct {
 }
 
 type retrieveTokenRsp struct {
+	Code        int    `json:"code"`
+	Message     string `json:"message"`
 	AccessToken string `json:"access_token"`
 	ExpiresIn   string `json:"expires_in"`
+}
+
+func getTokenURL() string {
+	return fmt.Sprintf("%v%v", constant.TokenDomain, tokenURL)
 }
 
 func retrieveToken(appID, secret string) (*AccessToken, error) {
@@ -67,9 +78,9 @@ func retrieveToken(appID, secret string) (*AccessToken, error) {
 		return nil, err
 	}
 	payload := bytes.NewReader(data)
-	log.Debugf("retrieve access token req:%v", string(data))
+	log.Debugf("retrieve access token URL:%v req:%v", getTokenURL(), string(data))
 
-	req, err := http.NewRequest(http.MethodPost, tokenURL, payload)
+	req, err := http.NewRequest(http.MethodPost, getTokenURL(), payload)
 	if err != nil {
 		log.Errorf("init http request failed:%v", err)
 		return nil, err
@@ -85,16 +96,21 @@ func retrieveToken(appID, secret string) (*AccessToken, error) {
 	}
 	defer res.Body.Close()
 
+	rsptraceID := res.Header.Get(constant.TraceIDKey)
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		log.Errorf("read rsp failed:%v", err)
 		return nil, err
 	}
-	log.Debugf("access token:%v", string(body))
+	log.Debugf("access token:%v traceID:%v", string(body), rsptraceID)
 	retrieveRsp := &retrieveTokenRsp{}
 	if err = json.Unmarshal(body, retrieveRsp); err != nil {
-		log.Errorf("unmarshal rsp failed:%v", err)
+		log.Errorf("unmarshal rsp failed:%v traceID:%v", err, rsptraceID)
 		return nil, err
+	}
+	if retrieveRsp.Code != 0 {
+		log.Errorf("query acessToken err:%v.%v traceID:%v", retrieveRsp.Code, retrieveRsp.Message, rsptraceID)
+		return nil, fmt.Errorf("%v.%v", retrieveRsp.Code, retrieveRsp.Message)
 	}
 	rdata := &AccessToken{
 		Token:      retrieveRsp.AccessToken,
@@ -102,7 +118,7 @@ func retrieveToken(appID, secret string) (*AccessToken, error) {
 	}
 	rdata.ExpiresIn, err = strconv.ParseInt(retrieveRsp.ExpiresIn, 10, 64)
 	if err != nil {
-		log.Errorf("parse expire_in failed err:%v", err)
+		log.Errorf("parse expire_in failed err:%v traceID:%v", err, rsptraceID)
 		return nil, err
 	}
 	return rdata, nil
