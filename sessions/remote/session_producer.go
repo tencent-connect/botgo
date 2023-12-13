@@ -20,7 +20,7 @@ func (r *RedisManager) distributeSession(
 	for i := uint32(0); i < apInfo.Shards; i++ {
 		session := dto.Session{
 			URL:          apInfo.URL,
-			TokenManager: *tokenManager,
+			TokenManager: tokenManager,
 			Intent:       *intents,
 			LastSeq:      0,
 			Shards: dto.ShardConfig{
