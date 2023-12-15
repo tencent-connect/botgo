@@ -17,18 +17,19 @@ type APIMessage interface {
 }
 
 // RichMediaMessage 富媒体消息
+// 注意：直接使用srv_send_msg=tre时会占用主动消息频率，且多媒体文件不能复用，建议先上传，然后再使用消息发送类型7进行发送
 type RichMediaMessage struct {
-	EventID    string `json:"event_id,omitempty"`  // 要回复的事件id, 逻辑同MsgID
-	FileType   uint64 `json:"file_type,omitempty"` // 业务类型，图片，文件，语音，视频 文件类型，取值:1图片,2视频,3语音(目前语音只支持silk格式)
-	URL        string `json:"url,omitempty"`
-	SrvSendMsg bool   `json:"srv_send_msg,omitempty"`
+	EventID    string `json:"event_id,omitempty"`     // 已经废弃：要回复的事件id, 逻辑同MsgID
+	FileType   uint64 `json:"file_type,omitempty"`    // 业务类型，图片，文件，语音，视频 文件类型，取值:1图片,2视频,3语音(目前语音只支持silk格式)
+	URL        string `json:"url,omitempty"`          // 需发送的富媒体文件，HTTP或者HTTPS链接
+	SrvSendMsg bool   `json:"srv_send_msg,omitempty"` // 为true时会直接发送到群/C2C，且会占用主动消息频率, 为false为上传富媒体文件
 	Content    string `json:"content,omitempty"`
 	MsgSeq     int64  `json:"msg_seq,omitempty"` // 机器人对于回复一个msg_id或者event_id的消息序号，指定后根据这个字段和msg_id或者event_id进行去重
 }
 
 // GetEventID 事件ID
 func (msg RichMediaMessage) GetEventID() string {
-	return msg.EventID
+	return ""
 }
 
 // GetSendType 消息类型
@@ -36,13 +37,26 @@ func (msg RichMediaMessage) GetSendType() SendType {
 	return RichMedia
 }
 
+// MessageType 消息类型
+type MessageType int
+
+const (
+	TextMsg        MessageType = 0 // 文字消息
+	MarkdownMsg    MessageType = 2 // md 消息
+	ArkMsg         MessageType = 3 // ark消息类型
+	EmbedMsg       MessageType = 4 // EMBED消息
+	ATMsg          MessageType = 5 // @消息
+	InputNotifyMsg MessageType = 6 // 输入状态消息
+	RichMediaMsg   MessageType = 7 // 富媒体消息（图片，视频等）
+)
+
 // MessageToCreate 发送消息结构体定义
 type MessageToCreate struct {
-	Content string `json:"content,omitempty"`
-	MsgType int    `json:"msg_type,omitempty"` //消息类型: 0:文字消息, 2: md消息
-	Embed   *Embed `json:"embed,omitempty"`
-	Ark     *Ark   `json:"ark,omitempty"`
-	Image   string `json:"image,omitempty"`
+	Content string      `json:"content,omitempty"`
+	MsgType MessageType `json:"msg_type,omitempty"` //消息类型: 0:文字消息, 2: md消息
+	Embed   *Embed      `json:"embed,omitempty"`
+	Ark     *Ark        `json:"ark,omitempty"`
+	Image   string      `json:"image,omitempty"`
 	// 要回复的消息id，为空是主动消息，公域机器人会异步审核，不为空是被动消息，公域机器人会校验语料
 	MsgID            string                    `json:"msg_id,omitempty"`
 	MessageReference *MessageReference         `json:"message_reference,omitempty"`
@@ -52,6 +66,8 @@ type MessageToCreate struct {
 	Timestamp        int64                     `json:"timestamp,omitempty"`    //TODO delete this
 	MsgSeq           int64                     `json:"msg_seq,omitempty"`      // 机器人对于回复一个msg_id或者event_id的消息序号，指定后根据这个字段和msg_id或者event_id进行去重
 	SubscribeId      string                    `json:"subscribe_id,omitempty"` // 订阅id，发送订阅消息时使用
+	InputNotify      InputNotify               `json:"input_notify,omitempty"` // 输入状态状态信息
+	Media            MediaInfo                 `json:"media,omitempty"`        // 富媒体信息
 }
 
 // GetEventID 事件ID
@@ -104,4 +120,15 @@ type SettingGuideToCreate struct {
 type SettingGuide struct {
 	// 频道ID, 当通过私信发送设置引导消息时，需要指定guild_id
 	GuildID string `json:"guild_id"`
+}
+
+// InputNotify 输入状态结构
+type InputNotify struct {
+	InputType   int   `json:"input_type,omitempty"`   //类型 1: "对方正在输入...", 2: 取消展示"]
+	InputSecond int32 `json:"input_second,omitempty"` //当input_type大于0时有效, 代码状态持续多长时间.
+}
+
+// MediaInfo 富媒体信息
+type MediaInfo struct {
+	FileInfo []byte `json:"file_info,omitempty"` //富媒体文件信息，通过上传接口取得
 }

@@ -187,7 +187,7 @@ func generateDemoMessage(id string, cmd string, recvMsg dto.Message) dto.APIMess
 	switch strings.ToLower(strings.TrimSpace(cmd)) {
 	case "发图片":
 		replyMsg = &dto.RichMediaMessage{
-			EventID:    id,
+			//EventID:    id,
 			FileType:   1,
 			URL:        "https://qqminiapp.cdn-go.cn/open-platform/53e29134/img/qqInterconncet.aa1a9d9c.png",
 			SrvSendMsg: true,
@@ -203,7 +203,7 @@ func generateDemoMessage(id string, cmd string, recvMsg dto.Message) dto.APIMess
 		replyMsg = &dto.MessageToCreate{
 			Timestamp: time.Now().UnixMilli(),
 			Content:   "md",
-			MsgType:   2,
+			MsgType:   dto.MarkdownMsg,
 			MsgID:     id,
 			Markdown: &dto.Markdown{
 				Params:  nil,
