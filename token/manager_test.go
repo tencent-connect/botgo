@@ -496,7 +496,6 @@ func Test_startRefreshAccessToken(t *testing.T) {
 					closeCh:           make(chan int, 1),
 				}},
 			},
-			wantErr: false,
 			prepare: func(args *args) {
 				args.m.Close()
 			},
@@ -519,7 +518,6 @@ func Test_startRefreshAccessToken(t *testing.T) {
 					closeCh:           make(chan int, 1),
 				}},
 			},
-			wantErr: false,
 			checkManager: func(manager ITokenManager) error {
 				manager.GetRefreshSigCh() <- "test"
 				time.Sleep(time.Duration(100) * time.Millisecond)
@@ -542,7 +540,6 @@ func Test_startRefreshAccessToken(t *testing.T) {
 					closeCh:           make(chan int, 1),
 				}},
 			},
-			wantErr: false,
 			checkManager: func(manager ITokenManager) error {
 				manager.GetRefreshSigCh() <- "test"
 				time.Sleep(time.Duration(100) * time.Millisecond)
@@ -567,7 +564,6 @@ func Test_startRefreshAccessToken(t *testing.T) {
 					closeCh:           make(chan int, 1),
 				}},
 			},
-			wantErr: false,
 			prepare: func(args *args) {
 				ctx, cancel := context.WithTimeout(context.TODO(), 100*time.Millisecond)
 				args.ctx = ctx
@@ -596,7 +592,6 @@ func Test_startRefreshAccessToken(t *testing.T) {
 					closeCh:           make(chan int, 1),
 				}},
 			},
-			wantErr: false,
 			checkManager: func(manager ITokenManager) error {
 				gapSec := manager.GetAccessToken().UpdateTime.Sub(time.Now()).Seconds()
 				if gapSec > 1 || gapSec < float64(-1) {

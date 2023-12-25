@@ -60,6 +60,7 @@ type tokenData struct {
 	Token        *AccessToken
 }
 
+// GetRefreshSigCh 获取同步刷新信号的 channel
 func (m *Manager) GetRefreshSigCh() chan interface{} {
 	return m.forceRefreshToken
 }

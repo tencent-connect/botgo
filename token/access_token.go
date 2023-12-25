@@ -40,6 +40,7 @@ type AccessToken struct {
 	UpdateTime time.Time
 }
 
+// GetToken 获取 token
 func (a *AccessToken) GetToken() string {
 	if a == nil {
 		return ""
