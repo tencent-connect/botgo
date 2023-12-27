@@ -1,6 +1,8 @@
 package botgo
 
 import (
+	"github.com/tencent-connect/botgo/dto"
+	"github.com/tencent-connect/botgo/event"
 	"github.com/tencent-connect/botgo/log"
 	"github.com/tencent-connect/botgo/openapi"
 	"github.com/tencent-connect/botgo/websocket"
@@ -24,4 +26,9 @@ func SetWebsocketClient(c websocket.WebSocket) {
 // SetOpenAPIClient 注册 openapi 的不同实现，需要设置版本
 func SetOpenAPIClient(v openapi.APIVersion, c openapi.OpenAPI) {
 	openapi.Register(v, c)
+}
+
+// RegisterDispatchEventHandler 注册回调事件处理器
+func RegisterDispatchEventHandler(eventType dto.EventType, f func(event *dto.WSPayload, message []byte) error) {
+	event.RegisterHandler(dto.WSDispatchEvent, eventType, f)
 }

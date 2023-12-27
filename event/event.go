@@ -3,12 +3,14 @@ package event
 
 import (
 	"encoding/json"
+	"sync"
 
 	"github.com/tidwall/gjson" // 由于回包的 d 类型不确定，gjson 用于从回包json中提取 d 并进行针对性的解析
 
 	"github.com/tencent-connect/botgo/dto"
 )
 
+var eventParseFuncMapLock = new(sync.RWMutex)
 var eventParseFuncMap = map[dto.OPCode]map[dto.EventType]eventParseFunc{
 	dto.WSDispatchEvent: {
 		dto.EventGuildCreate: guildHandler,
@@ -61,12 +63,29 @@ var eventParseFuncMap = map[dto.OPCode]map[dto.EventType]eventParseFunc{
 	},
 }
 
+// RegisterHandler 注册回调事件处理器
+func RegisterHandler(opCode dto.OPCode, eventType dto.EventType, handler eventParseFunc) {
+	eventParseFuncMapLock.Lock()
+	defer eventParseFuncMapLock.Unlock()
+	if eventParseFuncMap[opCode] == nil {
+		eventParseFuncMap[opCode] = make(map[dto.EventType]eventParseFunc)
+	}
+	eventParseFuncMap[opCode][eventType] = handler
+}
+
+func getHandler(opCode dto.OPCode, eventType dto.EventType) (eventParseFunc, bool) {
+	eventParseFuncMapLock.RLock()
+	defer eventParseFuncMapLock.RUnlock()
+	f, ok := eventParseFuncMap[opCode][eventType]
+	return f, ok
+}
+
 type eventParseFunc func(event *dto.WSPayload, message []byte) error
 
 // ParseAndHandle 处理回调事件
 func ParseAndHandle(payload *dto.WSPayload) error {
 	// 指定类型的 handler
-	if h, ok := eventParseFuncMap[payload.OPCode][payload.Type]; ok {
+	if h, ok := getHandler(payload.OPCode, payload.Type); ok {
 		return h(payload, payload.RawMessage)
 	}
 	// 透传handler，如果未注册具体类型的 handler，会统一投递到这个 handler
