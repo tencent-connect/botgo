@@ -41,3 +41,17 @@ type SearchRecord struct {
 	Tips  string `json:"tips"`
 	URL   string `json:"url"`
 }
+
+// Resolved 通用的互动反馈
+type Resolved struct {
+	Keyword     string `json:"keyword"`
+	UserID      string `json:"user_id"`
+	Request     string `json:"request"`
+	MessageID   string `json:"message_id"`
+	MemberNick  string `json:"member_nick"`
+	ButtonData  string `json:"button_data"`
+	ButtonID    string `json:"button_id"`
+	FeatureID   string `json:"feature_id"`
+	FeedbackOpt string `json:"feedback_opt"` // 智能体反馈选项，LIKE点赞，UNLIKE点踩
+	Checked     int32  `json:"checked"`      // 智能体反馈选项是否选中
+}

@@ -43,4 +43,10 @@ type InteractionDataType uint32
 const (
 	// InteractionDataTypeChatSearch 聊天框搜索
 	InteractionDataTypeChatSearch InteractionDataType = 9
+	// InteractionDataTypeInlineKeyboardClick 消息按钮点击
+	InteractionDataTypeInlineKeyboardClick = 11
+	// InteractionDataTypeCallbackCommandClick C2C菜单点击
+	InteractionDataTypeCallbackCommandClick = 12
+	// InteractionDataTypeMessageFeedbackClick 智能体消息反馈
+	InteractionDataTypeMessageFeedbackClick = 13
 )

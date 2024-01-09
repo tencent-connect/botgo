@@ -61,13 +61,34 @@ type MessageToCreate struct {
 	MsgID            string                    `json:"msg_id,omitempty"`
 	MessageReference *MessageReference         `json:"message_reference,omitempty"`
 	Markdown         *Markdown                 `json:"markdown,omitempty"`
-	Keyboard         *keyboard.MessageKeyboard `json:"keyboard,omitempty"`     // 消息按钮组件
-	EventID          string                    `json:"event_id,omitempty"`     // 要回复的事件id, 逻辑同MsgID
-	Timestamp        int64                     `json:"timestamp,omitempty"`    //TODO delete this
-	MsgSeq           int64                     `json:"msg_seq,omitempty"`      // 机器人对于回复一个msg_id或者event_id的消息序号，指定后根据这个字段和msg_id或者event_id进行去重
-	SubscribeId      string                    `json:"subscribe_id,omitempty"` // 订阅id，发送订阅消息时使用
-	InputNotify      InputNotify               `json:"input_notify,omitempty"` // 输入状态状态信息
-	Media            MediaInfo                 `json:"media,omitempty"`        // 富媒体信息
+	Keyboard         *keyboard.MessageKeyboard `json:"keyboard,omitempty"`        // 消息按钮组件
+	EventID          string                    `json:"event_id,omitempty"`        // 要回复的事件id, 逻辑同MsgID
+	Timestamp        int64                     `json:"timestamp,omitempty"`       //TODO delete this
+	MsgSeq           uint32                    `json:"msg_seq,omitempty"`         // 机器人对于回复一个msg_id或者event_id的消息序号，指定后根据这个字段和msg_id或者event_id进行去重
+	SubscribeId      string                    `json:"subscribe_id,omitempty"`    // 订阅id，发送订阅消息时使用
+	InputNotify      *InputNotify              `json:"input_notify,omitempty"`    // 输入状态状态信息
+	Media            *MediaInfo                `json:"media,omitempty"`           // 富媒体信息
+	PromptKeyboard   *PromptKeyboard           `json:"prompt_keyboard,omitempty"` // 消息扩展信息
+	ActionButton     *ActionButton             `json:"action_button,omitempty"`   // 消息操作结构
+	Stream           *Stream                   `json:"stream,omitempty"`          // 流式消息信息
+}
+
+// Stream 流式消息信息
+type Stream struct {
+	State int32  `json:"state,omitempty"` // 流式消息状态 1正文生成中，10：正文生成结束， 11：引志消息生成中， 20：引导消息生成结束。
+	ID    string `json:"id,omitempty"`    // 流式消息ID，流式消息第一条不用填写，第二条需要填写第一个分片返回的msgID.
+	Index int32  `json:"index,omitempty"` // 流式消息的序号， 从1开始
+}
+
+// PromptKeyboard 交互区操作
+type PromptKeyboard struct {
+	Keyboard *keyboard.MessageKeyboard `json:"keyboard,omitempty"` // 消息按钮组件
+}
+
+// ActionButton 消息操作按钮
+type ActionButton struct {
+	TemplateID   int32  `json:"template_id,omitempty"`   // 消息操作栏模块ID
+	CallbackData string `json:"callback_data,omitempty"` // 用户操作时会回调通过回调事件给到button_data中， 最长不超过128个字符。
 }
 
 // GetEventID 事件ID
