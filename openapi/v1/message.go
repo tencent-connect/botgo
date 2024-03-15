@@ -100,6 +100,26 @@ func (o *openAPI) RetractMessage(ctx context.Context,
 	return err
 }
 
+// RetractC2CMessage 撤回C2C消息
+func (o *openAPI) RetractC2CMessage(ctx context.Context,
+	userID, msgID string) error {
+	request := o.request(ctx).
+		SetPathParam("user_id", userID).
+		SetPathParam("message_id", msgID)
+	_, err := request.Delete(o.getURL(retractC2cMessageURI))
+	return err
+}
+
+// RetractGroupMessage 撤回群消息
+func (o *openAPI) RetractGroupMessage(ctx context.Context,
+	groupID, msgID string) error {
+	request := o.request(ctx).
+		SetPathParam("group_id", groupID).
+		SetPathParam("message_id", msgID)
+	_, err := request.Delete(o.getURL(retractGroupMessageURI))
+	return err
+}
+
 // PostSettingGuide 发送设置引导消息, atUserID为要at的用户
 func (o *openAPI) PostSettingGuide(ctx context.Context,
 	channelID string, atUserIDs []string) (*dto.Message, error) {

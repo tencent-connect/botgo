@@ -30,6 +30,9 @@ const (
 	c2cMessagesURI  uri = "/v2/users/{user_id}/messages"
 	c2cRichMediaURI uri = "/v2/users/{user_id}/files"
 
+	retractC2cMessageURI   uri = "/v2/users/{user_id}/messages/{message_id}"
+	retractGroupMessageURI uri = "/v2/groups/{group_id}/messages/{message_id}"
+
 	messageURI uri = "/channels/{channel_id}/messages/{message_id}"
 
 	userMeURI       uri = "/users/@me"

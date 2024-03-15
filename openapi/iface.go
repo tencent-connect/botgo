@@ -77,6 +77,10 @@ type MessageAPI interface {
 	PostGroupMessage(ctx context.Context, groupID string, msg dto.APIMessage) (*dto.Message, error)
 	// PostC2CMessage 发送C2C消息
 	PostC2CMessage(ctx context.Context, userID string, msg dto.APIMessage) (*dto.Message, error)
+	// RetractC2CMessage 撤回C2C消息
+	RetractC2CMessage(ctx context.Context, userID, msgID string) error
+	// RetractGroupMessage 撤回群消息
+	RetractGroupMessage(ctx context.Context, groupID, msgID string) error
 }
 
 // GuildAPI guild 相关接口
