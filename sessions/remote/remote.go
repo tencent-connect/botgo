@@ -79,7 +79,6 @@ func (r *RedisManager) Start(apInfo *dto.WebsocketAP, token *token.Token, intent
 		go distributeLock.StartRenew(ctx, distributeLockExpireTime)
 	} else {
 		log.Errorf("got lock failed, err: %v", err)
-		return err
 	}
 
 	// 持续 produce session，遇到网络问题在 chan 中重试
