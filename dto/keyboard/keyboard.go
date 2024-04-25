@@ -50,13 +50,14 @@ type Button struct {
 	ID         string      `json:"id,omitempty"`          // 按钮 ID
 	RenderData *RenderData `json:"render_data,omitempty"` // 渲染展示字段
 	Action     *Action     `json:"action,omitempty"`      // 该按纽操作相关字段
+	GroupID    string      `json:"group_id,omitempty"`    // 分组ID, 同一分组内有一个按钮操作后, 其它按钮则变灰不可点击 注意:只有当action.type = 1 时才有效
 }
 
 // RenderData  按纽渲染展示
 type RenderData struct {
 	Label        string `json:"label,omitempty"`         // 按纽上的文字
 	VisitedLabel string `json:"visited_label,omitempty"` // 点击后按纽上文字
-	Style        int    `json:"style,omitempty"`         // 按钮样式，0：灰色线框，1：蓝色线框
+	Style        int    `json:"style,omitempty"`         // 按钮样式，0：灰色线框，1：蓝色线框 3: 白色背景+红色字体, 4:蓝色背景+白色字体
 }
 
 // Action 按纽点击操作
@@ -67,6 +68,14 @@ type Action struct {
 	Data                 string        `json:"data,omitempty"`                     // 操作相关数据
 	AtBotShowChannelList bool          `json:"at_bot_show_channel_list,omitempty"` // false:当前 true:弹出展示子频道选择器
 	SubscribeData        SubscribeData `json:"subscribe_data"`                     // 订阅按钮数据，type=ActionTypeSubscribe时使用
+	Modal                *Modal        `json:"modal,omitempty"`                    // 用户点击二次确认操作
+}
+
+// Modal 二次确认数据
+type Modal struct {
+	Content     string `json:"content,omitempty"`      // 二次确认的提示文本,如果不为空则会进行二次确认. 注意:最多40个字符, 不能有URL
+	ConfirmText string `json:"confirm_text,omitempty"` // 二次确认提示确认按钮中展示的文字,可以为空,  默认为"确认" 注意:最多4个字符
+	CancelText  string `json:"cancel_text,omitempty"`  // 二次确认提示取消按钮中的文字,可以为空,默认为"取消" 注意:最多4个字符
 }
 
 // Permission 按纽操作权限
