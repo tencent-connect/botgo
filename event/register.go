@@ -9,6 +9,7 @@ var DefaultHandlers struct {
 	Ready       ReadyHandler
 	ErrorNotify ErrorNotifyHandler
 	Plain       PlainEventHandler
+	Check       CheckEventHandler
 
 	Guild       GuildEventHandler
 	GuildMember GuildMemberEventHandler
@@ -45,6 +46,9 @@ type ErrorNotifyHandler func(err error)
 
 // PlainEventHandler 透传handler
 type PlainEventHandler func(event *dto.WSPayload, message []byte) error
+
+// CheckEventHandler 消息前置检测
+type CheckEventHandler func(event *dto.WSPayload, message []byte) bool
 
 // GuildEventHandler 频道事件handler
 type GuildEventHandler func(event *dto.WSPayload, data *dto.WSGuildData) error
@@ -110,6 +114,8 @@ func RegisterHandlers(handlers ...interface{}) dto.Intent {
 			DefaultHandlers.Ready = handle
 		case ErrorNotifyHandler:
 			DefaultHandlers.ErrorNotify = handle
+		case CheckEventHandler:
+			DefaultHandlers.Check = handle
 		case PlainEventHandler:
 			DefaultHandlers.Plain = handle
 		case AudioEventHandler:
