@@ -39,12 +39,13 @@ type Message struct {
 }
 
 type GroupMessage struct {
-	GroupId     string    `json:"group_id"`
-	GroupOpenId string    `json:"group_openid"`
-	Content     string    `json:"content"`
-	MsgId       string    `json:"id"`
-	Author      Author    `json:"author"`
-	Timestamp   Timestamp `json:"timestamp"`
+	GroupId     string               `json:"group_id"`
+	GroupOpenId string               `json:"group_openid"`
+	Content     string               `json:"content"`
+	MsgId       string               `json:"id"`
+	Author      Author               `json:"author"`
+	Timestamp   Timestamp            `json:"timestamp"`
+	Attachments []*MessageAttachment `json:"attachments"`
 }
 
 type Author struct {
