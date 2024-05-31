@@ -52,7 +52,7 @@ func (o *openAPI) TraceID() string {
 func (o *openAPI) Setup(token *token.Manager, inSandbox bool) openapi.OpenAPI {
 	api := &openAPI{
 		tokenManager: token,
-		timeout:      3 * time.Second,
+		timeout:      5 * time.Second,
 		sandbox:      inSandbox,
 	}
 	api.setupClient() // 初始化可复用的 client
@@ -62,6 +62,12 @@ func (o *openAPI) Setup(token *token.Manager, inSandbox bool) openapi.OpenAPI {
 // WithTimeout 设置请求接口超时时间
 func (o *openAPI) WithTimeout(duration time.Duration) openapi.OpenAPI {
 	o.restyClient.SetTimeout(duration)
+	return o
+}
+
+// SetDebug 设置调试模式, 输出更多过程日志
+func (o *openAPI) SetDebug(debug bool) openapi.OpenAPI {
+	o.restyClient.Debug = debug
 	return o
 }
 

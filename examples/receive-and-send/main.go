@@ -34,7 +34,7 @@ func main() {
 		log.Fatalln(err)
 	}
 	// 初始化 openapi，正式环境
-	api := botgo.NewOpenAPI(tokenManager).WithTimeout(3 * time.Second)
+	api := botgo.NewOpenAPI(tokenManager).WithTimeout(5 * time.Second).SetDebug(true)
 	// 沙箱环境
 	// api := botgo.NewSandboxOpenAPI(botToken).WithTimeout(3 * time.Second)
 

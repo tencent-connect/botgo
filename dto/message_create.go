@@ -78,6 +78,7 @@ type Stream struct {
 	State int32  `json:"state,omitempty"` // 流式消息状态 1正文生成中，10：正文生成结束， 11：引志消息生成中， 20：引导消息生成结束。
 	ID    string `json:"id,omitempty"`    // 流式消息ID，流式消息第一条不用填写，第二条需要填写第一个分片返回的msgID.
 	Index int32  `json:"index,omitempty"` // 流式消息的序号， 从1开始
+	Reset bool   `json:"reset,omitempty"` // 重新生成流式消息标记，此参数只能使用于流式消息分片还没有发送完成时，reset时Index需要从0开始，需要填写流式ID。
 }
 
 // PromptKeyboard 交互区操作

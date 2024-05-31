@@ -2,17 +2,20 @@ package v1
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/tencent-connect/botgo/dto"
-	"github.com/tencent-connect/botgo/openapi"
+	"github.com/tencent-connect/botgo/openapi/options"
 )
 
 // CreateDirectMessage 创建私信频道
-func (o *openAPI) CreateDirectMessage(ctx context.Context, dm *dto.DirectMessageToCreate) (*dto.DirectMessage, error) {
-	resp, err := o.request(ctx).
+func (o *openAPI) CreateDirectMessage(ctx context.Context,
+	dm *dto.DirectMessageToCreate, opt ...options.Option) (*dto.DirectMessage, error) {
+	reqCMD := o.request(ctx).
 		SetResult(dto.DirectMessage{}).
-		SetBody(dm).
-		Post(o.getURL(userMeDMURI))
+		SetBody(dm)
+
+	resp, err := baseRequest(ctx, reqCMD, http.MethodPost, o.getURL(userMeDMURI), opt...)
 	if err != nil {
 		return nil, err
 	}
@@ -21,12 +24,13 @@ func (o *openAPI) CreateDirectMessage(ctx context.Context, dm *dto.DirectMessage
 
 // PostDirectMessage 在私信频道内发消息
 func (o *openAPI) PostDirectMessage(ctx context.Context,
-	dm *dto.DirectMessage, msg *dto.MessageToCreate) (*dto.Message, error) {
-	resp, err := o.request(ctx).
+	dm *dto.DirectMessage, msg *dto.MessageToCreate, opt ...options.Option) (*dto.Message, error) {
+	reqCMD := o.request(ctx).
 		SetResult(dto.Message{}).
 		SetPathParam("guild_id", dm.GuildID).
-		SetBody(msg).
-		Post(o.getURL(dmsURI))
+		SetBody(msg)
+
+	resp, err := baseRequest(ctx, reqCMD, http.MethodPost, o.getURL(dmsURI), opt...)
 	if err != nil {
 		return nil, err
 	}
@@ -35,32 +39,29 @@ func (o *openAPI) PostDirectMessage(ctx context.Context,
 
 // RetractDMMessage 撤回私信消息
 func (o *openAPI) RetractDMMessage(ctx context.Context,
-	guildID, msgID string, options ...openapi.RetractMessageOption) error {
-	request := o.request(ctx).
+	guildID, msgID string, opt ...options.Option) error {
+	reqCMD := o.request(ctx).
 		SetPathParam("guild_id", guildID).
-		SetPathParam("message_id", string(msgID))
-	for _, option := range options {
-		if option == openapi.RetractMessageOptionHidetip {
-			request = request.SetQueryParam("hidetip", "true")
-		}
-	}
-	_, err := request.Delete(o.getURL(dmsMessageURI))
+		SetPathParam("message_id", msgID)
+
+	_, err := baseRequest(ctx, reqCMD, http.MethodDelete, o.getURL(dmsMessageURI), opt...)
 	return err
 }
 
 // PostDMSettingGuide 发送私信设置引导, jumpGuildID为设置引导要跳转的频道ID
 func (o *openAPI) PostDMSettingGuide(ctx context.Context,
-	dm *dto.DirectMessage, jumpGuildID string) (*dto.Message, error) {
+	dm *dto.DirectMessage, jumpGuildID string, opt ...options.Option) (*dto.Message, error) {
 	msg := &dto.SettingGuideToCreate{
 		SettingGuide: &dto.SettingGuide{
 			GuildID: jumpGuildID,
 		},
 	}
-	resp, err := o.request(ctx).
+	reqCMD := o.request(ctx).
 		SetResult(dto.Message{}).
 		SetPathParam("guild_id", dm.GuildID).
-		SetBody(msg).
-		Post(o.getURL(dmSettingGuideURI))
+		SetBody(msg)
+
+	resp, err := baseRequest(ctx, reqCMD, http.MethodPost, o.getURL(dmSettingGuideURI), opt...)
 	if err != nil {
 		return nil, err
 	}

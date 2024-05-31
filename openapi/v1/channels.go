@@ -79,10 +79,10 @@ func (o *openAPI) DeleteChannel(ctx context.Context, channelID string) error {
 // CreatePrivateChannel 创建私密子频道，底层是用的是 PostChannel 能力
 // ChannelValueObject 中的 PrivateType 不需要填充，本方法会自动填充
 func (o *openAPI) CreatePrivateChannel(ctx context.Context, guildID string, value *dto.ChannelValueObject,
-	userIds []string) (*dto.Channel, error) {
+	userIDs []string) (*dto.Channel, error) {
 	value.PrivateType = dto.ChannelPrivateTypeAdminAndMember
-	if len(userIds) != 0 {
-		value.PrivateUserIDs = userIds
+	if len(userIDs) != 0 {
+		value.PrivateUserIDs = userIDs
 		value.PrivateType = dto.ChannelPrivateTypeOnlyAdmin
 	}
 	return o.PostChannel(ctx, guildID, value)
