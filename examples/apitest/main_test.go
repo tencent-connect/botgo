@@ -28,7 +28,7 @@ var (
 28003091c4bb02380c400c48d8a7928d06` // replace your channel id
 	testRolesID            = `10054557`                             // replace your roles id
 	testMemberID           = `1201318637970874066`                  // replace your member id
-	testMarkdownTemplateID = "1231231231231231"                     // replace your markdown template id
+	testMarkdownTemplateID = 1231231231231231                       // replace your markdown template id
 	testInteractionD       = "e924431f-aaed-4e78-8375-9295b1f1e0ef" // replace your interaction id
 	ctx                    context.Context
 )
