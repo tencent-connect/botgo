@@ -53,7 +53,7 @@ type MessageReference struct {
 
 // Markdown markdown 消息
 type Markdown struct {
-	TemplateID int               `json:"template_id"` // 模版 id
+	TemplateID string            `json:"template_id"` // 模版 id
 	Params     []*MarkdownParams `json:"params"`      // 模版参数
 	Content    string            `json:"content"`     // 原生 markdown
 }

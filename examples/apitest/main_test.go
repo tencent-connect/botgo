@@ -25,10 +25,10 @@ var (
 	testGuildID   = "3326534247441079828" // replace your guild id
 	testChannelID = "1595028"             // replace your channel id
 	testMessageID = `08e092eeb983afef9e0110f9bb5d1a1231343431313532313836373838333234303420801e
-28003091c4bb02380c400c48d8a7928d06`  // replace your channel id
+28003091c4bb02380c400c48d8a7928d06` // replace your channel id
 	testRolesID            = `10054557`                             // replace your roles id
 	testMemberID           = `1201318637970874066`                  // replace your member id
-	testMarkdownTemplateID = 1231231231231231                       // replace your markdown template id
+	testMarkdownTemplateID = "1231231231231231"                     // replace your markdown template id
 	testInteractionD       = "e924431f-aaed-4e78-8375-9295b1f1e0ef" // replace your interaction id
 	ctx                    context.Context
 )
@@ -46,7 +46,7 @@ func TestMain(m *testing.M) {
 	}
 	log.Println(conf)
 
-	botToken = token.BotToken(conf.AppID, conf.Token)
+	botToken = token.BotToken(conf.AppID, conf.Token, "Bot")
 	api = botgo.NewOpenAPI(botToken).WithTimeout(3 * time.Second)
 
 	os.Exit(m.Run())
