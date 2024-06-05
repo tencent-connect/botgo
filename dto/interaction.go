@@ -49,4 +49,6 @@ const (
 	InteractionDataTypeCallbackCommandClick = 12
 	// InteractionDataTypeMessageFeedbackClick 智能体消息反馈
 	InteractionDataTypeMessageFeedbackClick = 13
+	// InteractionDataTypeClearSessionClick 清空会话按钮点击
+	InteractionDataTypeClearSessionClick = 14
 )
