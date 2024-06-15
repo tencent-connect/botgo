@@ -16,6 +16,7 @@ type Type string
 const (
 	TypeBot    Type = "Bot"
 	TypeNormal Type = "Bearer"
+	TypeQQBot  Type = "QQBot"
 )
 
 // Token 用于调用接口的 token 结构
@@ -33,11 +34,11 @@ func New(tokenType Type) *Token {
 }
 
 // BotToken 机器人身份的 token
-func BotToken(appID uint64, accessToken string) *Token {
+func BotToken(appID uint64, accessToken string, qqType string) *Token {
 	return &Token{
 		AppID:       appID,
 		AccessToken: accessToken,
-		Type:        TypeBot,
+		Type:        Type(qqType),
 	}
 }
 
