@@ -53,7 +53,7 @@ var eventParseFuncMap = map[dto.OPCode]map[dto.EventType]eventParseFunc{
 		dto.EventInteractionCreate: interactionHandler,
 
 		dto.EventGroupATMessageCreate: groupAtMessageHandler,
-		dto.EventGroupMessageCreate: groupMessageHandler,
+		dto.EventGroupMessageCreate:   groupMessageHandler,
 	},
 }
 
@@ -61,6 +61,9 @@ type eventParseFunc func(event *dto.WSPayload, message []byte) error
 
 // ParseAndHandle 处理回调事件
 func ParseAndHandle(payload *dto.WSPayload) error {
+	if (DefaultHandlers.Check != nil) && DefaultHandlers.Check(payload, payload.RawMessage) == false {
+		return nil
+	}
 	// 指定类型的 handler
 	if h, ok := eventParseFuncMap[payload.OPCode][payload.Type]; ok {
 		return h(payload, payload.RawMessage)
