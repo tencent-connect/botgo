@@ -1,3 +1,4 @@
+// Package options openapi options
 package options
 
 // Options are openapi options
@@ -16,6 +17,7 @@ func WithURL(url string) Option {
 	}
 }
 
+// WithHideTip hide tip
 func WithHideTip() Option {
 	return func(o *Options) {
 		o.HideTip = true
