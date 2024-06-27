@@ -88,7 +88,16 @@ type PromptKeyboard struct {
 
 // ActionButton 消息操作按钮
 type ActionButton struct {
-	TemplateID   int32  `json:"template_id,omitempty"`   // 消息操作栏模块ID
+	TemplateID   int32             `json:"template_id,omitempty"`   // 消息操作栏模块ID
+	CallbackData string            `json:"callback_data,omitempty"` // 用户操作时会回调通过回调事件给到button_data中， 最长不超过128个字符。
+	Feedback     *ActionButtonData `json:"feedback,omitempty"`      // 反馈按钮（赞踩按钮）
+	TTS          *ActionButtonData `json:"tts,omitempty"`           // TTS语音播放按钮
+	ReGenerate   *ActionButtonData `json:"re_generate,omitempty"`   // 重新生成按钮
+	StopGenerate *ActionButtonData `json:"stop_generate,omitempty"` // 停止生成按钮
+}
+
+// ActionButtonData 消息操作按钮数据
+type ActionButtonData struct {
 	CallbackData string `json:"callback_data,omitempty"` // 用户操作时会回调通过回调事件给到button_data中， 最长不超过128个字符。
 }
 
