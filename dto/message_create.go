@@ -16,6 +16,33 @@ type MessageToCreate struct {
 	EventID          string                    `json:"event_id,omitempty"` // 要回复的事件id, 逻辑同MsgID
 }
 
+// 消息类型： 0 是文本，1 图文混排，2  markdown， 3 ark，4 embed 7 富媒体
+type GroupMessageToCreate struct {
+	Content          string                    `json:"content,omitempty"`
+	MsgType          int                       `json:"msg_type"`
+	Markdown         *Markdown                 `json:"markdown,omitempty"`
+	Keyboard         *keyboard.MessageKeyboard `json:"keyboard,omitempty"` // 消息按钮组件
+	Media            *FileInfo                 `json:"media,omitempty"`
+	Ark              *Ark                      `json:"ark,omitempty"`
+	Image            string                    `json:"image,omitempty"`
+	MessageReference *MessageReference         `json:"message_reference,omitempty"`
+	EventID          string                    `json:"event_id,omitempty"` // 要回复的事件id, 逻辑同MsgID
+	MsgID            string                    `json:"msg_id,omitempty"`
+	MsgReq           uint                      `json:"msg_req,omitempty"`
+}
+
+type FileInfo struct {
+	FileInfo string `json:"file_info,omitempty"`
+}
+
+// 媒体类型：1 图片，2 视频，3 语音，4 文件（暂不开放） 资源格式要求： 图片：png/jpg，视频：mp4，语音：silk，
+type GroupRichMediaMessageToCreate struct {
+	FileType   int    `json:"file_type"`
+	Url        string `json:"url"`
+	SrvSendMsg bool   `json:"srv_send_msg"`
+	FileData   []byte `json:"file_data"`
+}
+
 // MessageReference 引用消息
 type MessageReference struct {
 	MessageID             string `json:"message_id"`               // 消息 id
@@ -24,9 +51,10 @@ type MessageReference struct {
 
 // Markdown markdown 消息
 type Markdown struct {
-	TemplateID int               `json:"template_id"` // 模版 id
-	Params     []*MarkdownParams `json:"params"`      // 模版参数
-	Content    string            `json:"content"`     // 原生 markdown
+	TemplateID       int               `json:"template_id,omitempty"` // 模版 id
+	CustomTemplateId string            `json:"custom_template_id,omitempty"`
+	Params           []*MarkdownParams `json:"params"`  // 模版参数
+	Content          string            `json:"content"` // 原生 markdown
 }
 
 // MarkdownParams markdown 模版参数 键值对
@@ -45,4 +73,15 @@ type SettingGuideToCreate struct {
 type SettingGuide struct {
 	// 频道ID, 当通过私信发送设置引导消息时，需要指定guild_id
 	GuildID string `json:"guild_id"`
+}
+
+type RichMediaMsgResp struct {
+	FileUuid string `json:"file_uuid,omitempty"`
+	FileInfo string `json:"file_info,omitempty"`
+	Ttl      uint   `json:"ttl,omitempty"`
+}
+
+type GroupMsgResp struct {
+	Id        string    `json:"id"`
+	Timestamp Timestamp `json:"timestamp"`
 }

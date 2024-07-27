@@ -75,6 +75,10 @@ type WSATMessageData Message
 // WSDirectMessageData 私信消息 payload
 type WSDirectMessageData Message
 
+type WSGroupATMessageData GroupMessage
+
+type WSGroupMessageData GroupMessage
+
 // WSMessageDeleteData 消息 payload
 type WSMessageDeleteData MessageDelete
 

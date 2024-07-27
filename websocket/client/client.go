@@ -19,6 +19,7 @@ import (
 
 // DefaultQueueSize 监听队列的缓冲长度
 const DefaultQueueSize = 10000
+const DefaultHandleSize = 1000
 
 // Setup 依赖注册
 func Setup() {
@@ -28,22 +29,24 @@ func Setup() {
 // New 新建一个连接对象
 func (c *Client) New(session dto.Session) websocket.WebSocket {
 	return &Client{
-		messageQueue:    make(messageChan, DefaultQueueSize),
-		session:         &session,
-		closeChan:       make(closeErrorChan, 10),
-		heartBeatTicker: time.NewTicker(60 * time.Second), // 先给一个默认 ticker，在收到 hello 包之后，会 reset
+		messageQueue:      make(messageChan, DefaultQueueSize),
+		session:           &session,
+		closeChan:         make(closeErrorChan, 10),
+		heartBeatTicker:   time.NewTicker(60 * time.Second), // 先给一个默认 ticker，在收到 hello 包之后，会 reset
+		handleMessageChan: make(chan bool, DefaultHandleSize),
 	}
 }
 
 // Client websocket 连接客户端
 type Client struct {
-	version         int
-	conn            *wss.Conn
-	messageQueue    messageChan
-	session         *dto.Session
-	user            *dto.WSUser
-	closeChan       closeErrorChan
-	heartBeatTicker *time.Ticker // 用于维持定时心跳
+	version           int
+	conn              *wss.Conn
+	messageQueue      messageChan
+	session           *dto.Session
+	user              *dto.WSUser
+	closeChan         closeErrorChan
+	heartBeatTicker   *time.Ticker // 用于维持定时心跳
+	handleMessageChan chan bool
 }
 
 type messageChan chan *dto.WSPayload
@@ -211,18 +214,26 @@ func (c *Client) listenMessageAndHandle() {
 		}
 	}()
 	for payload := range c.messageQueue {
-		c.saveSeq(payload.Seq)
-		// ready 事件需要特殊处理
-		if payload.Type == "READY" {
-			c.readyHandler(payload)
-			continue
-		}
-		// 解析具体事件，并投递给业务注册的 handler
-		if err := event.ParseAndHandle(payload); err != nil {
-			log.Errorf("%s parseAndHandle failed, %v", c.session, err)
-		}
+		c.handleMessageChan <- true
+		go c.listenMessageAndHandleMessage(payload)
 	}
 	log.Infof("%s message queue is closed", c.session)
+}
+
+func (c *Client) listenMessageAndHandleMessage(payload *dto.WSPayload) {
+	defer func() {
+		<-c.handleMessageChan
+	}()
+	c.saveSeq(payload.Seq)
+	// ready 事件需要特殊处理
+	if payload.Type == "READY" {
+		c.readyHandler(payload)
+		return
+	}
+	// 解析具体事件，并投递给业务注册的 handler
+	if err := event.ParseAndHandle(payload); err != nil {
+		log.Errorf("%s parseAndHandle failed, %v", c.session, err)
+	}
 }
 
 func (c *Client) saveSeq(seq uint32) {

@@ -9,6 +9,7 @@ var DefaultHandlers struct {
 	Ready       ReadyHandler
 	ErrorNotify ErrorNotifyHandler
 	Plain       PlainEventHandler
+	Check       CheckEventHandler
 
 	Guild       GuildEventHandler
 	GuildMember GuildMemberEventHandler
@@ -31,6 +32,9 @@ var DefaultHandlers struct {
 	ForumAudit ForumAuditEventHandler
 
 	Interaction InteractionEventHandler
+
+	GroupAtMessage GroupAtMessageEventHandler
+	GroupMessage   GroupMessageEventHandler
 }
 
 // ReadyHandler 可以处理 ws 的 ready 事件
@@ -51,6 +55,9 @@ type GuildMemberEventHandler func(event *dto.WSPayload, data *dto.WSGuildMemberD
 
 // ChannelEventHandler 子频道事件 handler
 type ChannelEventHandler func(event *dto.WSPayload, data *dto.WSChannelData) error
+
+// CheckEventHandler 消息前置检测
+type CheckEventHandler func(event *dto.WSPayload, message []byte) bool
 
 // MessageEventHandler 消息事件 handler
 type MessageEventHandler func(event *dto.WSPayload, data *dto.WSMessageData) error
@@ -94,6 +101,10 @@ type ForumAuditEventHandler func(event *dto.WSPayload, data *dto.WSForumAuditDat
 // InteractionEventHandler 互动事件 handler
 type InteractionEventHandler func(event *dto.WSPayload, data *dto.WSInteractionData) error
 
+type GroupAtMessageEventHandler func(event *dto.WSPayload, data *dto.WSGroupATMessageData) error
+
+type GroupMessageEventHandler func(event *dto.WSPayload, data *dto.WSGroupMessageData) error
+
 // RegisterHandlers 注册事件回调，并返回 intent 用于 websocket 的鉴权
 func RegisterHandlers(handlers ...interface{}) dto.Intent {
 	var i dto.Intent
@@ -103,6 +114,8 @@ func RegisterHandlers(handlers ...interface{}) dto.Intent {
 			DefaultHandlers.Ready = handle
 		case ErrorNotifyHandler:
 			DefaultHandlers.ErrorNotify = handle
+		case CheckEventHandler:
+			DefaultHandlers.Check = handle
 		case PlainEventHandler:
 			DefaultHandlers.Plain = handle
 		case AudioEventHandler:
@@ -111,6 +124,12 @@ func RegisterHandlers(handlers ...interface{}) dto.Intent {
 				dto.EventAudioStart, dto.EventAudioFinish,
 				dto.EventAudioOnMic, dto.EventAudioOffMic,
 			)
+		case GroupAtMessageEventHandler:
+			DefaultHandlers.GroupAtMessage = handle
+			i = i | dto.EventToIntent(dto.EventGroupATMessageCreate)
+		case GroupMessageEventHandler:
+			DefaultHandlers.GroupMessage = handle
+			i = i | dto.EventToIntent(dto.EventGroupMessageCreate)
 		case InteractionEventHandler:
 			DefaultHandlers.Interaction = handle
 			i = i | dto.EventToIntent(dto.EventInteractionCreate)

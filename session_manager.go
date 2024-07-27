@@ -1,4 +1,4 @@
-package botgo
+package main
 
 import (
 	"github.com/tencent-connect/botgo/dto"
