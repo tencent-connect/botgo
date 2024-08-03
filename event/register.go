@@ -35,6 +35,7 @@ var DefaultHandlers struct {
 
 	GroupAtMessage GroupAtMessageEventHandler
 	GroupMessage   GroupMessageEventHandler
+	C2CMessage C2CMessageEventHandler
 }
 
 // ReadyHandler 可以处理 ws 的 ready 事件
@@ -105,6 +106,8 @@ type GroupAtMessageEventHandler func(event *dto.WSPayload, data *dto.WSGroupATMe
 
 type GroupMessageEventHandler func(event *dto.WSPayload, data *dto.WSGroupMessageData) error
 
+type C2CMessageEventHandler func(event *dto.WSPayload, data *dto.WSC2CMessageData) error
+
 // RegisterHandlers 注册事件回调，并返回 intent 用于 websocket 的鉴权
 func RegisterHandlers(handlers ...interface{}) dto.Intent {
 	var i dto.Intent
@@ -130,6 +133,9 @@ func RegisterHandlers(handlers ...interface{}) dto.Intent {
 		case GroupMessageEventHandler:
 			DefaultHandlers.GroupMessage = handle
 			i = i | dto.EventToIntent(dto.EventGroupMessageCreate)
+		case C2CMessageEventHandler:
+			DefaultHandlers.C2CMessage = handle
+			i = i | dto.EventToIntent(dto.EventC2CMessageCreate)
 		case InteractionEventHandler:
 			DefaultHandlers.Interaction = handle
 			i = i | dto.EventToIntent(dto.EventInteractionCreate)

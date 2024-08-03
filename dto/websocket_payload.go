@@ -75,6 +75,8 @@ type WSATMessageData Message
 // WSDirectMessageData 私信消息 payload
 type WSDirectMessageData Message
 
+type WSC2CMessageData C2CMessage
+
 type WSGroupATMessageData GroupMessage
 
 type WSGroupMessageData GroupMessage

@@ -43,9 +43,30 @@ type GroupMessage struct {
 	GroupOpenId string               `json:"group_openid"`
 	Content     string               `json:"content"`
 	MsgId       string               `json:"id"`
-	Author      Author               `json:"author"`
+	Author      *Author              `json:"author"`
 	Timestamp   Timestamp            `json:"timestamp"`
 	Attachments []*MessageAttachment `json:"attachments"`
+}
+
+type C2CMessage struct {
+	Id          string          `json:"id"`
+	Author      *C2CAuthor      `json:"author"`
+	Content     string          `json:"content"`
+	Timestamp   Timestamp       `json:"timestamp"`
+	Attachments []*C2CAtachment `json:"attachments"`
+}
+
+type C2CAtachment struct {
+	ContentType string `json:"content_type"`
+	Filename    string `json:"filename"`
+	Height      int    `json:"height"`
+	Width       int    `json:"width"`
+	Size        int    `json:"size"`
+	Url         string `json:"url"`
+}
+
+type C2CAuthor struct {
+	UserOpenId string `json:"user_openid"`
 }
 
 type Author struct {

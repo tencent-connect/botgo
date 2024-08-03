@@ -31,6 +31,20 @@ type GroupMessageToCreate struct {
 	MsgReq           uint                      `json:"msg_req,omitempty"`
 }
 
+type C2CMessageToCreate struct {
+	Content          string                    `json:"content,omitempty"`
+	MsgType          int                       `json:"msg_type"`
+	Markdown         *Markdown                 `json:"markdown,omitempty"`
+	Keyboard         *keyboard.MessageKeyboard `json:"keyboard,omitempty"` // 消息按钮组件
+	Media            *FileInfo                 `json:"media,omitempty"`
+	Ark              *Ark                      `json:"ark,omitempty"`
+	Image            string                    `json:"image,omitempty"`
+	MessageReference *MessageReference         `json:"message_reference,omitempty"`
+	EventID          string                    `json:"event_id,omitempty"` // 要回复的事件id, 逻辑同MsgID
+	MsgID            string                    `json:"msg_id,omitempty"`
+	MsgReq           uint                      `json:"msg_req,omitempty"`
+}
+
 type FileInfo struct {
 	FileInfo string `json:"file_info,omitempty"`
 }
@@ -42,6 +56,15 @@ type GroupRichMediaMessageToCreate struct {
 	SrvSendMsg bool   `json:"srv_send_msg"`
 	FileData   []byte `json:"file_data"`
 }
+
+// 媒体类型：1 图片，2 视频，3 语音，4 文件（暂不开放） 资源格式要求： 图片：png/jpg，视频：mp4，语音：silk，
+type C2CRichMediaMessageToCreate struct {
+	FileType   int    `json:"file_type"`
+	Url        string `json:"url"`
+	SrvSendMsg bool   `json:"srv_send_msg"`
+	FileData   []byte `json:"file_data"`
+}
+
 
 // MessageReference 引用消息
 type MessageReference struct {
@@ -82,6 +105,11 @@ type RichMediaMsgResp struct {
 }
 
 type GroupMsgResp struct {
+	Id        string    `json:"id"`
+	Timestamp Timestamp `json:"timestamp"`
+}
+
+type C2CMsgResp struct{
 	Id        string    `json:"id"`
 	Timestamp Timestamp `json:"timestamp"`
 }
