@@ -43,6 +43,7 @@ const (
 	EventSubscribeMsgStatus    EventType = "SUBSCRIBE_MESSAGE_STATUS"
 	EventC2CFriendAdd          EventType = "FRIEND_ADD"
 	EventC2CFriendDel          EventType = "FRIEND_DEL"
+	EventEnterAIO              EventType = "ENTER_AIO"
 )
 
 // intentEventMap 不同 intent 对应的事件定义
@@ -66,6 +67,7 @@ var intentEventMap = map[Intent][]EventType{
 		EventForumPostDelete, EventForumReplyCreate, EventForumReplyDelete, EventForumAuditResult,
 	},
 	IntentInteraction: {EventInteractionCreate},
+	IntentEnterAIO:    {EventEnterAIO},
 }
 
 var eventIntentMap = transposeIntentEventMap(intentEventMap)

@@ -127,3 +127,6 @@ type WSC2CFriendData C2CFriendData
 
 // WSSubscribeMsgStatus 订阅消息模板授权状态变更事件
 type WSSubscribeMsgStatus SubscribeMessageStatusData
+
+// WSEnterAIOData 进入aio事件
+type WSEnterAIOData EnterAIO

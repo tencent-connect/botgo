@@ -37,7 +37,13 @@ type MessageKeyboard struct {
 
 // CustomKeyboard 自定义 Keyboard
 type CustomKeyboard struct {
-	Rows []*Row `json:"rows,omitempty"` // 行数组
+	Rows  []*Row         `json:"rows,omitempty"`  // 行数组
+	Style *KeyboardStyle `json:"style,omitempty"` // 按钮样式
+}
+
+// KeyboardStyle 键盘样式
+type KeyboardStyle struct {
+	FontSize string `json:"font_size,omitempty"` // 字体大小
 }
 
 // Row 每行结构

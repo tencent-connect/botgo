@@ -36,6 +36,8 @@ var DefaultHandlers struct {
 	C2CMessage         C2CMessageEventHandler
 	SubscribeMsgStatus SubscribeMsgStatusEventHandler
 	C2CFriend          C2CFriendEventHandler
+
+	EnterAIO EnterAIOEventHandler
 }
 
 // ReadyHandler 可以处理 ws 的 ready 事件
@@ -117,6 +119,9 @@ type C2CFriendEventHandler func(event *dto.WSPayload, data *dto.WSC2CFriendData)
 // SubscribeMsgStatusEventHandler 订阅消息模板授权状态变更事件 handler
 type SubscribeMsgStatusEventHandler func(event *dto.WSPayload, data *dto.WSSubscribeMsgStatus) error
 
+// EnterAIOEventHandler 进入AIO事件 handler
+type EnterAIOEventHandler func(event *dto.WSPayload, data *dto.WSEnterAIOData) error
+
 // RegisterHandlers 注册事件回调，并返回 intent 用于 websocket 的鉴权
 func RegisterHandlers(handlers ...interface{}) dto.Intent {
 	var i dto.Intent
@@ -143,6 +148,9 @@ func RegisterHandlers(handlers ...interface{}) dto.Intent {
 		case C2CFriendEventHandler:
 			DefaultHandlers.C2CFriend = handle
 			i = i | dto.EventToIntent(dto.EventC2CFriendAdd)
+		case EnterAIOEventHandler:
+			DefaultHandlers.EnterAIO = handle
+			i = i | dto.EventToIntent(dto.EventEnterAIO)
 		default:
 		}
 	}

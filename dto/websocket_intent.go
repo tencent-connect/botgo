@@ -43,6 +43,8 @@ const (
 	IntentDirectMessageReactions
 	IntentDirectMessageTyping
 
+	IntentEnterAIO Intent = 1 << 23 // 进入aio事件
+
 	// IntentGroupMessages 群消息事件
 	// - GROUP_AT_MESSAGE_CREATE // 群中@机器人时的消息
 	IntentGroupMessages Intent = 1 << 25 // 群消息事件

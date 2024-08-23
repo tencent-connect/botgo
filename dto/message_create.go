@@ -71,6 +71,7 @@ type MessageToCreate struct {
 	PromptKeyboard   *PromptKeyboard           `json:"prompt_keyboard,omitempty"` // 消息扩展信息
 	ActionButton     *ActionButton             `json:"action_button,omitempty"`   // 消息操作结构
 	Stream           *Stream                   `json:"stream,omitempty"`          // 流式消息信息
+	FeatureID        uint                      `json:"feature_id,omitempty"`      // 控制消息发送
 }
 
 // Stream 流式消息信息
@@ -128,6 +129,13 @@ type Markdown struct {
 	CustomTemplateID string            `json:"custom_template_id"` // 自定义模板id
 	Params           []*MarkdownParams `json:"params"`             // 模版参数
 	Content          string            `json:"content"`            // 原生 markdown
+	Style            *MarkdownStyle    `json:"style"`              // markdown样式
+}
+
+// MarkdownStyle markdown 样式
+type MarkdownStyle struct {
+	MainFontSize string `json:"main_font_size"` // 正文字体大小 small middle large
+	Layout       string `json:"layout"`         // hide_avatar_and_center 隐藏头像并居中
 }
 
 // MarkdownParams markdown 模版参数 键值对

@@ -60,6 +60,7 @@ var eventParseFuncMap = map[dto.OPCode]map[dto.EventType]eventParseFunc{
 		dto.EventSubscribeMsgStatus:   subscribeStatusHandler,
 		dto.EventC2CFriendAdd:         c2cFriendAddHandler,
 		dto.EventC2CFriendDel:         c2cFriendDelHandler,
+		dto.EventEnterAIO:             enterAIOHandler,
 	},
 }
 
@@ -339,6 +340,17 @@ func interactionHandler(payload *dto.WSPayload, message []byte) error {
 	}
 	if DefaultHandlers.Interaction != nil {
 		return DefaultHandlers.Interaction(payload, data)
+	}
+	return nil
+}
+
+func enterAIOHandler(payload *dto.WSPayload, message []byte) error {
+	data := &dto.WSEnterAIOData{}
+	if err := ParseData(message, data); err != nil {
+		return err
+	}
+	if DefaultHandlers.EnterAIO != nil {
+		return DefaultHandlers.EnterAIO(payload, data)
 	}
 	return nil
 }
