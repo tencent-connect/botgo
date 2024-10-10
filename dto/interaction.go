@@ -12,7 +12,7 @@ type Interaction struct {
 	ChannelID         string           `json:"channel_id,omitempty"`          // 子频道 ID
 	Version           uint32           `json:"version,omitempty"`             // 版本，默认为 1
 	GroupOpenID       string           `json:"group_openid,omitempty"`        // 群OpenID
-	ChatType          uint32           `json:"chat_type,omitempty"`           // 按钮场景类型 频道：0 群：1 c2c：2，改成optional为了区分0和没有值
+	ChatType          uint32           `json:"chat_type,omitempty"`           // 0: 频道, 1: 群, 2: c2c
 	Scene             string           `json:"scene,omitempty"`               // 场景 c2c/group/guild
 	UserOpenID        string           `json:"user_openid,omitempty"`         // 用户ID
 	Timestamp         string           `json:"timestamp,omitempty"`           // 时间戳

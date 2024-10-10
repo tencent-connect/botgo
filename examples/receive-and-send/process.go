@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/tencent-connect/botgo/dto"
-	"github.com/tencent-connect/botgo/dto/message"
 	"github.com/tencent-connect/botgo/openapi"
 )
 
@@ -18,47 +17,12 @@ type Processor struct {
 	api openapi.OpenAPI
 }
 
-// ProcessMessage is a function to process message
-func (p Processor) ProcessMessage(input string, data *dto.WSATMessageData) error {
-	ctx := context.Background()
-	cmd := message.ParseCommand(input)
-	toCreate := &dto.MessageToCreate{
-		Content: "默认回复" + message.Emoji(307),
-		MessageReference: &dto.MessageReference{
-			// 引用这条消息
-			MessageID:             data.ID,
-			IgnoreGetMessageError: true,
-		},
+// ProcessChannelMessage is a function to process message
+func (p Processor) ProcessChannelMessage(input string, data *dto.WSATMessageData) error {
+	msg := generateDemoMessage(input, dto.Message(*data))
+	if err := p.sendChannelReply(context.Background(), data.ChannelID, msg); err != nil {
+		_ = p.sendChannelReply(context.Background(), data.GroupID, genErrMessage(dto.Message(*data), err))
 	}
-
-	// 进入到私信逻辑
-	if cmd.Cmd == "dm" {
-		p.dmHandler(data)
-		return nil
-	}
-
-	switch cmd.Cmd {
-	case "hi":
-		p.sendReply(ctx, data.ChannelID, toCreate)
-	case "time":
-		toCreate.Content = genReplyContent(data)
-		p.sendReply(ctx, data.ChannelID, toCreate)
-	case "ark":
-		toCreate.Ark = genReplyArk(data)
-		p.sendReply(ctx, data.ChannelID, toCreate)
-	case "公告":
-		p.setAnnounces(ctx, data)
-	case "pin":
-		if data.MessageReference != nil {
-			p.setPins(ctx, data.ChannelID, data.MessageReference.MessageID)
-		}
-	case "emoji":
-		if data.MessageReference != nil {
-			p.setEmoji(ctx, data.ChannelID, data.MessageReference.MessageID)
-		}
-	default:
-	}
-
 	return nil
 }
 
@@ -100,49 +64,7 @@ func (p Processor) ProcessInlineSearch(interaction *dto.WSInteractionData) error
 	return nil
 }
 
-func (p Processor) dmHandler(data *dto.WSATMessageData) {
-	dm, err := p.api.CreateDirectMessage(
-		context.Background(), &dto.DirectMessageToCreate{
-			SourceGuildID: data.GuildID,
-			RecipientID:   data.Author.ID,
-		},
-	)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	toCreate := &dto.MessageToCreate{
-		Content: "默认私信回复",
-	}
-	_, err = p.api.PostDirectMessage(
-		context.Background(), dm, toCreate,
-	)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-}
-
-func genReplyContent(data *dto.WSATMessageData) string {
-	var tpl = `你好：%s
-在子频道 %s 收到消息。
-收到的消息发送时时间为：%s
-当前本地时间为：%s
-
-消息来自：%s
-`
-	msgTime, _ := data.Timestamp.Time()
-	return fmt.Sprintf(
-		tpl,
-		message.MentionUser(data.Author.ID),
-		message.MentionChannel(data.ChannelID),
-		msgTime, time.Now().Format(time.RFC3339),
-		getIP(),
-	)
-}
-
-func genErrMessage(data dto.Message, err error) dto.APIMessage {
+func genErrMessage(data dto.Message, err error) *dto.MessageToCreate {
 	return &dto.MessageToCreate{
 		Timestamp: time.Now().UnixMilli(),
 		Content:   fmt.Sprintf("处理异常:%v", err),
@@ -157,9 +79,9 @@ func genErrMessage(data dto.Message, err error) dto.APIMessage {
 
 // ProcessGroupMessage 回复群消息
 func (p Processor) ProcessGroupMessage(input string, data *dto.WSGroupATMessageData) error {
-	msg := generateDemoMessage(data.ID, data.Content, dto.Message(*data))
+	msg := generateDemoMessage(input, dto.Message(*data))
 	if err := p.sendGroupReply(context.Background(), data.GroupID, msg); err != nil {
-		p.sendGroupReply(context.Background(), data.GroupID, genErrMessage(dto.Message(*data), err))
+		_ = p.sendGroupReply(context.Background(), data.GroupID, genErrMessage(dto.Message(*data), err))
 	}
 
 	return nil
@@ -171,66 +93,32 @@ func (p Processor) ProcessC2CMessage(input string, data *dto.WSC2CMessageData) e
 	if data.Author != nil && data.Author.ID != "" {
 		userID = data.Author.ID
 	}
-	msg := generateDemoMessage(data.ID, data.Content, dto.Message(*data))
+	msg := generateDemoMessage(input, dto.Message(*data))
 	if err := p.sendC2CReply(context.Background(), userID, msg); err != nil {
-		p.sendC2CReply(context.Background(), userID, genErrMessage(dto.Message(*data), err))
+		_ = p.sendC2CReply(context.Background(), userID, genErrMessage(dto.Message(*data), err))
 	}
 	return nil
 }
 
-func generateDemoMessage(id string, cmd string, recvMsg dto.Message) dto.APIMessage {
-	log.Printf("收到指令:%+v", cmd)
-
-	var replyMsg dto.APIMessage
-	log.Printf("opt:[%v]->[%v] attachments:%v", cmd, strings.ToLower(strings.TrimSpace(cmd)),
-		recvMsg.Attachments)
-	switch strings.ToLower(strings.TrimSpace(cmd)) {
-	case "发图片":
-		replyMsg = &dto.RichMediaMessage{
-			//EventID:    id,
-			FileType:   1,
-			URL:        "https://qqminiapp.cdn-go.cn/open-platform/53e29134/img/qqInterconncet.aa1a9d9c.png",
-			SrvSendMsg: true,
-		}
-	//case "发视频:":
-	//	replyMsg = &dto.RichMediaMessage{
-	//		EventID:    id,
-	//		FileType:   2,
-	//		URL:        "https://static-res.qq.com/static-res/imqq-home/video/video-large.mp4",
-	//		SrvSendMsg: true,
-	//	}
-	case "发md":
-		replyMsg = &dto.MessageToCreate{
-			Timestamp: time.Now().UnixMilli(),
-			Content:   "md",
-			MsgType:   dto.MarkdownMsg,
-			MsgID:     id,
-			Markdown: &dto.Markdown{
-				Params:  nil,
-				Content: "# Markdown消息标题内容",
-			},
-		}
-	default:
-		msg := ""
-		if len(recvMsg.Content) > 0 {
-			msg += "收到:" + recvMsg.Content
-		}
-		for _, _v := range recvMsg.Attachments {
-			msg += ",收到文件类型:" + _v.ContentType
-		}
-		replyMsg = &dto.MessageToCreate{
-			Timestamp: time.Now().UnixMilli(),
-			Content:   msg,
-			MessageReference: &dto.MessageReference{
-				// 引用这条消息
-				MessageID:             id,
-				IgnoreGetMessageError: true,
-			},
-			MsgID: id,
-		}
+func generateDemoMessage(input string, data dto.Message) *dto.MessageToCreate {
+	log.Printf("收到指令: %+v", input)
+	msg := ""
+	if len(input) > 0 {
+		msg += "收到:" + input
 	}
-
-	return replyMsg
+	for _, _v := range data.Attachments {
+		msg += ",收到文件类型:" + _v.ContentType
+	}
+	return &dto.MessageToCreate{
+		Timestamp: time.Now().UnixMilli(),
+		Content:   msg,
+		MessageReference: &dto.MessageReference{
+			// 引用这条消息
+			MessageID:             data.ID,
+			IgnoreGetMessageError: true,
+		},
+		MsgID: data.ID,
+	}
 }
 
 // ProcessFriend 处理 c2c 好友事件
@@ -244,15 +132,17 @@ func (p Processor) ProcessFriend(wsEventType string, data *dto.WSC2CFriendData) 
 	switch strings.ToLower(wsEventType) {
 	case strings.ToLower(string(dto.EventC2CFriendAdd)):
 		log.Println("添加好友")
-		content = fmt.Sprintf("ID为 %s 的用户添加好友", data.OpenId)
+		content = fmt.Sprintf("ID为 %s 的用户添加机器人为好友", data.OpenID)
+	case strings.ToLower(string(dto.EventC2CFriendDel)):
+		log.Println("删除好友")
 	default:
-		log.Println("添加好友")
+		log.Println(wsEventType)
 		return nil
 	}
 	replyMsg.Content = content
 	_, err := p.api.PostC2CMessage(
 		context.Background(),
-		data.OpenId,
+		data.OpenID,
 		replyMsg,
 	)
 	if err != nil {
@@ -260,45 +150,4 @@ func (p Processor) ProcessFriend(wsEventType string, data *dto.WSC2CFriendData) 
 		return err
 	}
 	return nil
-}
-
-func genReplyArk(data *dto.WSATMessageData) *dto.Ark {
-	return &dto.Ark{
-		TemplateID: 23,
-		KV: []*dto.ArkKV{
-			{
-				Key:   "#DESC#",
-				Value: "这是 ark 的描述信息",
-			},
-			{
-				Key:   "#PROMPT#",
-				Value: "这是 ark 的摘要信息",
-			},
-			{
-				Key: "#LIST#",
-				Obj: []*dto.ArkObj{
-					{
-						ObjKV: []*dto.ArkObjKV{
-							{
-								Key:   "desc",
-								Value: "这里展示的是 23 号模板",
-							},
-						},
-					},
-					{
-						ObjKV: []*dto.ArkObjKV{
-							{
-								Key:   "desc",
-								Value: "这是 ark 的列表项名称",
-							},
-							{
-								Key:   "link",
-								Value: "https://www.qq.com",
-							},
-						},
-					},
-				},
-			},
-		},
-	}
 }

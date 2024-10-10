@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"path"
-	"runtime"
+	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -13,8 +13,15 @@ import (
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/dto/message"
 	"github.com/tencent-connect/botgo/event"
+	"github.com/tencent-connect/botgo/interaction/webhook"
 	"github.com/tencent-connect/botgo/token"
-	"github.com/tencent-connect/botgo/websocket"
+	"gopkg.in/yaml.v3"
+)
+
+const (
+	host_ = "0.0.0.0"
+	port_ = 9000
+	path_ = "/qqbot"
 )
 
 // 消息处理器，持有 openapi 对象
@@ -23,123 +30,51 @@ var processor Processor
 func main() {
 	ctx := context.Background()
 	// 加载 appid 和 token
-	tokenManager := token.NewManager(token.TypeQQBot)
-
-	filePath := getConfigPath("config.yaml")
-	if err := tokenManager.LoadAppAccFromYAML(filePath); err != nil {
-		log.Fatalln(err)
+	content, err := os.ReadFile("config.yaml")
+	if err != nil {
+		log.Fatalln("load config file failed, err:", err)
 	}
-
-	if err := tokenManager.Init(ctx); err != nil {
+	credentials := &token.QQBotCredentials{
+		AppID:     "",
+		AppSecret: "",
+	}
+	if err = yaml.Unmarshal(content, &credentials); err != nil {
+		log.Fatalln("parse config failed, err:", err)
+	}
+	log.Println("credentials:", credentials)
+	tokenSource := token.NewQQBotTokenSource(&token.QQBotCredentials{
+		AppID:     "",
+		AppSecret: "",
+	})
+	if err = token.StartRefreshAccessToken(ctx, tokenSource); err != nil {
 		log.Fatalln(err)
 	}
 	// 初始化 openapi，正式环境
-	api := botgo.NewOpenAPI(tokenManager).WithTimeout(5 * time.Second).SetDebug(true)
-	// 沙箱环境
-	// api := botgo.NewSandboxOpenAPI(botToken).WithTimeout(3 * time.Second)
-
-	// 获取 websocket 信息
-	wsInfo, err := api.WS(ctx, nil, "")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
+	api := botgo.NewOpenAPI(credentials.AppID, tokenSource).WithTimeout(5 * time.Second).SetDebug(true)
 	processor = Processor{api: api}
-	// websocket.RegisterResumeSignal(syscall.SIGUSR1)
-	// 根据不同的回调，生成 intents
-	intent := websocket.RegisterHandlers(
-		// ***********公用事件消息***********
-		// 如果想要捕获到连接成功的事件，可以实现这个回调
-		ReadyHandler(),
-		// 连接关闭回调
-		ErrorNotifyHandler(),
-
-		//***********频道事件消息***********
-		// 频道 at 机器人事件，目前是在这个事件处理中有逻辑，会回消息，其他的回调处理都只把数据打印出来，不做任何处理
-		ATMessageEventHandler(),
-		// 频道事件
-		GuildEventHandler(),
-		// 成员事件
-		MemberEventHandler(),
-		// 子频道事件
-		ChannelEventHandler(),
-		// 私信，目前只有私域才能够收到这个，如果你的机器人不是私域机器人，会导致连接报错，那么启动 example 就需要注释掉这个回调
-		// DirectMessageHandler(),
-		// 互动事件
-		InteractionHandler(),
-		// ***********群事件及C2C消息***********
-		// 群@事件
+	// 注册处理函数
+	_ = event.RegisterHandlers(
+		// ***********消息事件***********
+		// 群@机器人消息事件
 		GroupATMessageEventHandler(),
 		// C2C消息事件
 		C2CMessageEventHandler(),
-		// C2C好友变更事件
-		C2CFriendEventHandler(),
+		// 频道@机器人事件
+		ChannelATMessageEventHandler(),
 	)
-	// 指定需要启动的分片数为 2 的话可以手动修改 wsInfo
-	if err = botgo.NewSessionManager().Start(wsInfo, tokenManager, &intent); err != nil {
-		log.Fatalln(err)
+	http.HandleFunc(path_, func(writer http.ResponseWriter, request *http.Request) {
+		webhook.HTTPHandler(writer, request, credentials)
+	})
+	if err = http.ListenAndServe(fmt.Sprintf("%s:%d", host_, port_), nil); err != nil {
+		log.Fatal("setup server fatal:", err)
 	}
 }
 
-// ReadyHandler 自定义 ReadyHandler 感知连接成功事件
-func ReadyHandler() event.ReadyHandler {
-	return func(event *dto.WSPayload, data *dto.WSReadyData) {
-		log.Println("ready event receive: ", data)
-	}
-}
-
-// ErrorNotifyHandler 处理当 ws 链接发送错误的事件
-func ErrorNotifyHandler() event.ErrorNotifyHandler {
-	return func(err error) {
-		log.Println("error notify receive: ", err)
-	}
-}
-
-// ATMessageEventHandler 实现处理 at 消息的回调
-func ATMessageEventHandler() event.ATMessageEventHandler {
+// ChannelATMessageEventHandler 实现处理 at 消息的回调
+func ChannelATMessageEventHandler() event.ATMessageEventHandler {
 	return func(event *dto.WSPayload, data *dto.WSATMessageData) error {
 		input := strings.ToLower(message.ETLInput(data.Content))
-		return processor.ProcessMessage(input, data)
-	}
-}
-
-// GuildEventHandler 处理频道事件
-func GuildEventHandler() event.GuildEventHandler {
-	return func(event *dto.WSPayload, data *dto.WSGuildData) error {
-		fmt.Println(data)
-		return nil
-	}
-}
-
-// ChannelEventHandler 处理子频道事件
-func ChannelEventHandler() event.ChannelEventHandler {
-	return func(event *dto.WSPayload, data *dto.WSChannelData) error {
-		fmt.Println(data)
-		return nil
-	}
-}
-
-// MemberEventHandler 处理成员变更事件
-func MemberEventHandler() event.GuildMemberEventHandler {
-	return func(event *dto.WSPayload, data *dto.WSGuildMemberData) error {
-		fmt.Println(data)
-		return nil
-	}
-}
-
-// DirectMessageHandler 处理私信事件
-func DirectMessageHandler() event.DirectMessageEventHandler {
-	return func(event *dto.WSPayload, data *dto.WSDirectMessageData) error {
-		fmt.Println(data)
-		return nil
-	}
-}
-
-// CreateMessageHandler 处理消息事件
-func CreateMessageHandler() event.MessageEventHandler {
-	return func(event *dto.WSPayload, data *dto.WSMessageData) error {
-		fmt.Println(data)
-		return nil
+		return processor.ProcessChannelMessage(input, data)
 	}
 }
 
@@ -174,10 +109,42 @@ func C2CFriendEventHandler() event.C2CFriendEventHandler {
 	}
 }
 
-func getConfigPath(name string) string {
-	_, filename, _, ok := runtime.Caller(1)
-	if ok {
-		return fmt.Sprintf("%s/%s", path.Dir(filename), name)
+// GuildEventHandler 处理频道事件
+func GuildEventHandler() event.GuildEventHandler {
+	return func(event *dto.WSPayload, data *dto.WSGuildData) error {
+		fmt.Println(data)
+		return nil
 	}
-	return ""
+}
+
+// ChannelEventHandler 处理子频道事件
+func ChannelEventHandler() event.ChannelEventHandler {
+	return func(event *dto.WSPayload, data *dto.WSChannelData) error {
+		fmt.Println(data)
+		return nil
+	}
+}
+
+// GuildMemberEventHandler 处理成员变更事件
+func GuildMemberEventHandler() event.GuildMemberEventHandler {
+	return func(event *dto.WSPayload, data *dto.WSGuildMemberData) error {
+		fmt.Println(data)
+		return nil
+	}
+}
+
+// GuildDirectMessageHandler 处理频道私信事件
+func GuildDirectMessageHandler() event.DirectMessageEventHandler {
+	return func(event *dto.WSPayload, data *dto.WSDirectMessageData) error {
+		fmt.Println(data)
+		return nil
+	}
+}
+
+// GuildMessageHandler 处理消息事件
+func GuildMessageHandler() event.MessageEventHandler {
+	return func(event *dto.WSPayload, data *dto.WSMessageData) error {
+		fmt.Println(data)
+		return nil
+	}
 }

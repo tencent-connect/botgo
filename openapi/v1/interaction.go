@@ -2,7 +2,6 @@ package v1
 
 import (
 	"context"
-	"strconv"
 )
 
 // HeaderCallbackAppID 互动按钮第三方回调 appID
@@ -12,7 +11,7 @@ const HeaderCallbackAppID = "X-Callback-AppID"
 func (o *openAPI) PutInteraction(ctx context.Context,
 	interactionID string, body string) error {
 	_, err := o.request(ctx).
-		SetHeader(HeaderCallbackAppID, strconv.FormatUint(o.tokenManager.GetAppID(), 10)).
+		SetHeader(HeaderCallbackAppID, o.GetAppID()).
 		SetPathParam("interaction_id", interactionID).
 		SetBody(body).
 		Put(o.getURL(interactionsURI))

@@ -7,7 +7,6 @@ import (
 	"github.com/tencent-connect/botgo/dto/keyboard"
 
 	"github.com/tencent-connect/botgo/dto"
-	"github.com/tencent-connect/botgo/openapi"
 )
 
 func TestMessage(t *testing.T) {
@@ -94,7 +93,7 @@ func TestRetractMessage(t *testing.T) {
 	msgID := "109b8a401a1231343431313532313831383136323933383420801e28003081b0f30338cd6040c36048f5e4908e0650b1acf8fa05"
 	t.Run(
 		"消息撤回", func(t *testing.T) {
-			err := api.RetractMessage(ctx, "1049883", msgID, openapi.RetractMessageOptionHidetip)
+			err := api.RetractMessage(ctx, "1049883", msgID)
 			if err != nil {
 				t.Error(err)
 			}

@@ -6,8 +6,8 @@ import "github.com/tencent-connect/botgo/dto/keyboard"
 type SendType int
 
 const (
-	Text      SendType = 1 // 文字消息
-	RichMedia SendType = 2 // 富媒体类消息
+	Text      SendType = 1 // Text 文字消息
+	RichMedia SendType = 2 // RichMedia 富媒体类消息
 )
 
 // APIMessage 消息结构接口
@@ -65,7 +65,7 @@ type MessageToCreate struct {
 	EventID          string                    `json:"event_id,omitempty"`        // 要回复的事件id, 逻辑同MsgID
 	Timestamp        int64                     `json:"timestamp,omitempty"`       //TODO delete this
 	MsgSeq           uint32                    `json:"msg_seq,omitempty"`         // 机器人对于回复一个msg_id或者event_id的消息序号，指定后根据这个字段和msg_id或者event_id进行去重
-	SubscribeId      string                    `json:"subscribe_id,omitempty"`    // 订阅id，发送订阅消息时使用
+	SubscribeID      string                    `json:"subscribe_id,omitempty"`    // 订阅id，发送订阅消息时使用
 	InputNotify      *InputNotify              `json:"input_notify,omitempty"`    // 输入状态状态信息
 	Media            *MediaInfo                `json:"media,omitempty"`           // 富媒体信息
 	PromptKeyboard   *PromptKeyboard           `json:"prompt_keyboard,omitempty"` // 消息扩展信息
@@ -158,11 +158,11 @@ type SettingGuide struct {
 
 // InputNotify 输入状态结构
 type InputNotify struct {
-	InputType   int   `json:"input_type,omitempty"`   //类型 1: "对方正在输入...", 2: 取消展示"]
-	InputSecond int32 `json:"input_second,omitempty"` //当input_type大于0时有效, 代码状态持续多长时间.
+	InputType   int   `json:"input_type,omitempty"`   // 类型 1: "对方正在输入...", 2: 取消展示"]
+	InputSecond int32 `json:"input_second,omitempty"` // 当input_type大于0时有效, 代码状态持续多长时间.
 }
 
 // MediaInfo 富媒体信息
 type MediaInfo struct {
-	FileInfo []byte `json:"file_info,omitempty"` //富媒体文件信息，通过上传接口取得
+	FileInfo []byte `json:"file_info,omitempty"` // 富媒体文件信息，通过上传接口取得
 }

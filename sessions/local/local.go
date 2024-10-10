@@ -8,8 +8,8 @@ import (
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/log"
 	"github.com/tencent-connect/botgo/sessions/manager"
-	"github.com/tencent-connect/botgo/token"
 	"github.com/tencent-connect/botgo/websocket"
+	"golang.org/x/oauth2"
 )
 
 // New 创建本地session管理器
@@ -23,7 +23,7 @@ type ChanManager struct {
 }
 
 // Start 启动本地 session manager
-func (l *ChanManager) Start(apInfo *dto.WebsocketAP, tokenManager *token.Manager, intents *dto.Intent) error {
+func (l *ChanManager) Start(apInfo *dto.WebsocketAP, tokenSource oauth2.TokenSource, intents *dto.Intent) error {
 	defer log.Sync()
 	if err := manager.CheckSessionLimit(apInfo); err != nil {
 		log.Errorf("[ws/session/local] session limited apInfo: %+v", apInfo)
@@ -37,10 +37,10 @@ func (l *ChanManager) Start(apInfo *dto.WebsocketAP, tokenManager *token.Manager
 	l.sessionChan = make(chan dto.Session, apInfo.Shards)
 	for i := uint32(0); i < apInfo.Shards; i++ {
 		session := dto.Session{
-			URL:          apInfo.URL,
-			TokenManager: tokenManager,
-			Intent:       *intents,
-			LastSeq:      0,
+			URL:         apInfo.URL,
+			TokenSource: tokenSource,
+			Intent:      *intents,
+			LastSeq:     0,
 			Shards: dto.ShardConfig{
 				ShardID:    i,
 				ShardCount: apInfo.Shards,
@@ -87,7 +87,7 @@ func (l *ChanManager) newConnect(session dto.Session) {
 		log.Errorf("[ws/session] Identify/Resume err %+v", err)
 		return
 	}
-	if err := wsClient.Listening(); err != nil {
+	if err = wsClient.Listening(); err != nil {
 		log.Errorf("[ws/session] Listening err %+v", err)
 		currentSession := wsClient.Session()
 		// 对于不能够进行重连的session，需要清空 session id 与 seq

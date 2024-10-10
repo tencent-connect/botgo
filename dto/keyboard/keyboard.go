@@ -98,11 +98,11 @@ type Permission struct {
 // TemplateID 对模板id的封装，兼容官方模板和自定义模板
 type TemplateID struct {
 	// 这两个字段互斥，只填入一个
-	TemplateId       uint32 `json:"template_id,omitempty"`        // 官方提供的模板id
-	CustomTemplateId string `json:"custom_template_id,omitempty"` // 自定义模板
+	TemplateID       uint32 `json:"template_id,omitempty"`        // 官方提供的模板id
+	CustomTemplateID string `json:"custom_template_id,omitempty"` // 自定义模板
 }
 
 // SubscribeData 订阅按钮数据
 type SubscribeData struct {
-	TemplateIds []*TemplateID `json:"template_ids,omitempty"` // 订阅按钮对应的模板id列表
+	TemplateIDs []*TemplateID `json:"template_ids,omitempty"` // 订阅按钮对应的模板id列表
 }

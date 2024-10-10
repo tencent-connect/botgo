@@ -2,113 +2,128 @@
 
 QQ频道机器人，官方 GOLANG SDK。
 
-![Build](https://github.com/tencent-connect/botgo/actions/workflows/build.yml/badge.svg)
 [![Go Reference](https://pkg.go.dev/badge/github.com/tencent-connect/botgo.svg)](https://pkg.go.dev/github.com/tencent-connect/botgo)
 [![Examples](https://img.shields.io/badge/BotGo-examples-yellowgreen)](https://github.com/tencent-connect/botgo/tree/master/examples)
 
+## 注意事项
+1. websocket 事件推送链路将在24年年底前逐步下线，后续官方不再维护。
+2. 新的webhook事件回调链路目前在灰度验证，灰度用户可体验通过页面配置事件监听及回调地址。如未在灰度范围，可联系QQ机器人反馈助手开通。
+
+![反馈机器人](docs/img/feedback_bot.png)
+
+灰度期间，原有机器人仍可使用websocket事件链路接收事件推送。
 ## 一、quick start
-### 1.打开 examples/receive-and-send
-### 2.复制 config.yaml.demo -> config.yaml
-![img.png](doc/img/copy-config-yaml.png)
-### 3.登录[开发者管理端](https://q.qq.com)，将BotAppID和机器人秘钥分别填入config.yaml中的appid和secret字段
-![find-app-acc.png](doc/img/find-app-acc.png)
-![type-in-app-info.png](doc/img/type-in-app-info.png)
-### 4.执行go build，然后执行./receive-and-send, 即可收到消息并回复。
-![robot-start-console.png](doc/img/robot-start-console.png)
-### 5.根据机器人QQ号查找、添加机器人为好友
-![add-robot.png](doc/img/add-robot.png)
+### 1. QQ机器人创建与配置
+1. 创建开发者账号，创建QQ机器人 [QQ机器人开放平台](https://q.qq.com/qqbot)
 
-### 6.发送消息，即可收到回复。
-![robot-reply.png](doc/img/robot-reply.png)
+![create_bot.png](docs/img/create_bot.png)
 
-## 二、如何使用
+2. 配置沙箱成员 (QQ机器人上线前，仅沙箱环境可访问)。新创建机器人会默认将创建者加入沙箱环境。
 
-### 1.请求 openapi 接口，操作资源
+![sandbox_setting.png](docs/img/sandbox_setting.png)
+
+### 2. 云函数创建与配置
+1. 腾讯云账号开通scf服务 [快速入门](https://cloud.tencent.com/document/product/1154/39271)
+2. 创建函数
+
+* 选择模板
+
+![create_scf.png](docs/img/create_scf.png)
+
+* 启用"公网访问"、"日志投递"
+
+![turn_internet_access.png](docs/img/turn_internet_access.png)
+
+* 编辑云函数，启用"固定公网出口IP" （QQ机器人需要配置IP白名单，仅白名单内服务器/容器可访问OpenAPI）
+
+![scf_setting.png](docs/img/scf_setting.png)
+
+![get_internet_ip.png](docs/img/get_internet_ip.png)
+
+### 3. 使用示例构建、上传云函数部署包
+1. 打开 examples/receive-and-send
+2. 复制 config.yaml.demo -> config.yaml
+
+![img.png](docs/img/copy-config-yaml.png)
+
+3. 登录[开发者管理端](https://q.qq.com)，将BotAppID和机器人秘钥分别填入config.yaml中的appid和secret字段
+
+![find-app-acc.png](docs/img/find-app-acc.png)
+
+![type-in-app-info.png](docs/img/type-in-app-info.png)
+
+4. 执行Makefile中build指令
+5. 将config.yaml、scf_bootstrap、qqbot-demo(二进制文件)打包，上传至云函数
+
+![上传压缩包](docs/img/upload_scf_zip.png)
+
+### 4.配置QQ机器人事件监听、回调地址、IP白名单
+
+1. 复制云函数地址 + "/qqbot"后缀，填入回调地址输入框。点击确认。
+
+![img.png](docs/img/copy_scf_addr.png)
+
+2. 勾选 C2C_MESSAGE_CREATE 事件。点击确认。
+
+![webhook配置](docs/img/webhook_setting.png)
+
+
+3. 将云函数 "固定公网出口IP" 配置到IP白名单中）
+
+![ip_whitlist_setting.png](docs/img/ip_whitlist_setting.png)
+
+### 体验与机器人的对话
+
+给机器人发送消息、富媒体文件，机器人回复消息
+
+## 二、如何使用SDK
 
 ```golang
-func main() {
-    token := token.BotToken(conf.AppID, conf.Token)
-    api := botgo.NewOpenAPI(token).WithTimeout(3 * time.Second)
-    ctx := context.Background()
 
-    ws, err := api.WS(ctx, nil, "")
-    log.Printf("%+v, err:%v", ws, err)
-    
-    me, err := api.Me(ctx, nil, "")
-    log.Printf("%+v, err:%v", me, err)
+var api openapi.OpenAPI
+
+func main() {
+	//创建oauth2标准token source
+	tokenSource := token.NewQQBotTokenSource(
+		&token.QQBotCredentials{
+			AppID:     "", 
+			AppSecret: "",
+		}) 
+	//启动自动刷新access token协程 
+	if err = token.StartRefreshAccessToken(ctx, tokenSource); err != nil {
+		log.Fatalln(err)
+	}
+	// 初始化 openapi，正式环境 
+	api = botgo.NewOpenAPI(credentials.AppID, tokenSource).WithTimeout(5 * time.Second).SetDebug(true) 
+	// 注册事件处理函数 
+	_ = event.RegisterHandlers( 
+		// 注册c2c消息处理函数 
+		C2CMessageEventHandler(), 
+	)
+	//注册回调处理函数 
+	http.HandleFunc(path_, func (writer http.ResponseWriter, request *http.Request) {
+		webhook.HTTPHandler(writer, request, credentials)
+	}) 
+	// 启动http服务监听端口 
+	if err = http.ListenAndServe(fmt.Sprintf("%s:%d", host_, port_), nil); err != nil {
+		log.Fatal("setup server fatal:", err)
+	}
+}
+
+// C2CMessageEventHandler 实现处理 at 消息的回调
+func C2CMessageEventHandler() event.C2CMessageEventHandler {
+	return func(event *dto.WSPayload, data *dto.WSC2CMessageData) error {
+		//TODO use api do sth.
+		return nil
+	}
 }
 ```
 
-### 2.使用默认 SessionManager 启动 websocket 连接，接收事件
+## 三、SDK 开发说明 (Deprecated)
 
-```golang
-func main() {
-    token := token.BotToken(conf.AppID, conf.Token)
-    api := botgo.NewOpenAPI(token).WithTimeout(3 * time.Second)
-    ctx := context.Background()
-    ws, err := api.WS(ctx, nil, "")
-    if err != nil {
-        log.Printf("%+v, err:%v", ws, err)
-    }
+请查看: [开发说明](./DEVELOP.md)
 
-    // 监听哪类事件就需要实现哪类的 handler，定义：websocket/event_handler.go
-    var atMessage websocket.ATMessageEventHandler = func(event *dto.WSPayload, data *dto.WSATMessageData) error {
-        fmt.Println(event, data)
-        return nil
-    }
-    intent := websocket.RegisterHandlers(atMessage)
-    // 启动 session manager 进行 ws 连接的管理，如果接口返回需要启动多个 shard 的连接，这里也会自动启动多个
-    botgo.NewSessionManager().Start(ws, token, &intent)
-}
-```
-
-## 三、什么是 SessionManager
-
-SessionManager，用于管理 websocket 连接的启动，重连等。接口定义在：`session_manager.go`。开发者也可以自己实现自己的 SessionManager。
-
-sdk 中实现了两个 SessionManager
-
-- [local](./sessions/local/local.go) 用于在单机上启动多个 shard 的连接。下文用 `local` 代表
-- [remote](./sessions/remote/remote.go) 基于 redis 的 list 数据结构，实现分布式的 shard 管理，可以在多个节点上启动多个服务进程。下文用 `remote` 代表
-
-另外，也有其他同事基于 etcd 实现了 shard 集群的管理，在 [botgo-plugns](https://github.com/tencent-connect/botgo-plugins) 中。
-
-## 四、生产环境中的一些建议
-
-得益于 websocket 的机制，我们可以在本地就启动一个机器人，实现相关逻辑，但是在生产环境中需要考虑扩容，容灾等情况，所以建
-议从以下几方面考虑生产环境的部署：
-
-### 1.公域机器人，优先使用分布式 shard 管理
-
-使用上面提到的分布式的 session manager 或者自己实现一个分布式的 session manager
-
-### 2.提前规划好分片
-
-分布式 SessionManager 需要解决的最大的问题，就是如何解决 shard 随时增加的问题，类似 kafka 的 rebalance 问题一样，
-由于 shard 是基于频道 id 来进行 hash 的，所以在扩容的时候所有的数据都会被重新 hash。
-
-提前规划好较多的分片，如 20 个分片，有助于在未来机器人接入的频道过多的时候，能够更加平滑的进行实例的扩容。比如如果使用的
-是 `remote`，初始化时候分 20 个分片，但是只启动 2 个进程，那么这2个进程将争抢 20 个分片的消费权，进行消费，当启动更多
-的实例之后，伴随着 websocket 要求一定时间进行一次重连，启动的新实例将会平滑的分担分片的数据处理。
-
-### 3.接入和逻辑分离
-
-接入是指从机器人平台收到事件的服务。逻辑是指处理相关事件的服务。
-
-接入与逻辑分离，有助于提升机器人的事件处理效率和可靠性。一般实现方式类似于以下方案：
-
-- 接入层：负责维护与平台的 websocket 连接，并接收相关事件，生产到 kafka 等消息中间件中。
-  如果使用 `local` 那么可能还涉及到分布式锁的问题。可以使用sdk 中的 `sessions/remote/lock` 快速基于 redis 实现分布式锁。
-
-- 逻辑层：从 kafka 消费到事件，并进行对应的处理，或者调用机器人的 openapi 进行相关数据的操作。
-
-提前规划好 kafka 的分片，然后从容的针对逻辑层做水平扩容。或者使用 pulsar（腾讯云上叫 tdmq） 来替代 kafka 避免 rebalance 问题。
-
-## 五、SDK 开发说明
-
-请查看：[开发说明](./DEVELOP.md)
-
-## 六、加入官方社区
+## 四、加入官方社区
 
 欢迎扫码加入 **QQ 频道开发者社区**。
 

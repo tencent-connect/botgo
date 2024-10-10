@@ -1,3 +1,4 @@
+// Package search 模拟内联搜索
 package search
 
 import (

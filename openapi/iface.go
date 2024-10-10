@@ -6,7 +6,7 @@ import (
 
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/openapi/options"
-	"github.com/tencent-connect/botgo/token"
+	"golang.org/x/oauth2"
 )
 
 // OpenAPI openapi 完整实现
@@ -34,8 +34,11 @@ type OpenAPI interface {
 
 // Base 基础能力接口
 type Base interface {
+	// Version 接口版本
 	Version() APIVersion
-	Setup(token *token.Manager, inSandbox bool) OpenAPI
+
+	// Setup 初始化
+	Setup(botAppID string, token oauth2.TokenSource, inSandbox bool) OpenAPI
 
 	// WithTimeout 设置请求接口超时时间
 	WithTimeout(duration time.Duration) OpenAPI
@@ -173,7 +176,8 @@ type MemberAPI interface {
 	MemberMute(ctx context.Context, guildID, userID string, mute *dto.UpdateGuildMute) error
 
 	// MultiMemberMute 频道指定批量成员禁言
-	MultiMemberMute(ctx context.Context, guildID string, mute *dto.UpdateGuildMute) (*dto.UpdateGuildMuteResponse, error)
+	MultiMemberMute(ctx context.Context, guildID string, mute *dto.UpdateGuildMute) (
+		*dto.UpdateGuildMuteResponse, error)
 }
 
 // DirectMessageAPI 信息相关接口
@@ -274,7 +278,7 @@ type InteractionAPI interface {
 	PutInteraction(ctx context.Context, interactionID string, body string) error
 }
 
-// WebhookAPI http 事件网关相关接口
+// WebhookAPI Deprecated: webhook无需维护session。http 事件网关相关接口
 type WebhookAPI interface {
 	CreateSession(ctx context.Context, identity dto.HTTPIdentity) (*dto.HTTPReady, error)
 	CheckSessions(ctx context.Context) ([]*dto.HTTPSession, error)

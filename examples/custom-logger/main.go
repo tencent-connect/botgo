@@ -2,7 +2,10 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -10,8 +13,16 @@ import (
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/dto/message"
 	"github.com/tencent-connect/botgo/event"
+	"github.com/tencent-connect/botgo/interaction/webhook"
 	"github.com/tencent-connect/botgo/openapi"
 	"github.com/tencent-connect/botgo/token"
+	"gopkg.in/yaml.v3"
+)
+
+const (
+	host_ = "0.0.0.0"
+	port_ = 9000
+	path_ = "/qqbot"
 )
 
 func main() {
@@ -25,30 +36,33 @@ func main() {
 	// 把新的 logger 设置到 sdk 上，替换掉老的控制台 logger
 	botgo.SetLogger(logger)
 
-	// 加载 appid 和 token
-	botToken := token.NewManager(token.TypeQQBot)
-	if err := botToken.LoadAppAccFromYAML("config.yaml"); err != nil {
-		log.Fatalln(err)
-	}
-	if err := botToken.Init(context.Background()); err != nil {
-		log.Fatalln(err)
-	}
-	// 初始化 openapi
-	api := botgo.NewOpenAPI(botToken).WithTimeout(3 * time.Second)
-	// 获取 websocket 信息
-	wsInfo, err := api.WS(ctx, nil, "")
+	content, err := os.ReadFile("config.yaml")
 	if err != nil {
+		log.Fatalln("load config file failed, err:", err)
+	}
+	credentials := &token.QQBotCredentials{}
+	if err = yaml.Unmarshal(content, &credentials); err != nil {
+		log.Fatalln("parse config failed, err:", err)
+	}
+
+	tokenSource := token.NewQQBotTokenSource(credentials)
+	if err = token.StartRefreshAccessToken(ctx, tokenSource); err != nil {
 		log.Fatalln(err)
 	}
+	// 初始化 openapi，正式环境
+	api := botgo.NewOpenAPI(credentials.AppID, tokenSource).WithTimeout(5 * time.Second).SetDebug(true)
 	// 根据不同的回调，生成 intents
-	intent := event.RegisterHandlers(ATMessageEventHandler(api))
-	if err = botgo.NewSessionManager().Start(wsInfo, botToken, &intent); err != nil {
-		log.Fatalln(err)
+	_ = event.RegisterHandlers(GuildATMessageEventHandler(api))
+	http.HandleFunc(path_, func(writer http.ResponseWriter, request *http.Request) {
+		webhook.HTTPHandler(writer, request, credentials)
+	})
+	if err = http.ListenAndServe(fmt.Sprintf("%s:%d", host_, port_), nil); err != nil {
+		log.Fatal("setup server fatal:", err)
 	}
 }
 
-// ATMessageEventHandler 实现处理 at 消息的回调
-func ATMessageEventHandler(api openapi.OpenAPI) event.ATMessageEventHandler {
+// GuildATMessageEventHandler 实现处理 at 消息的回调
+func GuildATMessageEventHandler(api openapi.OpenAPI) event.ATMessageEventHandler {
 	return func(event *dto.WSPayload, data *dto.WSATMessageData) error {
 		log.Printf("[%s] %s", event.Type, data.Content)
 		input := strings.ToLower(message.ETLInput(data.Content))

@@ -10,7 +10,6 @@ import (
 	"time"
 
 	wss "github.com/gorilla/websocket" // 是一个流行的 websocket 客户端，服务端实现
-
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/errs"
 	"github.com/tencent-connect/botgo/event"
@@ -97,7 +96,7 @@ func (c *Client) Listening() error {
 			}
 			// accessToken过期
 			if wss.IsCloseError(err, errs.WSCodeBackendAuthenticationFail) {
-				c.session.TokenManager.GetRefreshSigCh() <- err
+				_, _ = c.session.TokenSource.Token()
 			}
 			// 这里用 UnexpectedCloseError，如果有需要排除在外的 close error code，可以补充在第二个参数上
 			// 4009: session time out, 发了 reconnect 之后马上关闭连接时候的错误码，这个是允许 resumeSignal 的
@@ -138,9 +137,14 @@ func (c *Client) Write(message *dto.WSPayload) error {
 
 // Resume 重连
 func (c *Client) Resume() error {
+	token, err := c.session.TokenSource.Token()
+	if err != nil {
+		log.Errorf("[resume] get access token failed:%s", err)
+		return err
+	}
 	payload := &dto.WSPayload{
 		Data: &dto.WSResumeData{
-			Token:     c.session.TokenManager.GetTokenValue(),
+			Token:     token.AccessToken,
 			SessionID: c.session.ID,
 			Seq:       c.session.LastSeq,
 		},
@@ -155,9 +159,14 @@ func (c *Client) Identify() error {
 	if c.session.Intent == 0 {
 		c.session.Intent = dto.IntentGuilds
 	}
+	tk, err := c.session.TokenSource.Token()
+	if err != nil {
+		log.Errorf("[resume] get access token failed:%s", err)
+		return err
+	}
 	payload := &dto.WSPayload{
 		Data: &dto.WSIdentityData{
-			Token:   c.session.TokenManager.GetTokenValue(),
+			Token:   fmt.Sprintf("%s %s", tk.TokenType, tk.AccessToken),
 			Intents: c.session.Intent,
 			Shard: []uint32{
 				c.session.Shards.ShardID,
@@ -189,8 +198,8 @@ func (c *Client) readMessageToQueue() {
 			log.Errorf("%s read message failed, %v, message %s", c.session, err, string(message))
 			close(c.messageQueue)
 			// accessToken过期
-			if wss.IsCloseError(err, 4004) {
-				c.session.TokenManager.GetRefreshSigCh() <- err
+			if wss.IsCloseError(err, errs.WSCodeBackendAuthenticationFail) {
+				_, _ = c.session.TokenSource.Token()
 			}
 			c.closeChan <- err
 			return

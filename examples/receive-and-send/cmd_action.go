@@ -35,10 +35,12 @@ func (p Processor) setAnnounces(ctx context.Context, data *dto.WSATMessageData) 
 	}
 }
 
-func (p Processor) sendReply(ctx context.Context, channelID string, toCreate *dto.MessageToCreate) {
+func (p Processor) sendChannelReply(ctx context.Context, channelID string, toCreate *dto.MessageToCreate) error {
 	if _, err := p.api.PostMessage(ctx, channelID, toCreate); err != nil {
 		log.Println(err)
+		return err
 	}
+	return nil
 }
 
 func (p Processor) sendGroupReply(ctx context.Context, groupID string, toCreate dto.APIMessage) error {

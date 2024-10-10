@@ -10,21 +10,21 @@ import (
 	"time"
 
 	"github.com/go-resty/resty/v2" // resty 是一个优秀的 rest api 客户端，可以极大的减少开发基于 rest 标准接口求请求的封装工作量
-
 	"github.com/tencent-connect/botgo/constant"
 	"github.com/tencent-connect/botgo/errs"
 	"github.com/tencent-connect/botgo/log"
 	"github.com/tencent-connect/botgo/openapi"
-	"github.com/tencent-connect/botgo/token"
 	"github.com/tencent-connect/botgo/version"
+	"golang.org/x/oauth2"
 )
 
 // MaxIdleConns 默认指定空闲连接池大小
 const MaxIdleConns = 3000
 
 type openAPI struct {
-	tokenManager *token.Manager
-	timeout      time.Duration
+	appID       string
+	tokenSource oauth2.TokenSource
+	timeout     time.Duration
 
 	sandbox     bool   // 请求沙箱环境
 	debug       bool   // debug 模式，调试sdk时候使用
@@ -49,13 +49,14 @@ func (o *openAPI) TraceID() string {
 }
 
 // Setup 生成一个实例
-func (o *openAPI) Setup(token *token.Manager, inSandbox bool) openapi.OpenAPI {
+func (o *openAPI) Setup(botAppID string, tokenSource oauth2.TokenSource, inSandbox bool) openapi.OpenAPI {
 	api := &openAPI{
-		tokenManager: token,
-		timeout:      5 * time.Second,
-		sandbox:      inSandbox,
+		appID:       botAppID,
+		tokenSource: tokenSource,
+		timeout:     5 * time.Second,
+		sandbox:     inSandbox,
 	}
-	api.setupClient() // 初始化可复用的 client
+	api.setupClient(botAppID) // 初始化可复用的 client
 	return api
 }
 
@@ -78,37 +79,43 @@ func (o *openAPI) Transport(ctx context.Context, method, url string, body interf
 }
 
 // 初始化 client
-func (o *openAPI) setupClient() {
+func (o *openAPI) setupClient(appID string) {
 	o.restyClient = resty.New().
 		SetTransport(createTransport(nil, MaxIdleConns)). // 自定义 transport
 		SetLogger(log.DefaultLogger).
 		SetDebug(o.debug).
 		SetTimeout(o.timeout).
-		SetAuthScheme(string(o.tokenManager.Type)).
 		SetHeader("User-Agent", version.String()).
-		SetHeader("X-Union-Appid", fmt.Sprint(o.tokenManager.GetAppID())).
+		SetHeader("X-Union-Appid", appID).
 		SetPreRequestHook(
-			func(client *resty.Client, request *http.Request) error {
+			func(_ *resty.Client, request *http.Request) error {
 				// 执行请求前过滤器
 				// 由于在 `OnBeforeRequest` 的时候，request 还没生成，所以 filter 不能使用，所以放到 `PreRequestHook`
 				return openapi.DoReqFilterChains(request, nil)
 			},
 		).
 		OnBeforeRequest(
-			func(c *resty.Client, r *resty.Request) error {
-				c.SetAuthToken(o.tokenManager.GetAccessToken().GetToken())
+			func(c *resty.Client, _ *resty.Request) error {
+				tk, err := o.tokenSource.Token()
+				if err != nil {
+					log.Errorf("[setupClient] retrieve token failed:%s", err)
+					return err
+				}
+				c.SetAuthScheme(tk.TokenType)
+				log.Debugf("token type:%s", tk.TokenType)
+				c.SetAuthToken(tk.AccessToken)
 				return nil
 			},
 		).
 		// 设置请求之后的钩子，打印日志，判断状态码
 		OnAfterResponse(
-			func(client *resty.Client, resp *resty.Response) error {
+			func(_ *resty.Client, resp *resty.Response) error {
 				log.Infof("%v", respInfo(resp))
 				// 执行请求后过滤器
 				if err := openapi.DoRespFilterChains(resp.Request.RawRequest, resp.RawResponse); err != nil {
 					return err
 				}
-				traceID := resp.Header().Get(constant.TraceIDKey)
+				traceID := resp.Header().Get(constant.HeaderTraceID)
 				o.lastTraceID = traceID
 				// 非成功含义的状态码，需要返回 error 供调用方识别
 				if !openapi.IsSuccessStatus(resp.StatusCode()) {
@@ -123,6 +130,14 @@ func (o *openAPI) setupClient() {
 // request 每个请求，都需要创建一个 request
 func (o *openAPI) request(ctx context.Context) *resty.Request {
 	return o.restyClient.R().SetContext(ctx)
+}
+
+// GetAppID 获取接口地址，会处理沙箱环境判断
+func (o *openAPI) GetAppID() string {
+	if o == nil {
+		return ""
+	}
+	return o.appID
 }
 
 // errBody 请求出错情况下的body结构
@@ -143,7 +158,7 @@ func (o *openAPI) handleError(resp *resty.Response) {
 	}
 	if b.ErrCode == errs.APICodeTokenExpireOrNotExist || b.Code == errs.APICodeTokenExpireOrNotExist {
 		log.Errorf("token expire or not exist, update token")
-		o.tokenManager.GetRefreshSigCh() <- errs.New(errs.APICodeTokenExpireOrNotExist, "openapi token expire")
+		_, _ = o.tokenSource.Token()
 	}
 }
 
@@ -154,7 +169,7 @@ func respInfo(resp *resty.Response) string {
 		"[OPENAPI]%v %v, traceID:%v, status:%v, elapsed:%v req: %v, resp: %v",
 		resp.Request.Method,
 		resp.Request.URL,
-		resp.Header().Get(constant.TraceIDKey),
+		resp.Header().Get(constant.HeaderTraceID),
 		resp.Status(),
 		resp.Time(),
 		string(bodyJSON),

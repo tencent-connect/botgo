@@ -157,7 +157,6 @@ func getGroupURIBySendType(msgType dto.SendType) uri {
 // PostGroupMessage 回复群消息
 func (o *openAPI) PostGroupMessage(ctx context.Context, groupID string, msg dto.APIMessage,
 	opt ...options.Option) (*dto.Message, error) {
-
 	reqCMD := o.request(ctx).
 		SetResult(dto.Message{}).
 		SetPathParam("group_id", groupID).
@@ -196,7 +195,6 @@ func (o *openAPI) PostC2CMessage(ctx context.Context, userID string, msg dto.API
 
 func baseRequest(ctx context.Context, reqCMD *resty.Request, method, url string, opt ...options.Option) (
 	*resty.Response, error) {
-
 	opts := getOptions(ctx, opt...)
 	if opts.URL != "" {
 		url = opts.URL
@@ -208,7 +206,7 @@ func baseRequest(ctx context.Context, reqCMD *resty.Request, method, url string,
 	return reqCMD.Execute(method, url)
 }
 
-func getOptions(ctx context.Context, opt ...options.Option) *options.Options {
+func getOptions(_ context.Context, opt ...options.Option) *options.Options {
 	opts := &options.Options{}
 	for _, o := range opt {
 		o(opts)

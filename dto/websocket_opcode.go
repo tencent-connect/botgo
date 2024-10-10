@@ -18,6 +18,7 @@ const (
 	WSHello
 	WSHeartbeatAck
 	HTTPCallbackAck
+	HTTPCallbackValidation
 )
 
 // opMeans op 对应的含义字符串标识

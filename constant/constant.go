@@ -1,8 +1,8 @@
 // Package constant  常量定义
 package constant
 
-// TraceIDKey 机器人openapi返回的链路追踪ID
-const TraceIDKey = "X-Tps-trace-ID"
+// HeaderTraceID 机器人openapi返回的链路追踪ID
+const HeaderTraceID = "X-Tps-trace-ID"
 
 // APIDomain api domain
 var APIDomain = "https://api.sgroup.qq.com"

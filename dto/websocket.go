@@ -3,7 +3,7 @@ package dto
 import (
 	"fmt"
 
-	"github.com/tencent-connect/botgo/token"
+	"golang.org/x/oauth2"
 )
 
 // WebsocketAP wss 接入点信息
@@ -29,12 +29,14 @@ type ShardConfig struct {
 
 // Session 连接的 session 结构，包括链接的所有必要字段
 type Session struct {
-	ID           string
-	URL          string
-	TokenManager *token.Manager
-	Intent       Intent
-	LastSeq      uint32
-	Shards       ShardConfig
+	ID          string
+	URL         string
+	TokenSource oauth2.TokenSource
+	Intent      Intent
+	LastSeq     uint32
+	Shards      ShardConfig
+
+	AppID string
 }
 
 // String 输出session字符串
