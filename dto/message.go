@@ -43,6 +43,8 @@ type Message struct {
 	FileInfo []byte `json:"file_info,omitempty"`
 	// 上传富媒体文件后的有效期, 单位:秒, 在有效期内可以重复使用。
 	TTL uint `json:"ttl,omitempty"`
+	// 消息场景描述
+	MessageScene MessageScene `json:"message_scene,omitempty"`
 }
 
 // Embed 结构
@@ -80,4 +82,10 @@ type MessageReactionUsers struct {
 	Users  []*User `json:"users,omitempty"`
 	Cookie string  `json:"cookie,omitempty"`
 	IsEnd  bool    `json:"is_end,omitempty"`
+}
+
+// MessageScene 消息场景
+type MessageScene struct {
+	Source       string `json:"source,omitempty"`        // 消息来源, realtime_voice: 实时通话场景, ai_search: AI搜索 其它默认为AIO消息
+	CallbackData string `json:"callback_data,omitempty"` // 回调数据
 }
