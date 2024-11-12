@@ -130,6 +130,7 @@ type Markdown struct {
 	Params           []*MarkdownParams `json:"params"`             // 模版参数
 	Content          string            `json:"content"`            // 原生 markdown
 	Style            *MarkdownStyle    `json:"style"`              // markdown样式
+	ProcessMsg       string            `json:"process_msg"`        // markdown引导消息
 }
 
 // MarkdownStyle markdown 样式
