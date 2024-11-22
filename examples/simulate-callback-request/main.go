@@ -14,7 +14,7 @@ import (
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/interaction/signature"
 	"github.com/tencent-connect/botgo/token"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 const host = "http://localhost"
@@ -29,7 +29,7 @@ func main() {
 		log.Fatalln("load config file failed, err:", err)
 	}
 	credentials := &token.QQBotCredentials{}
-	if err = yaml.Unmarshal(content, &credentials); err != nil {
+	if err = yaml.Unmarshal(content, credentials); err != nil {
 		log.Fatalln("parse config failed, err:", err)
 	}
 	log.Println("credentials:", credentials)

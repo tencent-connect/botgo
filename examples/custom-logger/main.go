@@ -35,7 +35,6 @@ func main() {
 	}
 	// 把新的 logger 设置到 sdk 上，替换掉老的控制台 logger
 	botgo.SetLogger(logger)
-
 	content, err := os.ReadFile("config.yaml")
 	if err != nil {
 		log.Fatalln("load config file failed, err:", err)

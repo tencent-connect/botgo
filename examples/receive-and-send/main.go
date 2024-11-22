@@ -42,10 +42,7 @@ func main() {
 		log.Fatalln("parse config failed, err:", err)
 	}
 	log.Println("credentials:", credentials)
-	tokenSource := token.NewQQBotTokenSource(&token.QQBotCredentials{
-		AppID:     "",
-		AppSecret: "",
-	})
+	tokenSource := token.NewQQBotTokenSource(credentials)
 	if err = token.StartRefreshAccessToken(ctx, tokenSource); err != nil {
 		log.Fatalln(err)
 	}
