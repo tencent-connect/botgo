@@ -4,9 +4,8 @@ go 1.21
 
 require (
 	github.com/google/uuid v1.3.0
-	github.com/tencent-connect/botgo v0.0.0-00010101000000-000000000000
+	github.com/tencent-connect/botgo v0.1.7
 	go.uber.org/zap v1.19.1
-	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -22,5 +21,3 @@ require (
 	golang.org/x/oauth2 v0.23.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 )
-
-replace github.com/tencent-connect/botgo => ../

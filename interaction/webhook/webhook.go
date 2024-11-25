@@ -52,7 +52,7 @@ func HTTPHandler(w http.ResponseWriter, r *http.Request, credentials *token.QQBo
 		log.Errorf("read http callback body error: %s", err)
 		return
 	}
-	log.Debugf("http callback body: %v", string(body))
+	log.Debugf("http callback body: %s,len:%d", string(body), len(body))
 	log.Debugf("http callback header: %v", r.Header)
 	traceID := r.Header.Get(constant.HeaderTraceID)
 	// 签名验证

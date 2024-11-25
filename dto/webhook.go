@@ -8,6 +8,7 @@ type WHValidationReq struct {
 
 // WHValidationRsp 机器人回调验证响应结果
 type WHValidationRsp struct {
-	PlainToken string `json:"plain_token"`
-	Signature  string `json:"signature"`
+	PlainToken  string `json:"plain_token"`
+	Signature   string `json:"signature"`
+	DataVersion string `json:"data_version"` //数据格式版本号
 }
