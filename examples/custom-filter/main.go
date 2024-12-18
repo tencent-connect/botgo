@@ -29,7 +29,6 @@ const (
 )
 
 func main() {
-	ctx := context.Background()
 	openapi.RegisterReqFilter("set-trace", ReqFilter)
 	openapi.RegisterRespFilter("get-trace", RespFilter)
 	// 加载 appid 和 token
@@ -42,6 +41,8 @@ func main() {
 		log.Fatalln("parse config failed, err:", err)
 	}
 	tokenSource := token.NewQQBotTokenSource(credentials)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel() //释放刷新协程
 	if err = token.StartRefreshAccessToken(ctx, tokenSource); err != nil {
 		log.Fatalln(err)
 	}

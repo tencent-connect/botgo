@@ -179,28 +179,42 @@ func StartRefreshAccessToken(ctx context.Context, tokenSource oauth2.TokenSource
 	}
 	log.Debugf("token:%+v ", tk)
 	go func() {
+		var consecutiveFailures int
 		for {
-			refreshMilliSec := getRefreshMilliSec(tk.ExpiresIn)
+			var refreshMilliSec int64
+			//上一轮获取 tk 失败
+			if tk == nil {
+				if consecutiveFailures > 10 {
+					panic("get token failed continuously for more than ten times")
+				}
+				consecutiveFailures++
+				refreshMilliSec = 1000 // 1000ms后重试
+			} else {
+				consecutiveFailures = 0
+				refreshMilliSec = getRefreshMilliSec(tk.ExpiresIn)
+			}
 			log.Debugf("refresh after %d milli sec", refreshMilliSec)
-			ticker := time.NewTicker(time.Duration(refreshMilliSec) * time.Millisecond).C
+			timer := time.NewTimer(time.Duration(refreshMilliSec) * time.Millisecond)
 			select {
-			case <-ticker:
+			case <-timer.C:
 				{
 					log.Debugf("start to refresh access token %s", time.Now().Format(time.StampMilli))
 					tk, err = tokenSource.Token()
 					if err != nil {
 						log.Errorf("refresh access token failed:%s", err)
 					}
+					timer.Stop()
 				}
 			case <-ctx.Done():
 				{
 					log.Warnf("recv ctx:%v exit refresh token", ctx.Err())
+					timer.Stop()
 					return
 				}
 			}
 		}
 	}()
-	return err
+	return nil
 }
 
 var (

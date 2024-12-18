@@ -28,7 +28,6 @@ const (
 var processor Processor
 
 func main() {
-	ctx := context.Background()
 	// 加载 appid 和 token
 	content, err := os.ReadFile("config.yaml")
 	if err != nil {
@@ -43,6 +42,8 @@ func main() {
 	}
 	log.Println("credentials:", credentials)
 	tokenSource := token.NewQQBotTokenSource(credentials)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel() //释放刷新协程
 	if err = token.StartRefreshAccessToken(ctx, tokenSource); err != nil {
 		log.Fatalln(err)
 	}

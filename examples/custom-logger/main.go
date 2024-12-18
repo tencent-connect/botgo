@@ -26,8 +26,6 @@ const (
 )
 
 func main() {
-	ctx := context.Background()
-
 	// 初始化新的文件 logger，并使用相对路径来作为日志存放位置，设置最小日志界别为 DebugLevel
 	logger, err := New("./", DebugLevel)
 	if err != nil {
@@ -45,6 +43,8 @@ func main() {
 	}
 
 	tokenSource := token.NewQQBotTokenSource(credentials)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel() //释放刷新协程
 	if err = token.StartRefreshAccessToken(ctx, tokenSource); err != nil {
 		log.Fatalln(err)
 	}
