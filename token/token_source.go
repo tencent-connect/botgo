@@ -179,8 +179,20 @@ func StartRefreshAccessToken(ctx context.Context, tokenSource oauth2.TokenSource
 	}
 	log.Debugf("token:%+v ", tk)
 	go func() {
+		var consecutiveFailures int
 		for {
-			refreshMilliSec := getRefreshMilliSec(tk.ExpiresIn)
+			var refreshMilliSec int64
+			//上一轮获取 tk 失败
+			if tk == nil {
+				if consecutiveFailures > 10 {
+					panic("get token failed continuously for more than ten times")
+				}
+				consecutiveFailures++
+				refreshMilliSec = int64(time.Second)
+			} else {
+				consecutiveFailures = 0
+				refreshMilliSec = getRefreshMilliSec(tk.ExpiresIn)
+			}
 			log.Debugf("refresh after %d milli sec", refreshMilliSec)
 			ticker := time.NewTicker(time.Duration(refreshMilliSec) * time.Millisecond).C
 			select {
@@ -200,7 +212,7 @@ func StartRefreshAccessToken(ctx context.Context, tokenSource oauth2.TokenSource
 			}
 		}
 	}()
-	return err
+	return nil
 }
 
 var (
