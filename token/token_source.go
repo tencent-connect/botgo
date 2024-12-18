@@ -188,7 +188,7 @@ func StartRefreshAccessToken(ctx context.Context, tokenSource oauth2.TokenSource
 					panic("get token failed continuously for more than ten times")
 				}
 				consecutiveFailures++
-				refreshMilliSec = int64(time.Second)
+				refreshMilliSec = 1000 // 1000ms后重试
 			} else {
 				consecutiveFailures = 0
 				refreshMilliSec = getRefreshMilliSec(tk.ExpiresIn)
