@@ -1,7 +1,7 @@
 package dto
 
 // ReactionTargetType 表情表态对象类型
-type ReactionTargetType = int32
+type ReactionTargetType = string
 
 const (
 	// ReactionTargetTypeMsg 消息
