@@ -8,6 +8,8 @@ import (
 type WebSocket interface {
 	// New 创建一个新的ws实例，需要传递 session 对象
 	New(session dto.Session) WebSocket
+	// SetMsgHandler 设置消息处理回调
+	SetMsgHandler(handler func(payload *dto.WSPayload) error)
 	// Connect 连接到 wss 地址
 	Connect() error
 	// Identify 鉴权连接
