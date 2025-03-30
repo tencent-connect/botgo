@@ -1,3 +1,4 @@
 # 在这个配置文件中补充你的 appid 和 secret，并修改文件名为 config.yaml
-appid :
-secret :
+# 注意yaml文件要求key和value之间要有一个空格！！！
+appid: 
+secret: 
