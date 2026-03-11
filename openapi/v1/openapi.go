@@ -95,15 +95,15 @@ func (o *openAPI) setupClient(appID string) {
 			},
 		).
 		OnBeforeRequest(
-			func(c *resty.Client, _ *resty.Request) error {
+			func(_ *resty.Client, r *resty.Request) error {
 				tk, err := o.tokenSource.Token()
 				if err != nil {
 					log.Errorf("[setupClient] retrieve token failed:%s", err)
 					return err
 				}
-				c.SetAuthScheme(tk.TokenType)
+				r.SetAuthScheme(tk.TokenType)
 				log.Debugf("token type:%s", tk.TokenType)
-				c.SetAuthToken(tk.AccessToken)
+				r.SetAuthToken(tk.AccessToken)
 				return nil
 			},
 		).
